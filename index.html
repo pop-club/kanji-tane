@@ -134,6 +134,29 @@ footer { font-size: .78rem; color: var(--muted); }
 footer a { color: var(--accent); }
 .loading { position: absolute; inset: 0; display: grid; place-items: center; background: var(--surface); border-radius: var(--r); color: var(--muted); z-index: 2; }
 </style>
+<style>
+.tabs { flex-wrap: wrap; }
+.chip .n { font-size: .58rem; }
+.chip.done { background: var(--ok-bg); border-color: var(--ok); }
+.chip.partial { background: var(--retry-bg); border-color: var(--retry); }
+.chip.broken::after { content: ""; position: absolute; left: 4px; top: 4px; width: 6px; height: 6px; border-radius: 50%; background: var(--ng); }
+.samples { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 8px; }
+.sample { position: relative; aspect-ratio: 1; max-width: 100%; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
+.sample canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.sample .del { position: absolute; right: 4px; top: 4px; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ng); font-weight: 700; cursor: pointer; line-height: 1; }
+.sample .del:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+.empty { font-size: .85rem; color: var(--muted); padding: 10px 0; }
+.pick { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.pick input { width: 64px; height: 44px; font-family: var(--font-kanji); font-size: 1.4rem; text-align: center; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); }
+.pick .btn { min-height: 44px; padding: 0 16px; font-size: .9rem; }
+.meter { height: 8px; border-radius: 99px; background: var(--bg); overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--ok); width: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .75rem; color: var(--muted); }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; border: 1px solid var(--line); }
+.legend .l-done::before { background: var(--ok-bg); border-color: var(--ok); }
+.legend .l-part::before { background: var(--retry-bg); border-color: var(--retry); }
+.legend .l-broken::before { background: var(--ng); border-color: var(--ng); border-radius: 50%; width: 6px; height: 6px; }
+</style>
 
 <div class="app">
   <header>
@@ -144,6 +167,7 @@ footer a { color: var(--accent); }
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" id="tab-test" aria-selected="true">検証テスト（30字）</button>
     <button class="tab" role="tab" id="tab-free" aria-selected="false">自由に書く</button>
+    <button class="tab" role="tab" id="tab-reg" aria-selected="false">手本を登録</button>
   </div>
 
   <div class="main">
@@ -168,13 +192,36 @@ footer a { color: var(--accent); }
     </section>
 
     <section class="panel">
-      <div class="card">
+      <div class="card" id="verdictCard">
         <h2>判定</h2>
         <div class="verdict idle" id="verdict"><span>書いたら「はんてい」を押してください</span></div>
         <div class="cands" id="cands"></div>
         <div class="next-row" id="nextRow" hidden>
           <button class="btn" id="again">もう一度書く</button>
           <button class="btn primary" id="next">次の字へ</button>
+        </div>
+      </div>
+
+      <div class="card" id="regCard" hidden>
+        <h2>手本の登録</h2>
+        <div class="verdict idle" id="regMsg"><span>画数どおりに、ていねいに書いて「手本に登録」を押してください</span></div>
+        <div id="regList"></div>
+        <p class="note" id="regBundled"></p>
+      </div>
+
+      <div class="card" id="regPickCard" hidden>
+        <h2>登録する字</h2>
+        <div class="meter" aria-hidden="true"><i id="regMeter"></i></div>
+        <div class="status" id="regSummary"></div>
+        <div class="chips" id="regChips"></div>
+        <div class="legend">
+          <span class="l-done">3つ登録済み</span><span class="l-part">登録途中</span><span class="l-broken">元の手本に不具合がある字</span>
+        </div>
+        <div class="pick">
+          <label for="pickChar" class="note">ほかの字:</label>
+          <input id="pickChar" maxlength="2" autocomplete="off" aria-label="登録する字を1字入力">
+          <button class="btn" id="pickBtn">この字にする</button>
+          <span class="note" id="pickMsg"></span>
         </div>
       </div>
 
@@ -201,15 +248,16 @@ footer a { color: var(--accent); }
           <dt>画面</dt><dd id="eScreen">—</dd>
         </dl>
         <label class="toggle"><input type="checkbox" id="palm" checked> ペンを使ったら指のタッチを無視する（手のひら対策）</label>
+        <label class="toggle"><input type="checkbox" id="useExtras" checked> 登録した手本を判定に使う</label>
       </div>
 
       <div class="card">
         <h2>結果を送る</h2>
-        <p class="note">下の記録（判定結果と筆跡の座標）をコピーして、このチャットに貼り付けてください。実際の手書きで精度を再検証できます。データはこの端末の中にだけあり、自動では送信されません。</p>
-        <textarea id="exportBox" readonly aria-label="検証記録"></textarea>
+        <p class="note">判定の記録と登録した手本（筆跡の座標）をまとめてコピーできます。このチャットに貼り付けてください。データはこの端末の中にだけあり、自動では送信されません。</p>
+        <textarea id="exportBox" readonly aria-label="検証記録と手本"></textarea>
         <div class="row">
-          <button class="btn" id="copy">記録をコピー</button>
-          <button class="btn" id="reset">記録を消す</button>
+          <button class="btn" id="copy">記録と手本をコピー</button>
+          <button class="btn" id="reset">判定の記録を消す</button>
           <span class="note" id="copyMsg"></span>
         </div>
       </div>
@@ -217,24 +265,41 @@ footer a { color: var(--accent); }
   </div>
 
   <footer>
-    手書き認識: <a href="http://github.com/asdfjkl/kanjicanvas" target="_blank" rel="noopener">KanjiCanvas</a> © 2019-2024 Dominik Klein, © 2020 Seth Clydesdale (MIT License)。認識はすべてこの端末のブラウザ内で行います。
+    手書き認識: <a href="http://github.com/asdfjkl/kanjicanvas" target="_blank" rel="noopener">KanjiCanvas</a> © 2019-2024 Dominik Klein, © 2020 Seth Clydesdale (MIT License)。画数: kanji-data (MIT)。認識はすべてこの端末のブラウザ内で行います。
   </footer>
 </div>
 
 <script src="vendor/kanjicanvas/kanji-canvas.js"></script>
 <script src="js/joyo.js"></script>
+<script src="js/stroke-counts.js"></script>
+<script src="js/extra-samples.js"></script>
 <script src="js/recognizer.js"></script>
 <script>
 (function () {
   'use strict';
   // 検証用30字：指示書の似た字ペア + 追加の似た字 + 参照データに問題がある「衛」
   var TEST = '土士末未右石待持晴清味日目王玉大犬千干牛午矢失休体力刀問間衛'.split('');
-  var STORE = 'popkanji-step1-log';
+  // 手本を登録してほしい字：実際の手書きで誤認識した字 + 元の手本の画数が違う17字
+  var PRIORITY = '王玉右衛臨熟数歌社馬鳥鳴島進駅健散験慣敬'.split('');
+  // 元の手本が使えないほど壊れている字。登録した手本があれば元の手本を使わない
+  var REPLACED = '衛臨熟';
+  var BROKEN = '衛臨熟数歌社馬鳥鳴島進駅健散験慣敬';
+  var GOAL = 3;
+  var STORE = 'popkanji-step1-log', SSTORE = 'popkanji-step1-samples';
+  var STROKES = window.POPKANJI_STROKES || {};
+  var BUNDLED = window.POPKANJI_SAMPLES || [];
+  var R = window.PopKanjiRecognizer;
   var $ = function (id) { return document.getElementById(id); };
 
-  var state = { mode: 'test', idx: 0, log: [], loaded: false };
+  var state = { mode: 'test', idx: 0, log: [], loaded: false, regChar: PRIORITY[0], samples: [] };
   try { var saved = JSON.parse(localStorage.getItem(STORE) || 'null'); if (saved && saved.log) { state.log = saved.log; state.idx = saved.idx || 0; } } catch (e) {}
+  try { var ss = JSON.parse(localStorage.getItem(SSTORE) || 'null'); if (ss && ss.samples) state.samples = ss.samples; } catch (e) {}
   function save() { try { localStorage.setItem(STORE, JSON.stringify({ log: state.log, idx: state.idx })); } catch (e) {} }
+  var storageOk = true;
+  function saveSamples() {
+    try { localStorage.setItem(SSTORE, JSON.stringify({ samples: state.samples })); storageOk = true; }
+    catch (e) { storageOk = false; }
+  }
 
   // ---------- 外部通信の監視（このページが読み込んだリソースの送信先） ----------
   var foreign = [];
@@ -252,16 +317,40 @@ footer a { color: var(--accent); }
       : '<span class="netok">0件</span>（同じサイトのファイルのみ）';
   }
 
+  // ---------- 手本 ----------
+  var baseCount = 0;
+  function applyExtras() {
+    var list = [];
+    BUNDLED.concat(state.samples).forEach(function (s) {
+      try { list.push(R.makePattern(s.char, s.strokes, { width: 256, height: 256 })); } catch (e) {}
+    });
+    R.setExtras(list);
+    renderStatus();
+  }
+  function renderStatus() {
+    if (!state.loaded) return;
+    var n = BUNDLED.length + state.samples.length;
+    $('status').innerHTML = '認識対象 <b>' + baseCount + '</b> 字（常用漢字）・登録した手本 <b>' + n + '</b> 件' +
+      ($('useExtras').checked ? '' : '（使っていません）');
+  }
+  function countFor(ch) {
+    var n = 0;
+    state.samples.forEach(function (s) { if (s.char === ch) n++; });
+    BUNDLED.forEach(function (s) { if (s.char === ch) n++; });
+    return n;
+  }
+
   // ---------- 参照データの読み込み ----------
   var t0 = performance.now();
   var s = document.createElement('script');
   s.src = 'vendor/kanjicanvas/ref-patterns.js';
   s.onload = function () {
     var ms = performance.now() - t0;
-    var n = PopKanjiRecognizer.setCandidateSet(window.JOYO_KANJI);
+    baseCount = R.setCandidateSet(window.JOYO_KANJI);
+    R.setReplaced(REPLACED);
     state.loaded = true;
+    applyExtras();
     $('loading').remove();
-    $('status').innerHTML = '認識対象 <b>' + n + '</b> 字（常用漢字）・準備完了';
     $('eLoad').textContent = (ms / 1000).toFixed(1) + ' 秒（約6.7MB）';
     renderNet();
   };
@@ -294,22 +383,23 @@ footer a { color: var(--accent); }
     ctx.beginPath(); ctx.moveTo(size / 2, 8); ctx.lineTo(size / 2, size - 8); ctx.moveTo(8, size / 2); ctx.lineTo(size - 8, size / 2); ctx.stroke();
     ctx.restore();
   }
-  function drawStroke(st) {
+  function drawStroke(c, st) {
     if (!st.length) return;
-    ctx.beginPath(); ctx.moveTo(st[0][0], st[0][1]);
-    if (st.length === 1) ctx.lineTo(st[0][0] + 0.1, st[0][1] + 0.1);
-    for (var i = 1; i < st.length; i++) ctx.lineTo(st[i][0], st[i][1]);
-    ctx.stroke();
+    c.beginPath(); c.moveTo(st[0][0], st[0][1]);
+    if (st.length === 1) c.lineTo(st[0][0] + 0.1, st[0][1] + 0.1);
+    for (var i = 1; i < st.length; i++) c.lineTo(st[i][0], st[i][1]);
+    c.stroke();
   }
   function redraw() {
     ctx.clearRect(0, 0, size, size);
     drawGrid();
     ctx.strokeStyle = cssVar('--stroke'); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     ctx.lineWidth = Math.max(5, size / 45);
-    strokes.forEach(drawStroke);
-    if (cur) drawStroke(cur);
+    strokes.forEach(function (st) { drawStroke(ctx, st); });
+    if (cur) drawStroke(ctx, cur);
     $('hint').hidden = strokes.length > 0 || !!cur;
     $('undo').disabled = !strokes.length; $('clear').disabled = !strokes.length;
+    if (state.mode === 'reg') renderPrompt();
   }
   function pt(e) { var r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
 
@@ -355,18 +445,24 @@ footer a { color: var(--accent); }
   $('undo').onclick = function () { strokes.pop(); redraw(); };
   $('clear').onclick = function () { strokes = []; redraw(); };
 
+  function strokes256() {
+    return strokes.map(function (st) { return st.map(function (p) { return [Math.round(p[0] * 256 / size), Math.round(p[1] * 256 / size)]; }); });
+  }
+  function inputTypes() { return Object.keys(typesSeen).join('+'); }
+
   // ---------- 判定 ----------
   function currentTarget() { return state.mode === 'test' ? TEST[state.idx] : null; }
   var LABEL = { correct: '正解', retry: 'もう一度書いてね', wrong: '不正解' };
 
   $('judge').onclick = function () {
     if (!state.loaded || !strokes.length) return;
+    if (state.mode === 'reg') { registerSample(); return; }
     var t = performance.now();
-    var cands = PopKanjiRecognizer.recognize(strokes, { width: size, height: size }, 10);
+    var cands = R.recognize(strokes, { width: size, height: size }, 10);
     var ms = performance.now() - t;
     $('eMs').textContent = Math.round(ms) + ' ms（' + strokes.length + '画）';
     var target = currentTarget();
-    var j = target ? PopKanjiRecognizer.judge(cands, target) : null;
+    var j = target ? R.judge(cands, target) : null;
     renderCands(cands, target);
     var v = $('verdict');
     if (!target) {
@@ -383,9 +479,9 @@ footer a { color: var(--accent); }
       state.log.push({
         target: target, result: j.result, rank: j.rank, ratio: j.ratio ? +j.ratio.toFixed(3) : null,
         top: cands.slice(0, 5).map(function (c) { return c.char + ':' + c.score.toFixed(1); }).join(' '),
-        ms: Math.round(ms), input: Object.keys(typesSeen).join('+'), box: Math.round(size),
-        strokes: strokes.map(function (st) { return st.map(function (p) { return [Math.round(p[0] * 256 / size), Math.round(p[1] * 256 / size)]; }); }),
-        at: new Date().toISOString()
+        ms: Math.round(ms), input: inputTypes(), box: Math.round(size),
+        extras: $('useExtras').checked ? BUNDLED.length + state.samples.length : 0,
+        strokes: strokes256(), at: new Date().toISOString()
       });
       save(); renderLog();
       $('nextRow').hidden = false;
@@ -411,12 +507,112 @@ footer a { color: var(--accent); }
     $('cands').innerHTML = ''; $('nextRow').hidden = true;
   }
 
+  // ---------- 手本の登録 ----------
+  function regMsg(kind, big, detail) {
+    var m = $('regMsg');
+    m.className = 'verdict ' + kind;
+    m.innerHTML = big ? '<span class="big">' + big + '</span><span class="detail">' + detail + '</span>' : '<span>' + detail + '</span>';
+  }
+  function registerSample() {
+    var ch = state.regChar, std = STROKES[ch], n = strokes.length;
+    if (std && n !== std) {
+      regMsg('wrong', '画数が違います', '「' + ch + '」は' + std + '画です。いま' + n + '画でした。1画ずつ離して書き直してください。');
+      return;
+    }
+    var before = R.recognize(strokes, { width: size, height: size }, 3);
+    state.samples.push({ char: ch, strokes: strokes256(), input: inputTypes(), box: Math.round(size), at: new Date().toISOString(),
+      before: before.map(function (c) { return c.char; }).join('') });
+    saveSamples();
+    applyExtras();
+    strokes = []; redraw();
+    var k = countFor(ch);
+    var was = before.length ? '登録する前の認識は「' + before[0].char + '」でした。' : '';
+    var nextMsg = '';
+    if (k >= GOAL && state.mode === 'reg') {
+      var nxt = PRIORITY.filter(function (c) { return countFor(c) < GOAL; })[0];
+      if (nxt && PRIORITY.indexOf(ch) >= 0) { nextMsg = '「' + ch + '」はそろいました。次は「' + nxt + '」です。'; state.regChar = nxt; }
+      else if (!nxt) nextMsg = '登録してほしい字はすべてそろいました。ありがとうございます。';
+    }
+    regMsg('correct', '登録しました（' + Math.min(k, 99) + ' / ' + GOAL + '）', was + nextMsg + (storageOk ? '' : ' ※この端末に保存できませんでした。ページを閉じる前にコピーしてください。'));
+    renderReg(); renderPrompt(); renderExport();
+  }
+  function drawThumb(canvas, st) {
+    var px = 88 * (window.devicePixelRatio || 1);
+    canvas.width = px; canvas.height = px;
+    var c = canvas.getContext('2d'), k = px / 256;
+    c.strokeStyle = cssVar('--stroke'); c.lineCap = 'round'; c.lineJoin = 'round'; c.lineWidth = Math.max(2, px / 40);
+    st.forEach(function (s) { drawStroke(c, s.map(function (p) { return [p[0] * k, p[1] * k]; })); });
+  }
+  function renderReg() {
+    var ch = state.regChar;
+    var list = $('regList'); list.innerHTML = '';
+    var mine = [];
+    state.samples.forEach(function (s, i) { if (s.char === ch) mine.push(i); });
+    if (!mine.length) {
+      list.innerHTML = '<div class="empty">「' + ch + '」の手本はまだ登録されていません。</div>';
+    } else {
+      var grid = document.createElement('div'); grid.className = 'samples';
+      mine.forEach(function (i, n) {
+        var box = document.createElement('div'); box.className = 'sample';
+        var c = document.createElement('canvas'); box.appendChild(c);
+        var b = document.createElement('button'); b.className = 'del'; b.textContent = '×';
+        b.setAttribute('aria-label', '「' + ch + '」の手本' + (n + 1) + 'を削除');
+        b.onclick = function () {
+          state.samples.splice(i, 1); saveSamples(); applyExtras();
+          regMsg('idle', '', '「' + ch + '」の手本を1つ削除しました。');
+          renderReg(); renderPrompt(); renderExport();
+        };
+        box.appendChild(b); grid.appendChild(box);
+        drawThumb(c, state.samples[i].strokes);
+      });
+      list.appendChild(grid);
+    }
+    var bn = BUNDLED.filter(function (s) { return s.char === ch; }).length;
+    $('regBundled').textContent = bn ? 'このほかに、アプリに同梱済みの手本が ' + bn + ' 件あります。' : '';
+
+    var chips = $('regChips'); chips.innerHTML = '';
+    var done = 0;
+    var extra = state.samples.map(function (s) { return s.char; }).concat(BUNDLED.map(function (s) { return s.char; }))
+      .filter(function (c, i, a) { return PRIORITY.indexOf(c) < 0 && a.indexOf(c) === i; });
+    PRIORITY.concat(extra).forEach(function (k) {
+      var n = countFor(k);
+      if (PRIORITY.indexOf(k) >= 0 && n >= GOAL) done++;
+      var b = document.createElement('button');
+      b.className = 'chip' + (n >= GOAL ? ' done' : n ? ' partial' : '') + (BROKEN.indexOf(k) >= 0 ? ' broken' : '') + (k === ch ? ' cur' : '');
+      b.innerHTML = k + '<span class="n">' + n + '/' + GOAL + '</span>';
+      b.setAttribute('aria-label', k + ' 登録 ' + n + ' 件');
+      b.onclick = function () { pickChar(k); };
+      chips.appendChild(b);
+    });
+    $('regSummary').innerHTML = '登録してほしい ' + PRIORITY.length + ' 字のうち <b>' + done + '</b> 字がそろいました（1字につき ' + GOAL + ' つ）';
+    $('regMeter').style.width = (100 * done / PRIORITY.length) + '%';
+  }
+  function pickChar(k) {
+    state.regChar = k; strokes = []; redraw();
+    regMsg('idle', '', '画数どおりに、ていねいに書いて「手本に登録」を押してください');
+    $('pickMsg').textContent = '';
+    renderReg(); renderPrompt();
+  }
+  $('pickBtn').onclick = function () {
+    var v = Array.from(($('pickChar').value || '').trim())[0];
+    if (!v || !STROKES[v]) { $('pickMsg').textContent = '常用漢字を1字入れてください。'; return; }
+    $('pickChar').value = '';
+    pickChar(v);
+  };
+  $('pickChar').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.isComposing) $('pickBtn').click(); });
+
   // ---------- 表示 ----------
   function renderPrompt() {
     if (state.mode === 'test') {
       $('target').textContent = TEST[state.idx]; $('target').hidden = false;
       $('promptText').textContent = 'この字を書いてください';
       $('promptSub').textContent = (state.idx + 1) + ' / ' + TEST.length + ' ・ 書き順は自由です';
+    } else if (state.mode === 'reg') {
+      var ch = state.regChar, std = STROKES[ch];
+      $('target').textContent = ch; $('target').hidden = false;
+      $('promptText').textContent = 'この字を手本として書いてください';
+      $('promptSub').textContent = (std ? '正しい画数 ' + std + '画 ・ いま ' + strokes.length + '画' : 'いま ' + strokes.length + '画') +
+        ' ・ 登録 ' + countFor(ch) + ' / ' + GOAL;
     } else {
       $('target').hidden = true;
       $('promptText').textContent = '好きな漢字を書いてください';
@@ -438,36 +634,50 @@ footer a { color: var(--accent); }
       b.onclick = function () { setMode('test'); state.idx = i; save(); strokes = []; redraw(); resetVerdict(); renderPrompt(); renderLog(); };
       chips.appendChild(b);
     });
-    $('exportBox').value = n ? JSON.stringify({
+    $('reset').disabled = !n;
+    renderExport();
+  }
+  function renderExport() {
+    var n = state.log.length, m = state.samples.length;
+    var summary = { correct: 0, retry: 0, wrong: 0 };
+    state.log.forEach(function (r) { summary[r.result]++; });
+    $('exportBox').value = (n || m) ? JSON.stringify({
       app: 'Pop-Kanji STEP1', ua: navigator.userAgent, screen: [screen.width, screen.height, window.devicePixelRatio],
-      summary: c, log: state.log
+      summary: summary, log: state.log, samples: state.samples
     }) : '';
-    $('copy').disabled = !n; $('reset').disabled = !n;
+    $('copy').disabled = !(n || m);
   }
 
   function setMode(m) {
     state.mode = m;
-    $('tab-test').setAttribute('aria-selected', m === 'test'); $('tab-free').setAttribute('aria-selected', m === 'free');
+    ['test', 'free', 'reg'].forEach(function (k) { $('tab-' + k).setAttribute('aria-selected', m === k); });
+    $('verdictCard').hidden = m === 'reg';
+    $('progressCard').hidden = m === 'reg';
+    $('regCard').hidden = m !== 'reg';
+    $('regPickCard').hidden = m !== 'reg';
+    $('judge').textContent = m === 'reg' ? '手本に登録' : 'はんてい';
     strokes = []; redraw(); resetVerdict(); renderPrompt(); renderLog();
+    if (m === 'reg') { regMsg('idle', '', '画数どおりに、ていねいに書いて「手本に登録」を押してください'); renderReg(); }
   }
   $('tab-test').onclick = function () { setMode('test'); };
   $('tab-free').onclick = function () { setMode('free'); };
+  $('tab-reg').onclick = function () { setMode('reg'); };
+  $('useExtras').onchange = function () { R.setUseExtras(this.checked); renderStatus(); };
 
   $('copy').onclick = function () {
     var box = $('exportBox');
     var done = function () { $('copyMsg').textContent = 'コピーしました。チャットに貼り付けてください。'; };
-    try {
-      navigator.clipboard.writeText(box.value).then(done, function () { box.focus(); box.select(); $('copyMsg').textContent = '選択しました。長押しでコピーしてください。'; });
-    } catch (e) { box.focus(); box.select(); $('copyMsg').textContent = '選択しました。長押しでコピーしてください。'; }
+    var fallback = function () { box.focus(); box.select(); $('copyMsg').textContent = '選択しました。長押しでコピーしてください。'; };
+    try { navigator.clipboard.writeText(box.value).then(done, fallback); } catch (e) { fallback(); }
   };
   var resetArmed = false;
   $('reset').onclick = function () {
-    if (!resetArmed) { resetArmed = true; $('reset').textContent = '本当に消す'; setTimeout(function () { resetArmed = false; $('reset').textContent = '記録を消す'; }, 4000); return; }
-    state.log = []; state.idx = 0; save(); resetArmed = false; $('reset').textContent = '記録を消す'; renderPrompt(); renderLog(); resetVerdict();
+    if (!resetArmed) { resetArmed = true; $('reset').textContent = '本当に消す'; setTimeout(function () { resetArmed = false; $('reset').textContent = '判定の記録を消す'; }, 4000); return; }
+    state.log = []; state.idx = 0; save(); resetArmed = false; $('reset').textContent = '判定の記録を消す'; renderPrompt(); renderLog(); resetVerdict();
   };
 
   new ResizeObserver(resize).observe(pad);
-  if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redraw);
+  if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () { redraw(); if (state.mode === 'reg') renderReg(); });
   renderPrompt(); renderLog(); resize();
 })();
 </script>

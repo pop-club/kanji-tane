@@ -106,13 +106,6 @@
     var f = features(strokes, box);
     return [ch, f.length, f];
   }
-  function addPatterns(list) {
-    if (!allPatterns) allPatterns = KC.refPatterns;
-    allPatterns = allPatterns.concat(list);
-    var cur = KC.refPatterns;
-    KC.refPatterns = cur.concat(list);
-    return list.length;
-  }
 
   /*
    * 出題漢字との照合。認識失敗と書き間違いを区別する。
@@ -136,21 +129,49 @@
     return { result: 'wrong', rank: rank, ratio: r, seenAs: candidates[0].char };
   }
 
-  // 認識対象の文字を絞り込む（例：常用漢字のみ）。null で全パターンに戻す。
-  var allPatterns = null;
-  function setCandidateSet(chars) {
-    if (!allPatterns) allPatterns = KC.refPatterns;
-    if (!chars) { KC.refPatterns = allPatterns; return allPatterns.length; }
-    var set = {};
-    for (var i = 0; i < chars.length; i++) set[chars[i]] = true;
-    KC.refPatterns = allPatterns.filter(function (p) { return set[p[0]]; });
-    return KC.refPatterns.length;
+  /*
+   * 手本の管理
+   *  base:     同梱の参照パターン（KanjiCanvas）
+   *  extras:   手書きで登録した手本（字ごとに複数可）
+   *  replaced: 元の手本が壊れているため、登録した手本があれば元を使わない字
+   */
+  var base = null, extras = [], candidateSet = null, useExtras = true;
+  var replaced = {};
+  function rebuild() {
+    if (!base) base = KC.refPatterns;
+    var extraChars = {};
+    if (useExtras) extras.forEach(function (p) { extraChars[p[0]] = true; });
+    var list = base.filter(function (p) {
+      if (candidateSet && !candidateSet[p[0]]) return false;
+      if (useExtras && replaced[p[0]] && extraChars[p[0]]) return false;
+      return true;
+    });
+    if (useExtras) list = list.concat(extras.filter(function (p) { return !candidateSet || candidateSet[p[0]]; }));
+    KC.refPatterns = list;
+    return list.length;
   }
+  // 認識対象の文字を絞り込む（例：常用漢字のみ）。null で全パターンに戻す。
+  function setCandidateSet(chars) {
+    if (!base) base = KC.refPatterns;
+    candidateSet = null;
+    if (chars) { candidateSet = {}; for (var i = 0; i < chars.length; i++) candidateSet[chars[i]] = true; }
+    rebuild();
+    return base.filter(function (p) { return !candidateSet || candidateSet[p[0]]; }).length;
+  }
+  function addPatterns(list) { extras = extras.concat(list); rebuild(); return extras.length; }
+  function clearPatterns() { extras = []; rebuild(); }
+  function setExtras(list) { extras = list.slice(); rebuild(); return extras.length; }
+  function setUseExtras(v) { useExtras = !!v; rebuild(); }
+  function setReplaced(chars) { replaced = {}; for (var i = 0; i < chars.length; i++) replaced[chars[i]] = true; rebuild(); }
 
   function setStrokePenalty(v) { strokePenalty = v; }
 
-  var api = { setStrokePenalty: setStrokePenalty, recognize: recognize, judge: judge, resample: resample, setCandidateSet: setCandidateSet,
-    makePattern: makePattern, addPatterns: addPatterns };
+  var api = {
+    recognize: recognize, judge: judge, resample: resample, features: features,
+    setCandidateSet: setCandidateSet, setStrokePenalty: setStrokePenalty,
+    makePattern: makePattern, addPatterns: addPatterns, clearPatterns: clearPatterns,
+    setExtras: setExtras, setUseExtras: setUseExtras, setReplaced: setReplaced
+  };
   root.PopKanjiRecognizer = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

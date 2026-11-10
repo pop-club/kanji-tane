@@ -7,6 +7,8 @@ index.html                 検証ページ本体（Canvas + Pointer Events）
 build.sh                   静的ホスティング用に build/index.html を書き出す
 js/recognizer.js           認識ラッパー（筆跡→候補10件＋距離、正誤判定）
 js/joyo.js                 常用漢字2136字（認識対象の絞り込み用）
+js/stroke-counts.js        常用漢字の標準画数（kanji-data, MIT）。手本登録の画数チェックに使う
+js/extra-samples.js        手書きで登録した手本（同梱分）。tools/import_samples.js で生成
 vendor/kanjicanvas/        KanjiCanvas 本体・参照パターン・ライセンス（MIT）
 data/grade-kanji.json      学年別漢字配当表（2020年度施行）小1〜小6 1026字
 data/joyo-kanji.txt        常用漢字一覧
@@ -16,6 +18,7 @@ tools/threshold.js         判定しきい値の検証
 tools/kvg.js               テスト用：KanjiVG の筆画に手書きらしい歪みを加える
 tools/penalty_test.js      画数差の上乗せ量の比較（手書き記録・合成・似た字ペア）
 tools/augment_test.js      手書きの手本を追加したときの効果と副作用
+tools/import_samples.js    検証ページの「記録と手本」を取り込み、同梱の手本を作り直す
 data/user-samples/         検証ページから集めた実際の手書き記録
 results/                   テスト結果（JSON）
 ```
@@ -62,3 +65,11 @@ cd build && python3 -m http.server 8000
 正解26・書き直し5・不正解3（画数差の上乗せ後）。
 正しく書いたのに不正解：衛（手本の不具合）、王（→工）、右（→石）。
 王・右・玉は手本1つでは足りないため、手書きの手本を追加する必要がある。
+
+## 手本の登録（検証ページの「手本を登録」タブ）
+
+- 正しい画数で書いたときだけ登録できる（画数は js/stroke-counts.js で確認）
+- 登録した手本はその端末に保存され、すぐ判定に使われる（「登録した手本を判定に使う」で切り替え可）
+- 衛・臨・熟は元の手本が壊れているため、登録した手本があれば元の手本を使わない
+- 「記録と手本をコピー」した内容を `node tools/import_samples.js <ファイル>` で取り込むと、アプリに同梱される
+- 手本はアプリ利用者本人の手書きなので、第三者のライセンスは関係しない
