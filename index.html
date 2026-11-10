@@ -1,0 +1,473 @@
+<title>Pop-Kanji 認識テスト</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: 横向き＝左に大きな正方形の書き取り枠、右に判定と記録。縦向き・スマホ＝縦に積む */
+:root {
+  --bg: #f6f8fb;
+  --surface: #ffffff;
+  --ink: #1f2a37;
+  --muted: #5b6878;
+  --line: #d9e0ea;
+  --accent: #2f6fed;      /* 操作ボタン */
+  --accent-ink: #ffffff;
+  --grid: #c9d3e1;        /* 書き取り枠の補助線 */
+  --stroke: #1f2a37;      /* 筆跡 */
+  --ok: #1f8a4c;
+  --ok-bg: #e4f5ea;
+  --retry: #a35f00;
+  --retry-bg: #fff1d6;
+  --ng: #c23434;
+  --ng-bg: #fde7e7;
+  --font-ui: "Hiragino Maru Gothic ProN", "Hiragino Sans", "BIZ UDPGothic", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+  --font-kanji: "Hiragino Mincho ProN", "Yu Mincho", "BIZ UDPMincho", "Noto Serif JP", serif;
+  --font-data: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121820; --surface: #1b232e; --ink: #e8edf4; --muted: #9aa8b8; --line: #2c3746;
+    --accent: #6b9bff; --accent-ink: #0d1520; --grid: #34465c; --stroke: #f2f5f9;
+    --ok: #5fd08f; --ok-bg: #173325; --retry: #f2b24d; --retry-bg: #3a2b12; --ng: #ff8080; --ng-bg: #3d1c1c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121820; --surface: #1b232e; --ink: #e8edf4; --muted: #9aa8b8; --line: #2c3746;
+  --accent: #6b9bff; --accent-ink: #0d1520; --grid: #34465c; --stroke: #f2f5f9;
+  --ok: #5fd08f; --ok-bg: #173325; --retry: #f2b24d; --retry-bg: #3a2b12; --ng: #ff8080; --ng-bg: #3d1c1c;
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+html, body { overscroll-behavior: none; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-ui); font-size: 15px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 12px 32px;
+  -webkit-text-size-adjust: 100%;
+}
+button { font: inherit; }
+.app { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+h1 { font-size: 1.35rem; margin: 0; letter-spacing: .02em; text-wrap: balance; }
+h1 small { font-size: .8rem; color: var(--muted); font-weight: 500; margin-left: 8px; }
+.status { font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.status b { color: var(--ink); font-weight: 600; }
+
+.tabs { display: flex; gap: 6px; }
+.tab { border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 8px 16px; border-radius: 999px; cursor: pointer; min-height: 44px; }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+.main { display: grid; grid-template-columns: minmax(0, min(68vh, 620px)) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 860px), (orientation: portrait) { .main { grid-template-columns: minmax(0, 1fr); } }
+
+.writer { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+.prompt { display: flex; align-items: center; gap: 14px; min-height: 64px; }
+.prompt .target { font-family: var(--font-kanji); font-size: 2.6rem; line-height: 1; width: 64px; height: 64px; display: grid; place-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+.prompt .text { min-width: 0; }
+.prompt .text b { font-size: 1.05rem; }
+.prompt .text div { color: var(--muted); font-size: .85rem; }
+
+.pad {
+  position: relative; width: 100%; aspect-ratio: 1; max-width: 100%;
+  background: var(--surface); border: 2px solid var(--line); border-radius: var(--r);
+  touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
+@media (max-width: 860px), (orientation: portrait) { .pad, .controls { width: min(100%, 56vh, 620px); justify-self: center; } .writer { align-items: center; } .prompt { align-self: stretch; } }
+.pad canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; border-radius: var(--r); touch-action: none; }
+.pad .hint { position: absolute; left: 0; right: 0; bottom: 10px; text-align: center; color: var(--muted); font-size: .85rem; pointer-events: none; }
+
+.controls { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 10px; width: 100%; }
+.btn { min-height: 56px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-size: 1rem; font-weight: 600; cursor: pointer; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn:focus-visible, .tab:focus-visible, .chip:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.panel { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card h2 { font-size: .8rem; letter-spacing: .08em; color: var(--muted); margin: 0; font-weight: 600; }
+
+.verdict { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; font-weight: 600; }
+.verdict .big { font-size: 1.3rem; }
+.verdict.correct { background: var(--ok-bg); color: var(--ok); }
+.verdict.retry { background: var(--retry-bg); color: var(--retry); }
+.verdict.wrong { background: var(--ng-bg); color: var(--ng); }
+.verdict.idle { background: var(--bg); color: var(--muted); font-weight: 500; }
+.verdict .detail { font-weight: 500; font-size: .85rem; color: var(--ink); }
+
+.cands { display: flex; flex-wrap: wrap; gap: 6px; }
+.cand { display: flex; flex-direction: column; align-items: center; min-width: 52px; padding: 6px 4px 4px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
+.cand .k { font-family: var(--font-kanji); font-size: 1.7rem; line-height: 1.1; }
+.cand .s { font-family: var(--font-data); font-size: .68rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cand.hit { border-color: var(--ok); background: var(--ok-bg); }
+.cand.first .k { font-weight: 700; }
+
+.next-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.next-row .btn { flex: 1 1 140px; min-height: 48px; }
+
+.chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 6px; }
+.chip { height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font-family: var(--font-kanji); font-size: 1.35rem; cursor: pointer; position: relative; }
+.chip.cur { outline: 2px solid var(--accent); outline-offset: 1px; }
+.chip.correct { background: var(--ok-bg); border-color: var(--ok); }
+.chip.retry { background: var(--retry-bg); border-color: var(--retry); }
+.chip.wrong { background: var(--ng-bg); border-color: var(--ng); }
+.chip .n { position: absolute; right: 3px; top: 1px; font-family: var(--font-data); font-size: .6rem; color: var(--muted); }
+
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; text-align: center; }
+.stats div { background: var(--bg); border-radius: 10px; padding: 8px 4px; }
+.stats b { display: block; font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+.stats span { font-size: .72rem; color: var(--muted); }
+
+dl.env { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 12px; margin: 0; font-size: .85rem; }
+dl.env dt { color: var(--muted); }
+dl.env dd { margin: 0; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.netok { color: var(--ok); font-weight: 600; }
+.netng { color: var(--ng); font-weight: 600; }
+
+textarea { width: 100%; min-height: 110px; font-family: var(--font-data); font-size: .72rem; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); padding: 8px; box-sizing: border-box; resize: vertical; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.row .btn { min-height: 44px; padding: 0 16px; font-size: .9rem; }
+.note { font-size: .8rem; color: var(--muted); margin: 0; }
+label.toggle { display: flex; align-items: center; gap: 8px; font-size: .85rem; min-height: 32px; }
+label.toggle input { width: 20px; height: 20px; }
+footer { font-size: .78rem; color: var(--muted); }
+footer a { color: var(--accent); }
+.loading { position: absolute; inset: 0; display: grid; place-items: center; background: var(--surface); border-radius: var(--r); color: var(--muted); z-index: 2; }
+</style>
+
+<div class="app">
+  <header>
+    <h1>Pop-Kanji 認識テスト<small>STEP 1 技術検証版</small></h1>
+    <div class="status" id="status">参照データを読み込み中…</div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-test" aria-selected="true">検証テスト（30字）</button>
+    <button class="tab" role="tab" id="tab-free" aria-selected="false">自由に書く</button>
+  </div>
+
+  <div class="main">
+    <section class="writer">
+      <div class="prompt">
+        <div class="target" id="target">土</div>
+        <div class="text">
+          <b id="promptText">この字を書いてください</b>
+          <div id="promptSub">1 / 30 ・ 書き順は自由です</div>
+        </div>
+      </div>
+      <div class="pad" id="pad">
+        <canvas id="ink" aria-label="手書き入力欄"></canvas>
+        <div class="hint" id="hint">ここに指・ペンで書きます</div>
+        <div class="loading" id="loading">認識データを読み込み中…</div>
+      </div>
+      <div class="controls">
+        <button class="btn" id="undo">1画もどす</button>
+        <button class="btn" id="clear">ぜんぶけす</button>
+        <button class="btn primary" id="judge">はんてい</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="card">
+        <h2>判定</h2>
+        <div class="verdict idle" id="verdict"><span>書いたら「はんてい」を押してください</span></div>
+        <div class="cands" id="cands"></div>
+        <div class="next-row" id="nextRow" hidden>
+          <button class="btn" id="again">もう一度書く</button>
+          <button class="btn primary" id="next">次の字へ</button>
+        </div>
+      </div>
+
+      <div class="card" id="progressCard">
+        <h2>検証の記録</h2>
+        <div class="stats">
+          <div><b id="sN">0</b><span>判定回数</span></div>
+          <div><b id="sOk">0</b><span>正解</span></div>
+          <div><b id="sRe">0</b><span>書き直し</span></div>
+          <div><b id="sNg">0</b><span>不正解</span></div>
+        </div>
+        <div class="chips" id="chips"></div>
+        <p class="note">字をタップするとその字に移動します。正しく書いたのに「不正解」になった字が、報告してほしい誤認識です。</p>
+      </div>
+
+      <div class="card">
+        <h2>この端末の動作</h2>
+        <dl class="env">
+          <dt>入力の種類</dt><dd id="eType">—</dd>
+          <dt>入力の細かさ</dt><dd id="eRate">—</dd>
+          <dt>認識にかかった時間</dt><dd id="eMs">—</dd>
+          <dt>データ読み込み</dt><dd id="eLoad">—</dd>
+          <dt>外部への通信</dt><dd id="eNet">確認中</dd>
+          <dt>画面</dt><dd id="eScreen">—</dd>
+        </dl>
+        <label class="toggle"><input type="checkbox" id="palm" checked> ペンを使ったら指のタッチを無視する（手のひら対策）</label>
+      </div>
+
+      <div class="card">
+        <h2>結果を送る</h2>
+        <p class="note">下の記録（判定結果と筆跡の座標）をコピーして、このチャットに貼り付けてください。実際の手書きで精度を再検証できます。データはこの端末の中にだけあり、自動では送信されません。</p>
+        <textarea id="exportBox" readonly aria-label="検証記録"></textarea>
+        <div class="row">
+          <button class="btn" id="copy">記録をコピー</button>
+          <button class="btn" id="reset">記録を消す</button>
+          <span class="note" id="copyMsg"></span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    手書き認識: <a href="http://github.com/asdfjkl/kanjicanvas" target="_blank" rel="noopener">KanjiCanvas</a> © 2019-2024 Dominik Klein, © 2020 Seth Clydesdale (MIT License)。認識はすべてこの端末のブラウザ内で行います。
+  </footer>
+</div>
+
+<script src="vendor/kanjicanvas/kanji-canvas.js"></script>
+<script src="js/joyo.js"></script>
+<script src="js/recognizer.js"></script>
+<script>
+(function () {
+  'use strict';
+  // 検証用30字：指示書の似た字ペア + 追加の似た字 + 参照データに問題がある「衛」
+  var TEST = '土士末未右石待持晴清味日目王玉大犬千干牛午矢失休体力刀問間衛'.split('');
+  var STORE = 'popkanji-step1-log';
+  var $ = function (id) { return document.getElementById(id); };
+
+  var state = { mode: 'test', idx: 0, log: [], loaded: false };
+  try { var saved = JSON.parse(localStorage.getItem(STORE) || 'null'); if (saved && saved.log) { state.log = saved.log; state.idx = saved.idx || 0; } } catch (e) {}
+  function save() { try { localStorage.setItem(STORE, JSON.stringify({ log: state.log, idx: state.idx })); } catch (e) {} }
+
+  // ---------- 外部通信の監視（このページが読み込んだリソースの送信先） ----------
+  var foreign = [];
+  function checkEntry(e) {
+    try { var u = new URL(e.name, location.href); if (u.origin !== location.origin && u.protocol.indexOf('http') === 0) foreign.push(u.host); } catch (x) {}
+  }
+  try {
+    performance.getEntriesByType('resource').forEach(checkEntry);
+    new PerformanceObserver(function (l) { l.getEntries().forEach(checkEntry); renderNet(); }).observe({ type: 'resource', buffered: true });
+  } catch (e) {}
+  function renderNet() {
+    var hosts = Array.from(new Set(foreign));
+    $('eNet').innerHTML = hosts.length
+      ? '<span class="netng">他サイトへの読み込みあり: ' + hosts.join(', ') + '</span>'
+      : '<span class="netok">0件</span>（同じサイトのファイルのみ）';
+  }
+
+  // ---------- 参照データの読み込み ----------
+  var t0 = performance.now();
+  var s = document.createElement('script');
+  s.src = 'vendor/kanjicanvas/ref-patterns.js';
+  s.onload = function () {
+    var ms = performance.now() - t0;
+    var n = PopKanjiRecognizer.setCandidateSet(window.JOYO_KANJI);
+    state.loaded = true;
+    $('loading').remove();
+    $('status').innerHTML = '認識対象 <b>' + n + '</b> 字（常用漢字）・準備完了';
+    $('eLoad').textContent = (ms / 1000).toFixed(1) + ' 秒（約6.7MB）';
+    renderNet();
+  };
+  s.onerror = function () { $('loading').textContent = '認識データを読み込めませんでした。ページを再読み込みしてください。'; };
+  document.body.appendChild(s);
+
+  // ---------- 手書き入力（Pointer Events） ----------
+  var pad = $('pad'), cv = $('ink'), ctx = cv.getContext('2d');
+  var strokes = [], cur = null, activeId = null, penSeen = false, size = 0;
+  var typesSeen = {}, moveCount = 0, moveTime = 0, lastMoveT = 0;
+
+  function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+  function resize() {
+    var r = pad.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    var newSize = r.width;
+    if (size && newSize !== size) { // 画面回転時は筆跡を拡大縮小して保持
+      var k = newSize / size;
+      strokes = strokes.map(function (st) { return st.map(function (p) { return [p[0] * k, p[1] * k]; }); });
+    }
+    size = newSize;
+    cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    redraw();
+    $('eScreen').textContent = Math.round(window.innerWidth) + '×' + Math.round(window.innerHeight) + ' / 枠 ' + Math.round(size) + 'px / ' +
+      (window.innerWidth > window.innerHeight ? '横向き' : '縦向き') + ' / 倍率 ' + (window.devicePixelRatio || 1);
+  }
+  function drawGrid() {
+    ctx.save();
+    ctx.strokeStyle = cssVar('--grid'); ctx.lineWidth = 1; ctx.setLineDash([6, 6]);
+    ctx.beginPath(); ctx.moveTo(size / 2, 8); ctx.lineTo(size / 2, size - 8); ctx.moveTo(8, size / 2); ctx.lineTo(size - 8, size / 2); ctx.stroke();
+    ctx.restore();
+  }
+  function drawStroke(st) {
+    if (!st.length) return;
+    ctx.beginPath(); ctx.moveTo(st[0][0], st[0][1]);
+    if (st.length === 1) ctx.lineTo(st[0][0] + 0.1, st[0][1] + 0.1);
+    for (var i = 1; i < st.length; i++) ctx.lineTo(st[i][0], st[i][1]);
+    ctx.stroke();
+  }
+  function redraw() {
+    ctx.clearRect(0, 0, size, size);
+    drawGrid();
+    ctx.strokeStyle = cssVar('--stroke'); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.lineWidth = Math.max(5, size / 45);
+    strokes.forEach(drawStroke);
+    if (cur) drawStroke(cur);
+    $('hint').hidden = strokes.length > 0 || !!cur;
+    $('undo').disabled = !strokes.length; $('clear').disabled = !strokes.length;
+  }
+  function pt(e) { var r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+
+  cv.addEventListener('pointerdown', function (e) {
+    if (!state.loaded) return;
+    if (e.pointerType === 'pen') penSeen = true;
+    if (penSeen && $('palm').checked && e.pointerType === 'touch') return; // 手のひら対策
+    if (activeId !== null) return; // 2本目の指は無視
+    e.preventDefault();
+    activeId = e.pointerId;
+    try { cv.setPointerCapture(e.pointerId); } catch (x) {}
+    typesSeen[e.pointerType] = true;
+    $('eType').textContent = Object.keys(typesSeen).map(function (t) { return { pen: 'ペン', touch: '指', mouse: 'マウス' }[t] || t; }).join('・');
+    cur = [pt(e)];
+    lastMoveT = e.timeStamp;
+    redraw();
+  });
+  cv.addEventListener('pointermove', function (e) {
+    if (e.pointerId !== activeId || !cur) return;
+    e.preventDefault();
+    var evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+    if (!evs.length) evs = [e];
+    for (var i = 0; i < evs.length; i++) cur.push(pt(evs[i]));
+    moveCount += evs.length; moveTime += e.timeStamp - lastMoveT; lastMoveT = e.timeStamp;
+    redraw();
+  });
+  function endStroke(e) {
+    if (e.pointerId !== activeId) return;
+    activeId = null;
+    if (cur && cur.length) strokes.push(cur);
+    cur = null;
+    if (moveTime > 0) $('eRate').textContent = '約 ' + Math.round(moveCount / (moveTime / 1000)) + ' 点/秒';
+    redraw();
+  }
+  cv.addEventListener('pointerup', endStroke);
+  cv.addEventListener('pointercancel', endStroke);
+  ['contextmenu', 'selectstart', 'dblclick'].forEach(function (t) { pad.addEventListener(t, function (e) { e.preventDefault(); }); });
+  // iOS Safari のスクロール・拡大を確実に止める
+  pad.addEventListener('touchstart', function (e) { e.preventDefault(); }, { passive: false });
+  pad.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
+  document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+
+  $('undo').onclick = function () { strokes.pop(); redraw(); };
+  $('clear').onclick = function () { strokes = []; redraw(); };
+
+  // ---------- 判定 ----------
+  function currentTarget() { return state.mode === 'test' ? TEST[state.idx] : null; }
+  var LABEL = { correct: '正解', retry: 'もう一度書いてね', wrong: '不正解' };
+
+  $('judge').onclick = function () {
+    if (!state.loaded || !strokes.length) return;
+    var t = performance.now();
+    var cands = PopKanjiRecognizer.recognize(strokes, { width: size, height: size }, 10);
+    var ms = performance.now() - t;
+    $('eMs').textContent = Math.round(ms) + ' ms（' + strokes.length + '画）';
+    var target = currentTarget();
+    var j = target ? PopKanjiRecognizer.judge(cands, target) : null;
+    renderCands(cands, target);
+    var v = $('verdict');
+    if (!target) {
+      v.className = 'verdict idle';
+      v.innerHTML = cands.length ? '<span>1位は <b style="font-family:var(--font-kanji);font-size:1.4rem">' + cands[0].char + '</b> です</span>'
+                                 : '<span>候補が見つかりませんでした。画数が多すぎるか少なすぎる可能性があります。</span>';
+    } else {
+      v.className = 'verdict ' + j.result;
+      var d = '';
+      if (j.result === 'correct') d = '1位で認識しました';
+      else if (j.result === 'retry') d = (j.rank < 0 ? '字として読み取れませんでした。' : '「' + j.seenAs + '」と迷いました。') + '不正解にはしません。';
+      else d = '「' + (j.seenAs || '?') + '」と認識しました' + (j.rank > 0 ? '（' + target + 'は' + (j.rank + 1) + '位）' : '（' + target + 'は10位以内になし）');
+      v.innerHTML = '<span class="big">' + LABEL[j.result] + '</span><span class="detail">' + d + '</span>';
+      state.log.push({
+        target: target, result: j.result, rank: j.rank, ratio: j.ratio ? +j.ratio.toFixed(3) : null,
+        top: cands.slice(0, 5).map(function (c) { return c.char + ':' + c.score.toFixed(1); }).join(' '),
+        ms: Math.round(ms), input: Object.keys(typesSeen).join('+'), box: Math.round(size),
+        strokes: strokes.map(function (st) { return st.map(function (p) { return [Math.round(p[0] * 256 / size), Math.round(p[1] * 256 / size)]; }); }),
+        at: new Date().toISOString()
+      });
+      save(); renderLog();
+      $('nextRow').hidden = false;
+    }
+  };
+
+  function renderCands(cands, target) {
+    var box = $('cands'); box.innerHTML = '';
+    cands.forEach(function (c, i) {
+      var d = document.createElement('div');
+      d.className = 'cand' + (c.char === target ? ' hit' : '') + (i === 0 ? ' first' : '');
+      d.innerHTML = '<span class="k">' + c.char + '</span><span class="s">' + c.score.toFixed(1) + '</span>';
+      d.title = (i + 1) + '位 距離 ' + c.score.toFixed(2);
+      box.appendChild(d);
+    });
+  }
+
+  $('again').onclick = function () { strokes = []; redraw(); resetVerdict(); };
+  $('next').onclick = function () { state.idx = (state.idx + 1) % TEST.length; save(); strokes = []; redraw(); resetVerdict(); renderPrompt(); renderLog(); };
+  function resetVerdict() {
+    $('verdict').className = 'verdict idle';
+    $('verdict').innerHTML = '<span>書いたら「はんてい」を押してください</span>';
+    $('cands').innerHTML = ''; $('nextRow').hidden = true;
+  }
+
+  // ---------- 表示 ----------
+  function renderPrompt() {
+    if (state.mode === 'test') {
+      $('target').textContent = TEST[state.idx]; $('target').hidden = false;
+      $('promptText').textContent = 'この字を書いてください';
+      $('promptSub').textContent = (state.idx + 1) + ' / ' + TEST.length + ' ・ 書き順は自由です';
+    } else {
+      $('target').hidden = true;
+      $('promptText').textContent = '好きな漢字を書いてください';
+      $('promptSub').textContent = '常用漢字から候補を10個まで表示します（記録には残りません）';
+    }
+  }
+  function renderLog() {
+    var n = state.log.length, c = { correct: 0, retry: 0, wrong: 0 };
+    state.log.forEach(function (r) { c[r.result]++; });
+    $('sN').textContent = n; $('sOk').textContent = c.correct; $('sRe').textContent = c.retry; $('sNg').textContent = c.wrong;
+    var chips = $('chips'); chips.innerHTML = '';
+    TEST.forEach(function (k, i) {
+      var rs = state.log.filter(function (r) { return r.target === k; });
+      var last = rs.length ? rs[rs.length - 1].result : '';
+      var b = document.createElement('button');
+      b.className = 'chip ' + last + (state.mode === 'test' && i === state.idx ? ' cur' : '');
+      b.innerHTML = k + (rs.length ? '<span class="n">' + rs.length + '</span>' : '');
+      b.setAttribute('aria-label', k + (last ? ' ' + LABEL[last] : ' 未判定'));
+      b.onclick = function () { setMode('test'); state.idx = i; save(); strokes = []; redraw(); resetVerdict(); renderPrompt(); renderLog(); };
+      chips.appendChild(b);
+    });
+    $('exportBox').value = n ? JSON.stringify({
+      app: 'Pop-Kanji STEP1', ua: navigator.userAgent, screen: [screen.width, screen.height, window.devicePixelRatio],
+      summary: c, log: state.log
+    }) : '';
+    $('copy').disabled = !n; $('reset').disabled = !n;
+  }
+
+  function setMode(m) {
+    state.mode = m;
+    $('tab-test').setAttribute('aria-selected', m === 'test'); $('tab-free').setAttribute('aria-selected', m === 'free');
+    strokes = []; redraw(); resetVerdict(); renderPrompt(); renderLog();
+  }
+  $('tab-test').onclick = function () { setMode('test'); };
+  $('tab-free').onclick = function () { setMode('free'); };
+
+  $('copy').onclick = function () {
+    var box = $('exportBox');
+    var done = function () { $('copyMsg').textContent = 'コピーしました。チャットに貼り付けてください。'; };
+    try {
+      navigator.clipboard.writeText(box.value).then(done, function () { box.focus(); box.select(); $('copyMsg').textContent = '選択しました。長押しでコピーしてください。'; });
+    } catch (e) { box.focus(); box.select(); $('copyMsg').textContent = '選択しました。長押しでコピーしてください。'; }
+  };
+  var resetArmed = false;
+  $('reset').onclick = function () {
+    if (!resetArmed) { resetArmed = true; $('reset').textContent = '本当に消す'; setTimeout(function () { resetArmed = false; $('reset').textContent = '記録を消す'; }, 4000); return; }
+    state.log = []; state.idx = 0; save(); resetArmed = false; $('reset').textContent = '記録を消す'; renderPrompt(); renderLog(); resetVerdict();
+  };
+
+  new ResizeObserver(resize).observe(pad);
+  if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redraw);
+  renderPrompt(); renderLog(); resize();
+})();
+</script>
