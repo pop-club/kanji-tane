@@ -15,6 +15,7 @@
   var TMP_ID = '__popkanji_tmp__';
   var FEATURE_INTERVAL = 20;
   var RESAMPLE_STEP = 1.5; // 256座標系での点間隔（参照パターンの記録密度に合わせる）
+  var strokePenalty = 0.1; // 画数差1画あたりの上乗せ。tools/penalty_test.js の比較で決めた値
 
   function scaleTo256(strokes, box) {
     var s = 256 / Math.max(box.width, box.height);
@@ -63,21 +64,54 @@
       map = KC.completeMap(ref[2], input, KC.wholeWholeDistance, map);
       var d = KC.computeWholeDistanceWeighted(ref[2], input, map);
       d = d / Math.min(n0, ref[2].length);
+      // 画数の差への上乗せ。1画少ない似た字（間→問など）に1位を取られるのを防ぐ
+      d = d * (1 + strokePenalty * Math.abs(n0 - ref[2].length));
       res.push({ char: ref[0], score: d });
     }
     res.sort(function (a, b) { return a.score - b.score; });
-    return res.slice(0, limit || 10);
+    // 同じ字の手本が複数あるときは、いちばん近いものだけを残す
+    var seen = {}, out = [];
+    for (var k = 0; k < res.length && out.length < (limit || 10); k++) {
+      if (seen[res[k].char]) continue;
+      seen[res[k].char] = true; out.push(res[k]);
+    }
+    return out;
+  }
+
+  // 筆跡を参照パターンと同じ形式の特徴量に変換する
+  function features(strokes, box) {
+    var pat = scaleTo256(strokes, box).map(function (s) { return resample(s, RESAMPLE_STEP); });
+    KC['recordedPattern_' + TMP_ID] = pat;
+    var mn = KC.momentNormalize(TMP_ID);
+    delete KC['recordedPattern_' + TMP_ID];
+    return KC.extractFeatures(mn, FEATURE_INTERVAL);
   }
 
   function recognize(strokes, box, limit) {
     if (!strokes || !strokes.length) return [];
-    var pat = scaleTo256(strokes, box).map(function (s) { return resample(s, RESAMPLE_STEP); });
-    KC['recordedPattern_' + TMP_ID] = pat;
-    var mn = KC.momentNormalize(TMP_ID);
-    var feats = KC.extractFeatures(mn, FEATURE_INTERVAL);
+    var feats = features(strokes, box);
     var coarse = KC.coarseClassification(feats);
-    delete KC['recordedPattern_' + TMP_ID];
-    return fineRanked(feats, coarse, limit);
+    // 粗い分類の上位100件に同じ字の手本が複数入るため、字の種類で数えて広めに渡す
+    var seen = {}, picked = [];
+    for (var i = 0; i < coarse.length && picked.length < 100; i++) {
+      var ch = KC.refPatterns[coarse[i][0]][0];
+      if (!seen[ch]) { seen[ch] = 0; }
+      if (seen[ch]++ < 3) picked.push(coarse[i]);
+    }
+    return fineRanked(feats, picked, limit);
+  }
+
+  // 追加の手本（手書きで登録したもの）。[字, 画数, 特徴量] の配列
+  function makePattern(ch, strokes, box) {
+    var f = features(strokes, box);
+    return [ch, f.length, f];
+  }
+  function addPatterns(list) {
+    if (!allPatterns) allPatterns = KC.refPatterns;
+    allPatterns = allPatterns.concat(list);
+    var cur = KC.refPatterns;
+    KC.refPatterns = cur.concat(list);
+    return list.length;
   }
 
   /*
@@ -113,7 +147,10 @@
     return KC.refPatterns.length;
   }
 
-  var api = { recognize: recognize, judge: judge, resample: resample, setCandidateSet: setCandidateSet };
+  function setStrokePenalty(v) { strokePenalty = v; }
+
+  var api = { setStrokePenalty: setStrokePenalty, recognize: recognize, judge: judge, resample: resample, setCandidateSet: setCandidateSet,
+    makePattern: makePattern, addPatterns: addPatterns };
   root.PopKanjiRecognizer = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);
