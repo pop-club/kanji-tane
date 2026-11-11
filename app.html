@@ -292,7 +292,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
   <header class="top">
     <a class="brand" href="#home" aria-label="かんじのたね ホームへ"><img class="mark" src="icons/icon.svg" alt="" width="44" height="44"><b>かんじのたね</b></a>
     <div class="modesw" id="modeSw" role="group" aria-label="モード">
-      <button data-m="sho" aria-pressed="true">しょうがくせい</button><button data-m="kanken" aria-pressed="false">漢検</button>
+      <button data-m="sho" aria-pressed="true" data-k="[小学生:しょうがくせい]">しょうがくせい</button><button data-m="kanken" aria-pressed="false">漢検</button>
     </div>
     <span class="loadstate" id="loadstate">よみとりの じゅんびちゅう…</span>
   </header>
@@ -301,22 +301,22 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
   <section id="v-home" class="view">
     <div class="hero">
       <div class="card">
-        <h1>きょうの かんじ</h1>
+        <h1 data-k="[今日:きょう]の [漢字:かんじ]">きょうの かんじ</h1>
         <div class="today">
-          <div><b id="hReview">0</b><span>きょうの ふくしゅう</span></div>
-          <div><b id="hWeak">0</b><span>にがての かんじ</span></div>
+          <div><b id="hReview">0</b><span data-k="[今日:きょう]の [復習:ふくしゅう]">きょうの ふくしゅう</span></div>
+          <div><b id="hWeak">0</b><span data-k="[苦手:にがて]の [漢字:かんじ]">にがての かんじ</span></div>
         </div>
         <div class="big-actions">
-          <a class="btn primary" href="#grade">テストを はじめる</a>
+          <a class="btn primary" href="#grade" data-k="テストを [始:はじ]める">テストを はじめる</a>
           <button class="btn sky" id="hReviewBtn">にがてを ふくしゅう する</button>
-          <a class="btn" href="#weak">にがてリスト・れんしゅうプリント</a>
+          <a class="btn" href="#weak" data-k="[苦手:にがて]リスト・[練習:れんしゅう]プリント">にがてリスト・れんしゅうプリント</a>
         </div>
       </div>
       <div class="card">
         <h2 id="hLevelsTitle">がくねんごとの おぼえぐあい</h2>
         <div class="levels" id="hLevels"></div>
-        <div class="legend"><span class="lm">おぼえた</span><span class="lc">おぼえかけ</span><span class="lw">にがて</span></div>
-        <p class="sub" style="font-size:.78rem">すうじは せいかいした かんじの かず。2かい つづけて せいかいすると「おぼえた」に なるよ。</p>
+        <div class="legend"><span class="lm" data-k="[覚:おぼ]えた">おぼえた</span><span class="lc" data-k="[覚:おぼ]えかけ">おぼえかけ</span><span class="lw" data-k="[苦手:にがて]">にがて</span></div>
+        <p class="sub" style="font-size:.78rem" data-k="[数字:すうじ]は [正解:せいかい]した [漢字:かんじ]の [数:かず]。2[回:かい] [続:つづ]けて [正解:せいかい]すると「[覚:おぼ]えた」に なるよ。">すうじは せいかいした かんじの かず。2かい つづけて せいかいすると「おぼえた」に なるよ。</p>
       </div>
     </div>
   </section>
@@ -324,23 +324,23 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
   <!-- 学年えらび -->
   <section id="v-grade" class="view" hidden>
     <div class="card">
-      <div class="row" style="justify-content:space-between"><h1 id="gTitle">なんねんせいの かんじ？</h1><a class="back" href="#home" role="button" style="display:inline-flex;align-items:center;text-decoration:none;color:inherit">もどる</a></div>
+      <div class="row" style="justify-content:space-between"><h1 id="gTitle">なんねんせいの かんじ？</h1><a class="back" href="#home" role="button" style="display:inline-flex;align-items:center;text-decoration:none;color:inherit" data-k="もどる">もどる</a></div>
       <div class="grades" id="gList"></div>
-      <h2>なんもん やる？</h2>
+      <h2 data-k="[何問:なんもん] やる？">なんもん やる？</h2>
       <div class="count" id="gCount">
-        <button data-n="5" aria-pressed="false">5もん</button>
-        <button data-n="10" aria-pressed="true">10もん</button>
-        <button data-n="20" aria-pressed="false">20もん</button>
+        <button data-n="5" aria-pressed="false" data-k="5[問:もん]">5もん</button>
+        <button data-n="10" aria-pressed="true" data-k="10[問:もん]">10もん</button>
+        <button data-n="20" aria-pressed="false" data-k="20[問:もん]">20もん</button>
       </div>
-      <p class="sub">まだ おぼえて いない かんじから じゅんばんに でます。にがての かんじも ときどき まざります。まちがえた かんじは、さいごに もういちど でます。</p>
-      <button class="btn primary" id="gStart" disabled>はじめる</button>
+      <p class="sub" data-k="まだ [覚:おぼ]えて いない [漢字:かんじ]から [順番:じゅんばん]に [出:で]ます。[苦手:にがて]の [漢字:かんじ]も ときどき まざります。[間違:まちが]えた [漢字:かんじ]は、[最後:さいご]に もう[一度:いちど] [出:で]ます。">まだ おぼえて いない かんじから じゅんばんに でます。にがての かんじも ときどき まざります。まちがえた かんじは、さいごに もういちど でます。</p>
+      <button class="btn primary" id="gStart" disabled data-k="[始:はじ]める">はじめる</button>
     </div>
   </section>
 
   <!-- テスト -->
   <section id="v-test" class="view" hidden>
     <div class="testbar">
-      <button class="back" id="tQuit">やめる</button>
+      <button class="back" id="tQuit" data-k="やめる">やめる</button>
       <div class="prog"><i id="tProg"></i></div>
       <span class="num" id="tNum">1 / 10</span>
     </div>
@@ -354,14 +354,14 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
         <div id="tFb" hidden></div>
       </div>
       <div class="writer">
-        <div class="pad" id="tPad"><div class="padcount" id="tCount" hidden></div><div class="padhint" id="tPadHint">ここに ゆびや ペンで かこう</div></div>
+        <div class="pad" id="tPad"><div class="padcount" id="tCount" hidden></div><div class="padhint" id="tPadHint" data-k="ここに [指:ゆび]や ペンで [書:か]こう">ここに ゆびや ペンで かこう</div></div>
         <div class="controls" id="tControls">
-          <button class="btn" id="tUndo">1かく けす</button>
-          <button class="btn" id="tClear">ぜんぶ けす</button>
+          <button class="btn" id="tUndo" data-k="1[画:かく] [消:け]す">1かく けす</button>
+          <button class="btn" id="tClear" data-k="[全部:ぜんぶ] [消:け]す">ぜんぶ けす</button>
           <button class="btn primary" id="tAnswer">こたえる</button>
         </div>
-        <div class="row" id="tNextRow" hidden><button class="btn primary" id="tNext">つぎへ</button></div>
-        <button class="skip" id="tSkip">わからない</button>
+        <div class="row" id="tNextRow" hidden><button class="btn primary" id="tNext" data-k="[次:つぎ]へ">つぎへ</button></div>
+        <button class="skip" id="tSkip" data-k="[分:わ]からない">わからない</button>
       </div>
     </div>
   </section>
@@ -374,8 +374,8 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
       <div class="rlist" id="rList"></div>
       <div class="row">
         <button class="btn primary" id="rPrint">まちがえた かんじの プリント</button>
-        <button class="btn" id="rAgain">もういちど テスト</button>
-        <a class="btn" href="#home">ホームへ</a>
+        <button class="btn" id="rAgain" data-k="もう[一度:いちど] テスト">もういちど テスト</button>
+        <a class="btn" href="#home" data-k="ホームへ">ホームへ</a>
       </div>
     </div>
   </section>
@@ -383,17 +383,17 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
   <!-- 苦手リスト -->
   <section id="v-weak" class="view" hidden>
     <div class="card">
-      <div class="row" style="justify-content:space-between"><h1>にがてリスト</h1><a class="back" href="#home" role="button" style="display:inline-flex;align-items:center;text-decoration:none;color:inherit">もどる</a></div>
+      <div class="row" style="justify-content:space-between"><h1 data-k="[苦手:にがて]リスト">にがてリスト</h1><a class="back" href="#home" role="button" style="display:inline-flex;align-items:center;text-decoration:none;color:inherit" data-k="もどる">もどる</a></div>
       <div class="tabs" role="tablist" id="wTabs"></div>
-      <p class="sub">プリントや テストに つかう かんじを えらんでね。にがての かんじは さいしょから えらんで あります。</p>
+      <p class="sub" data-k="プリントや テストに [使:つか]う [漢字:かんじ]を [選:えら]んでね。[苦手:にがて]の [漢字:かんじ]は [最初:さいしょ]から [選:えら]んで あります。">プリントや テストに つかう かんじを えらんでね。にがての かんじは さいしょから えらんで あります。</p>
       <div id="wGroups" style="display:flex;flex-direction:column;gap:16px"></div>
     </div>
     <div class="card sticky">
       <div class="row">
         <span id="wSel" style="flex:1 1 140px">0字 えらんで います</span>
-        <button class="btn small" id="wAll">ぜんぶ えらぶ / はずす</button>
-        <button class="btn small sky" id="wTest">えらんだ字で テスト</button>
-        <button class="btn small primary" id="wPrint">えらんだ字で プリント</button>
+        <button class="btn small" id="wAll" data-k="[全部:ぜんぶ] [選:えら]ぶ / はずす">ぜんぶ えらぶ / はずす</button>
+        <button class="btn small sky" id="wTest" data-k="[選:えら]んだ字で テスト">えらんだ字で テスト</button>
+        <button class="btn small primary" id="wPrint" data-k="[選:えら]んだ字で プリント">えらんだ字で プリント</button>
       </div>
     </div>
   </section>
@@ -401,14 +401,14 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
   <!-- プリント -->
   <section id="v-print" class="view" hidden>
     <div class="card">
-      <div class="row" style="justify-content:space-between"><h1>れんしゅうプリント</h1><button class="back" id="pBack">もどる</button></div>
+      <div class="row" style="justify-content:space-between"><h1 data-k="[練習:れんしゅう]プリント">れんしゅうプリント</h1><button class="back" id="pBack" data-k="もどる">もどる</button></div>
       <div class="popts">
-        <label><input type="checkbox" id="pTrace" checked> 1マスめに うすい おてほん</label>
-        <label><input type="checkbox" id="pAnswer" checked> こたえの ページを つける</label>
-        <label>1字に <select id="pPer"><option value="1">1もん</option><option value="2">2もん</option></select></label>
+        <label><input type="checkbox" id="pTrace" checked><span data-k="1マス[目:め]に うすい お[手本:てほん]">1マスめに うすい おてほん</span></label>
+        <label><input type="checkbox" id="pAnswer" checked><span data-k="[答:こた]えの ページを つける">こたえの ページを つける</span></label>
+        <label><span data-k="1字に">1字に</span> <select id="pPer"><option value="1" data-k="1[問:もん]">1もん</option><option value="2" data-k="2[問:もん]">2もん</option></select></label>
       </div>
       <div class="row">
-        <button class="btn primary" id="pPrintBtn">いんさつする</button>
+        <button class="btn primary" id="pPrintBtn" data-k="[印刷:いんさつ]する">いんさつする</button>
       </div>
       <p class="sub" id="pNote"></p>
     </div>
@@ -418,7 +418,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
   <!-- データ -->
   <section id="v-data" class="view" hidden>
     <div class="card prose">
-      <div class="row" style="justify-content:space-between"><h1>がくしゅう データ</h1><a class="back" href="#home" role="button" style="display:inline-flex;align-items:center;text-decoration:none;color:inherit">もどる</a></div>
+      <div class="row" style="justify-content:space-between"><h1 data-k="[学習:がくしゅう] データ">がくしゅう データ</h1><a class="back" href="#home" role="button" style="display:inline-flex;align-items:center;text-decoration:none;color:inherit" data-k="もどる">もどる</a></div>
       <p id="dState"></p>
       <p>学習の記録は、この端末のブラウザの中だけに保存されています。別の端末に移すときや、念のための控えには、ファイルに書き出してください。</p>
       <div class="row">
@@ -436,7 +436,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
   <!-- このアプリについて -->
   <section id="v-about" class="view" hidden>
     <div class="card prose">
-      <div class="row" style="justify-content:space-between"><h1>このアプリについて</h1><a class="back" href="#home" role="button" style="display:inline-flex;align-items:center;text-decoration:none;color:inherit">もどる</a></div>
+      <div class="row" style="justify-content:space-between"><h1 data-k="このアプリについて">このアプリについて</h1><a class="back" href="#home" role="button" style="display:inline-flex;align-items:center;text-decoration:none;color:inherit" data-k="もどる">もどる</a></div>
       <p>かんじのたね は、小学生が手書きで答える漢字テストです。まちがえた字は「にがてリスト」に入り、練習プリントを作って印刷できます。</p>
       <h2>プライバシー</h2>
       <ul>
@@ -470,8 +470,8 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
   </section>
 
   <footer>
-    <a href="#data">がくしゅう データ</a>
-    <a href="#about">このアプリについて</a>
+    <a href="#data" data-k="[学習:がくしゅう] データ">がくしゅう データ</a>
+    <a href="#about" data-k="このアプリについて">このアプリについて</a>
   </footer>
 </div>
 

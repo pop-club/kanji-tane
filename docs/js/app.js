@@ -11,10 +11,10 @@
   var QD = window.POPKANJI_QUESTIONS || {};
   // 学年の番号: 1〜6 = 小学校、7〜10 = 中学の字を漢検の級で分けたもの（4級・3級・準2級・2級）
   var GRADE_TOTAL = { 1: 80, 2: 160, 3: 200, 4: 202, 5: 193, 6: 191, 7: 313, 8: 284, 9: 328, 10: 185 };
-  var GRADE_NAME = { 1: '1ねんせい', 2: '2ねんせい', 3: '3ねんせい', 4: '4ねんせい', 5: '5ねんせい', 6: '6ねんせい',
+  var GRADE_NAME = { 1: '[1年生:1ねんせい]', 2: '[2年生:2ねんせい]', 3: '[3年生:3ねんせい]', 4: '[4年生:4ねんせい]', 5: '[5年生:5ねんせい]', 6: '[6年生:6ねんせい]',
     7: '漢検4級', 8: '漢検3級', 9: '漢検準2級', 10: '漢検2級' };
   var LEVEL_NOTE = { 7: '中学在学程度', 8: '中学卒業程度', 9: '高校在学程度', 10: '高校卒業程度' };   // 漢検協会の目安
-  var SHORT_NAME = { 1: '1ねん', 2: '2ねん', 3: '3ねん', 4: '4ねん', 5: '5ねん', 6: '6ねん', 7: '4級', 8: '3級', 9: '準2級', 10: '2級' };
+  var SHORT_NAME = { 1: '[1年:1ねん]', 2: '[2年:2ねん]', 3: '[3年:3ねん]', 4: '[4年:4ねん]', 5: '[5年:5ねん]', 6: '[6年:6ねん]', 7: '4級', 8: '3級', 9: '準2級', 10: '2級' };
   // モード: しょうがくせい（小1〜小6）／漢検（中学の字）。この端末に覚えておく
   var MODES = { sho: [1, 2, 3, 4, 5, 6], kanken: [7, 8, 9, 10] };
   var mode = 'sho';
@@ -39,6 +39,28 @@
   var GL = window.POPKANJI_GRADES || {};
   Object.keys(GL).forEach(function (g) { Array.from(GL[g]).forEach(function (c) { GRADE_OF[c] = +g; }); });
   function hasGrade(g) { return !!QD[g]; }
+
+  /*
+   * 画面の文字を、その子のレベルに合わせて漢字にする。
+   * K('[今日:きょう]の [漢字:かんじ]') → 習った字だけの言葉は漢字、まだの字をふくむ言葉は ひらがな。
+   * レベル: 小学生モードは「えらんだ学年 − 1」年までの字（1年生は ひらがなだけ）、漢検モードは常用漢字すべて。
+   * 漢検モードでは、ことばの間の空白（わかち書き）も つめる。
+   */
+  var uiGrade = 1;
+  try { uiGrade = +localStorage.getItem('kt-grade') || 1; } catch (e) {}
+  function uiLevel() { return mode === 'kanken' ? 10 : Math.max(0, Math.min(6, uiGrade) - 1); }
+  function K(s) {
+    var lv = uiLevel();
+    var out = String(s).replace(/\[([^:\]]+):([^\]]+)\]/g, function (m, k, rd) {
+      return Array.from(k).every(function (c) { return !/[\u3400-\u9fff\uf900-\ufaff]/.test(c) || (GRADE_OF[c] && GRADE_OF[c] <= lv); }) ? k : rd;
+    });
+    if (lv >= 7) out = out.replace(/([^\x00-\x7F]) (?=[^\x00-\x7F])/g, '$1');
+    return out;
+  }
+  function paintText() {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-k]'), function (el) { el.textContent = K(el.getAttribute('data-k')); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-ka]'), function (el) { el.setAttribute('aria-label', K(el.getAttribute('data-ka'))); });
+  }
 
   /*
    * ふりがなは <ruby> を使わず、「よみ」と「字」を縦に積んだ箱で表示する
@@ -123,6 +145,7 @@
     if (APP_VER) src += '?v=' + APP_VER;
     return new Promise(function (res, rej) { var s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.body.appendChild(s); });
   }
+  $('loadstate').textContent = K('[読:よ]み[取:と]りの [準備中:じゅんびちゅう]…');
   loadScript('vendor/kanjicanvas/ref-patterns.js').then(function () {
     R.setCandidateSet(window.JOYO_KANJI);
     return loadScript('vendor/kanjivg-refs/kvg-refs.js').then(function () {
@@ -137,7 +160,7 @@
     $('loadstate').textContent = '';
     updateAnswerBtn();
   }, function () {
-    $('loadstate').textContent = 'よみとりの データを よみこめませんでした。ページを よみこみなおしてください。';
+    $('loadstate').textContent = K('[読:よ]み[取:と]りの データを [読:よ]み[込:こ]めませんでした。ページを [読:よ]み[込:こ]み[直:なお]してください。');
   });
   // 中学の字の手本（約4MB）は、漢検モードにしたときだけ読む
   var midLoading = null;
@@ -155,8 +178,8 @@
     paintMode();
     if (m === 'kanken' && ready && !window.POPKANJI_KVG_REFS_MID) {
       ready = false;
-      $('loadstate').textContent = 'かんじの てほんを よみこみちゅう…';
-      loadMidRefs().then(function () { $('loadstate').textContent = ''; }, function () { $('loadstate').textContent = 'てほんを よみこめませんでした'; })
+      $('loadstate').textContent = K('[漢字:かんじ]の [手本:てほん]を [読:よ]み[込:こ]み[中:ちゅう]…');
+      loadMidRefs().then(function () { $('loadstate').textContent = ''; }, function () { $('loadstate').textContent = K('[手本:てほん]を [読:よ]み[込:こ]めませんでした'); })
         .then(function () { ready = true; updateAnswerBtn(); });
     }
     route();
@@ -164,6 +187,7 @@
   function paintMode() {
     Array.prototype.forEach.call(document.querySelectorAll('#modeSw button'), function (b) { b.setAttribute('aria-pressed', b.dataset.m === mode); });
     document.body.classList.toggle('kanken', mode === 'kanken');
+    paintText();
   }
   Array.prototype.forEach.call(document.querySelectorAll('#modeSw button'), function (b) { b.onclick = function () { setMode(b.dataset.m); }; });
   paintMode();
@@ -182,6 +206,7 @@
     if (h === 'test' && !session) h = 'home';
     if (h === 'result' && !lastResult) h = 'home';
     if (h === 'print' && !printChars.length) h = 'weak';
+    paintText();   // 固定の文を先に。そのあと各画面の render が動く文を書く
     if (h === 'home') renderHome();
     if (h === 'grade') renderGrade();
     if (h === 'weak') renderWeak();
@@ -199,43 +224,47 @@
     $('hReview').textContent = rv.length;
     $('hWeak').textContent = weak;
     $('hReviewBtn').disabled = !rv.length;
-    $('hReviewBtn').textContent = rv.length ? 'にがてを ふくしゅう する（' + Math.min(rv.length, 10) + 'もん）' : 'ふくしゅうする かんじは ありません';
+    $('hReviewBtn').textContent = rv.length ? K('[苦手:にがて]を [復習:ふくしゅう] する（') + Math.min(rv.length, 10) + K('[問:もん]）') : K('[復習:ふくしゅう]する [漢字:かんじ]は ありません');
     var html = '';
     levels().forEach(function (g) {
       if (!hasGrade(g)) {
-        html += '<div class="level soon"><span>' + SHORT_NAME[g] + '</span><span class="bar"></span><span class="n">じゅんびちゅう</span></div>';
+        html += '<div class="level soon"><span>' + K(SHORT_NAME[g]) + '</span><span class="bar"></span><span class="n">' + K('[準備中:じゅんびちゅう]') + '</span></div>';
         return;
       }
       // 数字は「せいかいした字（おぼえた＋おぼえかけ）」。おぼえた は2回つづけて正解したときなので、1回めのテストでは 0 のまま
       var chars = gradeChars(g), c = statusCounts(chars), t = chars.length, done = c.mastered + c.candidate, tested = t - c.new;
-      html += '<div class="level"><span>' + SHORT_NAME[g] + '</span><span class="bar" role="img" aria-label="' + SHORT_NAME[g] + ' おぼえた ' + c.mastered + '字、おぼえかけ ' + c.candidate + '字、にがて ' + c.weak + '字 / ' + t + '字">' +
+      html += '<div class="level"><span>' + K(SHORT_NAME[g]) + '</span><span class="bar" role="img" aria-label="' + K(SHORT_NAME[g]) + ' ' + K('[覚:おぼ]えた ') + c.mastered + '字、' + K('[覚:おぼ]えかけ ') + c.candidate + '字、' + K('[苦手:にがて] ') + c.weak + '字 / ' + t + '字">' +
         '<i class="m" style="width:' + (100 * c.mastered / t) + '%"></i><i class="c" style="width:' + (100 * c.candidate / t) + '%"></i><i class="w" style="width:' + (100 * c.weak / t) + '%"></i>' +
         '</span><span class="n">' + done + ' / ' + t + '字</span>' +
-        (tested ? '<small class="ld">おぼえた ' + c.mastered + '　おぼえかけ ' + c.candidate + '　にがて ' + c.weak + '</small>' : '') + '</div>';
+        (tested ? '<small class="ld">' + K('[覚:おぼ]えた ') + c.mastered + '　' + K('[覚:おぼ]えかけ ') + c.candidate + '　' + K('[苦手:にがて] ') + c.weak + '</small>' : '') + '</div>';
     });
     $('hLevels').innerHTML = html;
-    $('hLevelsTitle').textContent = mode === 'kanken' ? '級ごとの おぼえぐあい' : 'がくねんごとの おぼえぐあい';
+    $('hLevelsTitle').textContent = mode === 'kanken' ? K('[級:きゅう]ごとの [覚:おぼ]え[具合:ぐあい]') : K('[学年:がくねん]ごとの [覚:おぼ]え[具合:ぐあい]');
   }
   $('hReviewBtn').onclick = function () { var l = reviewList(); if (l.length) startTest('review', 0, l.slice(0, 10)); };
 
   // ---------- 学年えらび ----------
-  var pickGrade = 1, pickN = 10;
+  var pickGrade = uiGrade, pickN = 10;
   function renderGrade() {
     var html = '';
-    if (levels().indexOf(pickGrade) < 0) pickGrade = levels()[0];
-    $('gTitle').textContent = mode === 'kanken' ? 'どの 級に する？' : 'なんねんせいの かんじ？';
+    if (levels().indexOf(pickGrade) < 0) pickGrade = mode === 'sho' ? uiGrade : levels()[0];
+    $('gTitle').textContent = mode === 'kanken' ? K('どの [級:きゅう]に する？') : K('[何年生:なんねんせい]の [漢字:かんじ]？');
     levels().forEach(function (g) {
       var ok = hasGrade(g);
       var sample = ok ? gradeChars(g).slice(0, 4).join('') : '';
       var c = ok ? statusCounts(gradeChars(g)) : null;
       html += '<button class="grade' + (ok && g === pickGrade ? ' on' : '') + '" data-g="' + g + '"' + (ok ? '' : ' disabled') + '>' +
-        '<b>' + GRADE_NAME[g] + '</b>' + (LEVEL_NOTE[g] ? '<small>' + LEVEL_NOTE[g] + '</small>' : '') +
-        (ok ? '<span class="sample">' + esc(sample) + '…</span><small>' + GRADE_TOTAL[g] + '字 ・ せいかい ' + (c.mastered + c.candidate) + '字（おぼえた ' + c.mastered + '）</small>'
-            : '<small>' + GRADE_TOTAL[g] + '字 ・ じゅんびちゅう</small>') + '</button>';
+        '<b>' + K(GRADE_NAME[g]) + '</b>' + (LEVEL_NOTE[g] ? '<small>' + LEVEL_NOTE[g] + '</small>' : '') +
+        (ok ? '<span class="sample">' + esc(sample) + '…</span><small>' + GRADE_TOTAL[g] + '字 ・ ' + K('[正解:せいかい] ') + (c.mastered + c.candidate) + '字（' + K('[覚:おぼ]えた ') + c.mastered + '）</small>'
+            : '<small>' + GRADE_TOTAL[g] + '字 ・ ' + K('[準備中:じゅんびちゅう]') + '</small>') + '</button>';
     });
     $('gList').innerHTML = html;
     Array.prototype.forEach.call($('gList').querySelectorAll('.grade'), function (b) {
-      b.onclick = function () { pickGrade = +b.dataset.g; renderGrade(); };
+      b.onclick = function () {
+        pickGrade = +b.dataset.g;
+        if (pickGrade <= 6) { uiGrade = pickGrade; try { localStorage.setItem('kt-grade', pickGrade); } catch (e) {} paintText(); }
+        renderGrade();
+      };
     });
     $('gStart').disabled = !hasGrade(pickGrade);
   }
@@ -284,7 +313,7 @@
   function showCount(n) {
     var el = $('tCount'), std = session && STD_STROKES[cur().ch];
     el.hidden = !n && !std;
-    el.textContent = std ? n + ' / ' + std + 'かく' : n + 'かく';
+    el.textContent = std ? n + ' / ' + std + K('[画:かく]') : n + K('[画:かく]');
     el.className = 'padcount' + (std && n === std ? ' ok' : std && n > std ? ' over' : '');
   }
   function updateAnswerBtn() {
@@ -292,7 +321,7 @@
     var n = pad.strokes().length;
     var busy = answered && !practicing;
     $('tAnswer').disabled = !ready || !n || busy;
-    $('tAnswer').textContent = !ready ? 'じゅんびちゅう…' : practicing ? 'かけた！' : 'こたえる';
+    $('tAnswer').textContent = !ready ? K('[準備中:じゅんびちゅう]…') : practicing ? K('[書:か]けた！') : K('[答:こた]える');
     $('tUndo').disabled = !n || busy; $('tClear').disabled = !n || busy;
   }
   var answered = false, pending = null, practicing = false;
@@ -302,8 +331,8 @@
     pad.setGuide(null);
     $('tNum').textContent = (session.idx + 1) + ' / ' + n;
     $('tProg').style.width = (100 * session.idx / n) + '%';
-    $('tLabel').textContent = it.again ? 'もういちど：さっき まちがえた かんじだよ' :
-      session.mode === 'review' ? 'ふくしゅう：しかくに はいる かんじを かこう' : GRADE_NAME[k.grade] + '：しかくに はいる かんじを かこう';
+    $('tLabel').textContent = it.again ? K('もう[一度:いちど]：さっき [間違:まちが]えた [漢字:かんじ]だよ') :
+      session.mode === 'review' ? K('[復習:ふくしゅう]：[四角:しかく]に [入:はい]る [漢字:かんじ]を [書:か]こう') : K(GRADE_NAME[k.grade]) + K('：[四角:しかく]に [入:はい]る [漢字:かんじ]を [書:か]こう');
     $('tLabel').classList.toggle('again', !!it.again);
     $('tQ').innerHTML = renderQ(it.q, 'test');
     $('tQ').dataset.qid = it.q.id;
@@ -338,23 +367,23 @@
     var yomi = [].concat(k.on, k.kun).filter(Boolean).join('・') || '—';
     var hasK = k.meaningTokens && k.meaningTokens.some(function (t) { return t.k !== undefined; });
     var mean = hasK ? '<span class="qline mline">' + renderQ({ tokens: k.meaningTokens, kanji: ch }, 'answer') + '</span>' : esc(k.meaning);
-    return '<dl><dt>よみ</dt><dd>' + esc(yomi) + '</dd><dt>いみ</dt><dd>' + mean + '</dd>' +
-      (k.words && k.words.length ? '<dt>ことば</dt><dd class="kj">' + esc(k.words.slice(0, 4).join('　')) + '</dd>' : '') + '</dl>';
+    return '<dl><dt>' + K('[読:よ]み') + '</dt><dd>' + esc(yomi) + '</dd><dt>' + K('[意味:いみ]') + '</dt><dd>' + mean + '</dd>' +
+      (k.words && k.words.length ? '<dt>' + K('[言葉:ことば]') + '</dt><dd class="kj">' + esc(k.words.slice(0, 4).join('　')) + '</dd>' : '') + '</dl>';
   }
   function feedback(kind, verdict, detail, withInfo, misjudge) {
     var it = cur();
     var showAns = kind !== 'retry';   // 書き直しのときは答えを見せない
     var html = '<div class="fb ' + kind + '" role="status"><div class="head">' + (showAns ? '<span class="ans">' + esc(it.ch) + '</span>' : '') + '<div><div class="verdict">' + verdict + '</div>' +
       (detail ? '<div>' + detail + '</div>' : '') + '</div></div>' + (withInfo ? infoDl(it.ch) : '') +
-      (kind === 'wrong' || kind === 'recog' ? '<button class="btn small practice" id="tPractice">おてほんを みて もういちど かく</button><div class="pmsg" id="tPmsg" aria-live="polite"></div>' : '') +
-      (misjudge ? '<button class="misjudge" id="tMis">ただしく かいたのに まちがいに なった</button>' : '') + '</div>';
+      (kind === 'wrong' || kind === 'recog' ? '<button class="btn small practice" id="tPractice">' + K('お[手本:てほん]を [見:み]て もう[一度:いちど] [書:か]く') + '</button><div class="pmsg" id="tPmsg" aria-live="polite"></div>' : '') +
+      (misjudge ? '<button class="misjudge" id="tMis">' + K('[正:ただ]しく [書:か]いたのに [間違:まちが]いに なった') + '</button>' : '') + '</div>';
     $('tFb').innerHTML = html; $('tFb').hidden = false;
     setTimeout(fitPad, 0);
     if ($('tPractice')) $('tPractice').onclick = startPractice;
     if (misjudge) $('tMis').onclick = function () {
       pending = 'recog';
       $('tFb').firstChild.className = 'fb recog';
-      $('tFb').querySelector('.verdict').textContent = 'まちがいに しませんでした';
+      $('tFb').querySelector('.verdict').textContent = K('[間違:まちが]いに しませんでした');
       this.remove();
     };
   }
@@ -375,7 +404,7 @@
     pad.setGuide(cur().ch);
     pad.lock(false); pad.clear();
     $('tControls').hidden = false;
-    $('tPmsg').textContent = 'うすい おてほんを なぞって かいてみよう';
+    $('tPmsg').textContent = K('うすい お[手本:てほん]を なぞって [書:か]いてみよう');
     $('tPractice').hidden = true;
     updateAnswerBtn();
     fitPad();
@@ -384,7 +413,7 @@
     var it = cur();
     var cands = R.recognize(pad.strokes(), { width: pad.size(), height: pad.size() }, 10);
     var ok = R.judge(cands, it.ch).result === 'correct';
-    $('tPmsg').textContent = ok ? 'よく かけたね！ もういちど かいても いいよ' : 'おしい！ おてほんを よく みて かこう';
+    $('tPmsg').textContent = ok ? K('よく [書:か]けたね！ もう[一度:いちど] [書:か]いても いいよ') : K('おしい！ お[手本:てほん]を よく [見:み]て [書:か]こう');
     if (ok) { pad.clear(); }
   }
   $('tUndo').onclick = function () { pad.undo(); };
@@ -400,18 +429,18 @@
     // 1回めは画数のヒントを出して書き直し、2回めも画数がちがえば理由を伝えてまちがいにする。
     var std = STD_STROKES[it.ch], n = pad.strokes().length, mismatch = !!std && n !== std;
     if (j.result === 'correct') {
-      feedback('correct', 'せいかい！', it.again ? 'こんどは かけたね。べつの 日にも かけたら「おぼえた」に なるよ。' : '', true, false);
+      feedback('correct', K('[正解:せいかい]！'), it.again ? K('[今度:こんど]は [書:か]けたね。[別:べつ]の [日:ひ]にも [書:か]けたら「[覚:おぼ]えた」に なるよ。') : '', true, false);
       finishItem('correct');
     } else if (mismatch && !it.strokeHinted) {
       it.strokeHinted = true;
-      feedback('retry', std + 'かくで かいてみよう', 'いまは ' + n + 'かく だったよ。1かくずつ はなして かこう。', false, false);
+      feedback('retry', std + K('[画:かく]で [書:か]いてみよう'), K('[今:いま]は ') + n + K('[画:かく] だったよ。1[画:かく]ずつ [離:はな]して [書:か]こう。'), false, false);
       pad.clear();
     } else if (j.result === 'retry' && it.tries < MAX_RETRY) {
-      feedback('retry', 'もういちど ていねいに かいてね', 'うまく よみとれなかったよ（' + it.tries + ' / ' + MAX_RETRY + '）', false, false);
+      feedback('retry', K('もう[一度:いちど] ていねいに [書:か]いてね'), K('うまく [読:よ]み[取:と]れなかったよ（') + it.tries + ' / ' + MAX_RETRY + '）', false, false);
       pad.clear();
       $('tHint').hidden = true;
     } else if (j.result === 'retry') {
-      feedback('recog', 'よみとれませんでした', 'まちがいには しません。こたえは この かんじです。', true, false);
+      feedback('recog', K('[読:よ]み[取:と]れませんでした'), K('[間違:まちが]いには しません。[答:こた]えは この [漢字:かんじ]です。'), true, false);
       finishItem('recog');
     } else {
       // 「〜に みえたよ」と見せるのは、その子が習った・習いそうな字（学年＋1まで）だけ。上位5つから選ぶ
@@ -421,9 +450,9 @@
         var g = GRADE_OF[cands[i].char];
         if (cands[i].char !== it.ch && g && g <= maxGrade) { shown = cands[i].char; break; }
       }
-      var seen = mismatch ? 'かくすうが ちがったよ（ただしくは ' + std + 'かく）。こたえは この かんじ。'
-        : shown ? '「<span class="kj">' + esc(shown) + '</span>」に みえたよ。こたえは この かんじ。' : 'ちがう かんじに みえたよ。こたえは この かんじ。';
-      feedback('wrong', 'ざんねん', seen, true, true);
+      var seen = mismatch ? K('[画数:かくすう]が [違:ちが]ったよ（[正:ただ]しくは ') + std + K('[画:かく]）。[答:こた]えは この [漢字:かんじ]。')
+        : shown ? '「<span class="kj">' + esc(shown) + '</span>」' + K('に [見:み]えたよ。[答:こた]えは この [漢字:かんじ]。') : K('[違:ちが]う [漢字:かんじ]に [見:み]えたよ。[答:こた]えは この [漢字:かんじ]。');
+      feedback('wrong', K('[残念:ざんねん]'), seen, true, true);
       finishItem('wrong', j.seenAs);
     }
     it.top = cands.slice(0, 5).map(function (c) { return c.char; }).join('');
@@ -431,7 +460,7 @@
   $('tSkip').onclick = function () {
     if (answered) return;
     cur().tries++;
-    feedback('wrong', 'こたえは この かんじ', 'つぎは かけるように れんしゅう しよう。', true, false);
+    feedback('wrong', K('[答:こた]えは この [漢字:かんじ]'), K('[次:つぎ]は [書:か]けるように [練習:れんしゅう] しよう。'), true, false);
     finishItem('wrong', null);
   };
   $('tNext').onclick = function () {
@@ -452,7 +481,7 @@
   };
   var quitArmed = false;
   $('tQuit').onclick = function () {
-    if (!quitArmed) { quitArmed = true; this.textContent = 'ほんとうに やめる？'; var b = this; setTimeout(function () { quitArmed = false; b.textContent = 'やめる'; }, 3000); return; }
+    if (!quitArmed) { quitArmed = true; this.textContent = K('[本当:ほんとう]に やめる？'); var b = this; setTimeout(function () { quitArmed = false; b.textContent = K('やめる'); }, 3000); return; }
     quitArmed = false; this.textContent = 'やめる';
     // こたえた ところまでを保存する（「つぎへ」を おす前の 問題も ふくめる）
     var it = cur();
@@ -483,7 +512,7 @@
   }
 
   // ---------- 結果 ----------
-  var PILL = { correct: 'せいかい', wrong: 'まちがい', recog: 'よみとれず' };
+  var PILL = { correct: '[正解:せいかい]', wrong: '[間違:まちが]い', recog: '[読:よ]み[取:と]れず' };
   function renderResult() {
     var all = lastResult.items;
     var items = all.filter(function (x) { return !x.again; }), again = all.filter(function (x) { return x.again; });
@@ -491,17 +520,17 @@
     var wrong = items.filter(function (x) { return x.result === 'wrong'; });
     var recog = items.filter(function (x) { return x.result === 'recog'; }).length;
     $('rScore').textContent = ok;
-    $('rOf').textContent = '/ ' + items.length + ' もん せいかい' + (lastResult.partial ? '（とちゅうで やめた ところまで）' : '');
-    $('rNote').textContent = (wrong.length ? 'まちがえた ' + wrong.length + '字は にがてリストに はいりました。' : 'まちがいは ありませんでした。') +
-      (recog ? ' よみとれなかった ' + recog + '字は まちがいに していません。' : '') +
-      (again.length ? ' もういちど：' + again.filter(function (x) { return x.result === 'correct'; }).length + ' / ' + again.length + '字 かけました。' : '');
+    $('rOf').textContent = '/ ' + items.length + K(' [問:もん] [正解:せいかい]') + (lastResult.partial ? K('（[途中:とちゅう]で やめた ところまで）') : '');
+    $('rNote').textContent = (wrong.length ? K('[間違:まちが]えた ') + wrong.length + K('字は [苦手:にがて]リストに [入:はい]りました。') : K('[間違:まちが]いは ありませんでした。')) +
+      (recog ? K(' [読:よ]み[取:と]れなかった ') + recog + K('字は [間違:まちが]いに していません。') : '') +
+      (again.length ? K(' もう[一度:いちど]：') + again.filter(function (x) { return x.result === 'correct'; }).length + ' / ' + again.length + K('字 [書:か]けました。') : '');
     function row(x) {
       return '<div class="ritem' + (x.again ? ' again' : '') + '"><span class="k">' + esc(x.ch) + '</span><span class="q qline">' + renderQ(x.q, x.result === 'correct' ? 'answer' : 'wrong') +
-        '</span><span class="pill ' + x.result + '">' + (x.again ? 'もういちど ' : '') + PILL[x.result] + '</span></div>';
+        '</span><span class="pill ' + x.result + '">' + (x.again ? K('もう[一度:いちど] ') : '') + K(PILL[x.result]) + '</span></div>';
     }
-    $('rList').innerHTML = items.map(row).join('') + (again.length ? '<h3 class="rsub">もういちど かいた かんじ</h3>' + again.map(row).join('') : '');
+    $('rList').innerHTML = items.map(row).join('') + (again.length ? '<h3 class="rsub">' + K('もう[一度:いちど] [書:か]いた [漢字:かんじ]') + '</h3>' + again.map(row).join('') : '');
     $('rPrint').disabled = !wrong.length;
-    $('rPrint').textContent = wrong.length ? 'まちがえた かんじの プリント（' + wrong.length + '字）' : 'まちがえた かんじは ありません';
+    $('rPrint').textContent = wrong.length ? K('[間違:まちが]えた [漢字:かんじ]の プリント（') + wrong.length + '字）' : K('[間違:まちが]えた [漢字:かんじ]は ありません');
   }
   $('rPrint').onclick = function () {
     printChars = uniq(lastResult.items.filter(function (x) { return !x.again && x.result === 'wrong'; }).map(function (x) { return x.ch; }));
@@ -516,7 +545,7 @@
   // ---------- 新しいバージョンの読みこみ ----------
   // ブラウザに残っている古いページを取りなおしてから開きなおす（学習の記録 IndexedDB はそのまま）
   $('aUpdate').onclick = function () {
-    var btn = this; btn.disabled = true; $('aUpMsg').textContent = 'よみこみちゅう…';
+    var btn = this; btn.disabled = true; $('aUpMsg').textContent = K('[読:よ]み[込:こ]み[中:ちゅう]…');
     var url = location.pathname + '?t=' + Date.now();
     fetch(location.pathname, { cache: 'reload' }).catch(function () {}).then(function () {
       location.replace(url + '#home');
@@ -526,7 +555,7 @@
   // ---------- 苦手リスト ----------
   var weakGrade = 1, selected = null;
   var GROUPS = [
-    ['weak', 'にがて', 'wrong'], ['due', 'もういちど かくにん', 'recog'], ['candidate', 'おぼえかけ', ''], ['mastered', 'おぼえた', 'correct'], ['new', 'まだ テストして いない', '']
+    ['weak', '[苦手:にがて]', 'wrong'], ['due', 'もう[一度:いちど] [確認:かくにん]', 'recog'], ['candidate', '[覚:おぼ]えかけ', ''], ['mastered', '[覚:おぼ]えた', 'correct'], ['new', 'まだ テストして いない', '']
   ];
   function kindOf(ch, now) { var r = Store.get(ch); if (!r || r.status === 'new') return 'new'; if (isDue(r, now)) return 'due'; return r.status; }
   function renderWeak() {
@@ -540,15 +569,15 @@
     levels().forEach(function (g) {
       if (!hasGrade(g)) return;
       var c = statusCounts(gradeChars(g));
-      tabs += '<button class="tab" role="tab" data-g="' + g + '" aria-selected="' + (g === weakGrade) + '">' + SHORT_NAME[g] + '（にがて ' + c.weak + '）</button>';
+      tabs += '<button class="tab" role="tab" data-g="' + g + '" aria-selected="' + (g === weakGrade) + '">' + K(SHORT_NAME[g]) + K('（[苦手:にがて] ') + c.weak + '）</button>';
     });
     $('wTabs').innerHTML = tabs;
     Array.prototype.forEach.call($('wTabs').querySelectorAll('.tab'), function (b) { b.onclick = function () { weakGrade = +b.dataset.g; renderWeak(); }; });
     var chars = gradeChars(weakGrade), html = '';
     GROUPS.forEach(function (gr) {
       var list = chars.filter(function (ch) { return kindOf(ch, now) === gr[0]; });
-      html += '<div class="group"><h3>' + gr[1] + ' <span class="pill ' + gr[2] + '">' + list.length + '字</span></h3>';
-      if (!list.length) html += '<div class="empty">ありません</div>';
+      html += '<div class="group"><h3>' + K(gr[1]) + ' <span class="pill ' + gr[2] + '">' + list.length + '字</span></h3>';
+      if (!list.length) html += '<div class="empty">' + K('ありません') + '</div>';
       else html += '<div class="kgrid">' + list.map(function (ch) {
         var r = Store.get(ch);
         var meta = r ? '○' + r.correct + ' ×' + r.wrong + (r.lastAt ? ' ・ ' + new Date(r.lastAt).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' }) : '') : '';
@@ -565,7 +594,7 @@
   function selList() { return Object.keys(selected || {}).filter(function (ch) { return selected[ch] && KANJI[ch]; }); }
   function updateSel() {
     var n = selList().length;
-    $('wSel').textContent = n + '字 えらんで います';
+    $('wSel').textContent = n + K('字 [選:えら]んで います');
     $('wTest').disabled = !n; $('wPrint').disabled = !n;
   }
   $('wAll').onclick = function () {
@@ -593,14 +622,14 @@
     var pages = [];
     for (var i = 0; i < rows.length; i += ROWS) pages.push(rows.slice(i, i + ROWS));
     var today = new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
-    var grades = uniq(printChars.map(function (ch) { return KANJI[ch].grade; })).sort().map(function (g) { return '小' + g; }).join('・');
+    var grades = uniq(printChars.map(function (ch) { return KANJI[ch].grade; })).sort(function (a, b) { return a - b; }).map(function (g) { return g <= 6 ? '小' + g : GRADE_NAME[g]; }).join('・');
     var total = pages.length * (withAns ? 2 : 1), pageNo = 0;
     function sheet(rowsOnPage, startNo, answer) {
       pageNo++;
       return '<div class="sheet-wrap"><div class="sheet">' +
-        '<div class="sh-head"><div><h2>' + (answer ? 'こたえ' : 'かんじ れんしゅうプリント') + '</h2><p>' +
-        (answer ? 'あかい 字が こたえです。' : 'しかくに はいる かんじを かいて、マスで れんしゅう しよう。') + '</p></div>' +
-        '<div class="sh-meta"><span>ひづけ　' + esc(today) + '</span>' + (answer ? '' : '<span class="name">なまえ</span>') + '</div></div>' +
+        '<div class="sh-head"><div><h2>' + (answer ? K('[答:こた]え') : K('[漢字:かんじ] [練習:れんしゅう]プリント')) + '</h2><p>' +
+        (answer ? K('[赤:あか]い [字:じ]が [答:こた]えです。') : K('[四角:しかく]に [入:はい]る [漢字:かんじ]を [書:か]いて、マスで [練習:れんしゅう] しよう。')) + '</p></div>' +
+        '<div class="sh-meta"><span>' + K('[日付:ひづけ]') + '　' + esc(today) + '</span>' + (answer ? '' : '<span class="name">' + K('[名前:なまえ]') + '</span>') + '</div></div>' +
         rowsOnPage.map(function (row, k) {
           var cells = '';
           for (var c = 0; c < 5; c++) cells += '<span class="sh-cell">' + ((answer || trace) && c === 0 ? esc(row.ch) : '') + '</span>';
@@ -612,7 +641,7 @@
     pages.forEach(function (p, i) { html += sheet(p, i * ROWS, false); });
     if (withAns) pages.forEach(function (p, i) { html += sheet(p, i * ROWS, true); });
     $('pSheets').innerHTML = html;
-    $('pNote').textContent = printChars.length + '字・' + rows.length + 'もん（A4 ' + total + 'まい）。いんさつの せっていで「余白なし」または「既定」、倍率100%を えらんでください。';
+    $('pNote').textContent = printChars.length + '字・' + rows.length + K('[問:もん]（A4 ') + total + K('[枚:まい]）。[印刷:いんさつ]の [設定:せってい]で「余白なし」または「既定」、倍率100%を [選:えら]んでください。');
   }
   ['pPer', 'pTrace', 'pAnswer'].forEach(function (id) { $(id).onchange = renderPrint; });
   $('pPrintBtn').onclick = function () { window.print(); };
