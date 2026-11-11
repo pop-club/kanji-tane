@@ -25,7 +25,7 @@ js/questions.js            問題データ（build.sh が data/questions/*.json 
 data/src/g1.txt            小1の問題の元データ（手で書く）
 data/questions/g1.json     検査済みの問題データ
 tools/build_questions.py   問題データの作成と検査
-index.html                 読み取り検証ページ（公開時は docs/verify.html）
+index.html                 読み取り検証ページ（公開時は docs/verify.html。アプリからのリンクはなし、URL を直接開く）
 build.sh                   静的ホスティング用に build/index.html を書き出す
 js/recognizer.js           認識ラッパー（筆跡→候補10件＋距離、正誤判定）
 js/joyo.js                 常用漢字2136字（認識対象の絞り込み用）
