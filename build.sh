@@ -30,4 +30,6 @@ for out in build docs; do
   cp -r js icons "$out/"
   cp -r vendor/kanjicanvas vendor/kanjivg-refs "$out/vendor/"
   touch "$out/.nojekyll"
+  # Google Search Console の確認用ファイル（リポジトリ直下に置いたもの）も公開する
+  for f in google*.html; do [ -f "$f" ] && cp "$f" "$out/"; done
 done
