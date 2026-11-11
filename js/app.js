@@ -122,7 +122,8 @@
   function show(name) {
     views.forEach(function (v) { $('v-' + v).hidden = v !== name; });
     window.scrollTo(0, 0);
-    if (name === 'test' && pad) setTimeout(pad.redraw, 0);
+    document.body.classList.toggle('testing', name === 'test');
+    if (name === 'test' && pad) setTimeout(function () { fitPad(); pad.redraw(); }, 0);
   }
   function route() {
     var h = (location.hash || '#home').slice(1);
@@ -199,21 +200,26 @@
     return (pool.length ? pool : qs)[Math.floor(Math.random() * (pool.length || qs.length))];
   }
   function chooseForGrade(g, n) {
-    // まだ出ていない字 → にがて → 再確認 → おぼえかけ → おぼえた の順に
+    // 4もんに1もんくらい（10もんなら3もん）は、にがて・再確認の字を入れる。
+    // のこりは まだ出ていない字 → にがて → 再確認 → おぼえかけ → おぼえた の順に
     var order = { new: 0, weak: 1, due: 2, candidate: 3, mastered: 4 }, now = Date.now();
+    function kind(ch) { var r = Store.get(ch); return !r ? 'new' : isDue(r, now) ? 'due' : r.status; }
     var chars = shuffle(gradeChars(g).slice());
-    chars.sort(function (a, b) {
-      var ra = Store.get(a), rb = Store.get(b);
-      var ka = !ra ? 'new' : isDue(ra, now) ? 'due' : ra.status, kb = !rb ? 'new' : isDue(rb, now) ? 'due' : rb.status;
-      return order[ka] - order[kb];
-    });
-    return chars.slice(0, n);
+    var weak = chars.filter(function (ch) { var k = kind(ch); return k === 'weak' || k === 'due'; });
+    var pick = weak.slice(0, Math.min(weak.length, Math.round(n / 4)));
+    var rest = chars.filter(function (ch) { return pick.indexOf(ch) < 0; });
+    rest.sort(function (a, b) { return order[kind(a)] - order[kind(b)]; });
+    return shuffle(pick.concat(rest.slice(0, n - pick.length)));
   }
   function startTest(mode, grade, chars) {
     if (!chars) chars = chooseForGrade(grade, pickN);
     session = { id: 's' + Date.now(), at: Date.now(), mode: mode, grade: grade, idx: 0,
       items: chars.map(function (ch) { return { ch: ch, q: pickQuestion(ch), result: null, tries: 0 }; }) };
-    if (!pad) pad = new window.PopKanjiPad($('tPad'), { onChange: function (n) { $('tPadHint').hidden = n > 0; updateAnswerBtn(); } });
+    if (!pad) pad = new window.PopKanjiPad($('tPad'), { onChange: function (n) {
+      $('tPadHint').hidden = n > 0;
+      $('tCount').hidden = !n; $('tCount').textContent = n + 'かく';
+      updateAnswerBtn();
+    } });
     go('test');
     showItem();
   }
@@ -233,7 +239,9 @@
     pad.setGuide(null);
     $('tNum').textContent = (session.idx + 1) + ' / ' + n;
     $('tProg').style.width = (100 * session.idx / n) + '%';
-    $('tLabel').textContent = session.mode === 'review' ? 'ふくしゅう：しかくに はいる かんじを かこう' : GRADE_NAME[k.grade] + '：しかくに はいる かんじを かこう';
+    $('tLabel').textContent = it.again ? 'もういちど：さっき まちがえた かんじだよ' :
+      session.mode === 'review' ? 'ふくしゅう：しかくに はいる かんじを かこう' : GRADE_NAME[k.grade] + '：しかくに はいる かんじを かこう';
+    $('tLabel').classList.toggle('again', !!it.again);
     $('tQ').innerHTML = renderQ(it.q, 'test');
     $('tQ').dataset.qid = it.q.id;
     $('tHint').hidden = true;
@@ -241,7 +249,26 @@
     $('tControls').hidden = false; $('tNextRow').hidden = true; $('tSkip').hidden = false;
     pad.lock(false); pad.clear();
     updateAnswerBtn();
+    window.scrollTo(0, 0);
+    fitPad();
   }
+  // スマホ縦向き：問題・書く枠・ボタンが1画面に収まるように、枠の大きさを決める
+  var narrowMq = window.matchMedia('(orientation: portrait), (max-width: 820px) and (min-height: 561px)');
+  function fitPad() {
+    var w = $('tPad').parentNode;
+    w.style.width = '';
+    if (!session || !narrowMq.matches || $('v-test').hidden) return;
+    var full = w.getBoundingClientRect().width;
+    var top = $('tPad').getBoundingClientRect().top + window.scrollY;
+    var below = 0;
+    Array.prototype.forEach.call(w.children, function (c) { if (c.id !== 'tPad' && !c.hidden) below += c.getBoundingClientRect().height + 10; });
+    var vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    var avail = Math.floor(vh - top - below - 12);
+    var min = answered && !practicing ? 150 : 230;
+    var size = Math.max(min, Math.min(full, avail));
+    if (size < full) w.style.width = size + 'px';
+  }
+  window.addEventListener('resize', function () { if (session) fitPad(); });
   function infoDl(ch) {
     var k = KANJI[ch];
     var yomi = [].concat(k.on, k.kun).filter(Boolean).join('・') || '—';
@@ -258,6 +285,7 @@
       (kind === 'wrong' || kind === 'recog' ? '<button class="btn small practice" id="tPractice">おてほんを みて もういちど かく</button><div class="pmsg" id="tPmsg" aria-live="polite"></div>' : '') +
       (misjudge ? '<button class="misjudge" id="tMis">ただしく かいたのに まちがいに なった</button>' : '') + '</div>';
     $('tFb').innerHTML = html; $('tFb').hidden = false;
+    setTimeout(fitPad, 0);
     if ($('tPractice')) $('tPractice').onclick = startPractice;
     if (misjudge) $('tMis').onclick = function () {
       pending = 'recog';
@@ -273,8 +301,9 @@
     pad.lock(true);
     $('tControls').hidden = true; $('tSkip').hidden = true; $('tNextRow').hidden = false;
     $('tQ').innerHTML = renderQ(it.q, result === 'correct' ? 'answer' : 'wrong');
-    $('tNext').focus();
+    $('tNext').focus({ preventScroll: true });
     updateAnswerBtn();
+    fitPad();
   }
   // まちがえた字の練習：お手本をうすく出して、なぞって書く。記録（まちがい）は変えない
   function startPractice() {
@@ -285,6 +314,7 @@
     $('tPmsg').textContent = 'うすい おてほんを なぞって かいてみよう';
     $('tPractice').hidden = true;
     updateAnswerBtn();
+    fitPad();
   }
   function practiceCheck() {
     var it = cur();
@@ -306,7 +336,7 @@
     // 1回めは画数のヒントを出して書き直し、2回めも画数がちがえば理由を伝えてまちがいにする。
     var std = STD_STROKES[it.ch], n = pad.strokes().length, mismatch = !!std && n !== std;
     if (j.result === 'correct') {
-      feedback('correct', 'せいかい！', '', true, false);
+      feedback('correct', 'せいかい！', it.again ? 'こんどは かけたね。べつの 日にも かけたら「おぼえた」に なるよ。' : '', true, false);
       finishItem('correct');
     } else if (mismatch && !it.strokeHinted) {
       it.strokeHinted = true;
@@ -343,7 +373,16 @@
   $('tNext').onclick = function () {
     var it = cur();
     it.result = pending;
-    applyResult(it.ch, it.q.id, pending);
+    // 「もういちど」は答えを見た直後なので、記録（にがて・おぼえた）は変えない
+    if (!it.again) applyResult(it.ch, it.q.id, pending);
+    saveSession(session.items.filter(function (x) { return x.result; }));   // 1問ごとに保存（とちゅうで とじても のこる）
+    if (session.idx + 1 >= session.items.length && !session.againAdded) {
+      // さいごに、このテストで まちがえた字を もういちど出す（ちがう問題で、1回だけ）
+      session.againAdded = true;
+      session.items.forEach(function (x) {
+        if (!x.again && x.result === 'wrong') session.items.push({ ch: x.ch, q: pickQuestion(x.ch), result: null, tries: 0, again: true });
+      });
+    }
     if (session.idx + 1 < session.items.length) { session.idx++; showItem(); }
     else endTest();
   };
@@ -351,14 +390,22 @@
   $('tQuit').onclick = function () {
     if (!quitArmed) { quitArmed = true; this.textContent = 'ほんとうに やめる？'; var b = this; setTimeout(function () { quitArmed = false; b.textContent = 'やめる'; }, 3000); return; }
     quitArmed = false; this.textContent = 'やめる';
+    // こたえた ところまでを保存する（「つぎへ」を おす前の 問題も ふくめる）
+    var it = cur();
+    if (answered && !it.result) { it.result = pending; if (!it.again) applyResult(it.ch, it.q.id, pending); }
     var done = session.items.filter(function (x) { return x.result; });
-    if (done.length) saveSession(done);
-    session = null; go('home');
+    if (!done.length) { session = null; go('home'); return; }
+    saveSession(done);
+    lastResult = { mode: session.mode, grade: session.grade, items: done, partial: true };
+    session = null;
+    renderResult();
+    go('result');
   };
   function saveSession(items) {
     Store.addSession({ id: session.id, at: session.at, mode: session.mode, grade: session.grade,
       items: items.map(function (x) {
         var o = { ch: x.ch, q: x.q.id, result: x.result, tries: x.tries, seenAs: x.seenAs, top: x.top || null };
+        if (x.again) o.again = true;
         if (x.result !== 'correct') o.strokes = x.strokes;   // まちがい・読み取れなかった字の筆跡（読み取り改善用、この端末だけ）
         return o;
       }) });
@@ -374,23 +421,26 @@
   // ---------- 結果 ----------
   var PILL = { correct: 'せいかい', wrong: 'まちがい', recog: 'よみとれず' };
   function renderResult() {
-    var items = lastResult.items;
+    var all = lastResult.items;
+    var items = all.filter(function (x) { return !x.again; }), again = all.filter(function (x) { return x.again; });
     var ok = items.filter(function (x) { return x.result === 'correct'; }).length;
     var wrong = items.filter(function (x) { return x.result === 'wrong'; });
     var recog = items.filter(function (x) { return x.result === 'recog'; }).length;
     $('rScore').textContent = ok;
-    $('rOf').textContent = '/ ' + items.length + ' もん せいかい';
+    $('rOf').textContent = '/ ' + items.length + ' もん せいかい' + (lastResult.partial ? '（とちゅうで やめた ところまで）' : '');
     $('rNote').textContent = (wrong.length ? 'まちがえた ' + wrong.length + '字は にがてリストに はいりました。' : 'まちがいは ありませんでした。') +
-      (recog ? ' よみとれなかった ' + recog + '字は まちがいに していません。' : '');
-    $('rList').innerHTML = items.map(function (x) {
-      return '<div class="ritem"><span class="k">' + esc(x.ch) + '</span><span class="q qline">' + renderQ(x.q, x.result === 'correct' ? 'answer' : 'wrong') +
-        '</span><span class="pill ' + x.result + '">' + PILL[x.result] + '</span></div>';
-    }).join('');
+      (recog ? ' よみとれなかった ' + recog + '字は まちがいに していません。' : '') +
+      (again.length ? ' もういちど：' + again.filter(function (x) { return x.result === 'correct'; }).length + ' / ' + again.length + '字 かけました。' : '');
+    function row(x) {
+      return '<div class="ritem' + (x.again ? ' again' : '') + '"><span class="k">' + esc(x.ch) + '</span><span class="q qline">' + renderQ(x.q, x.result === 'correct' ? 'answer' : 'wrong') +
+        '</span><span class="pill ' + x.result + '">' + (x.again ? 'もういちど ' : '') + PILL[x.result] + '</span></div>';
+    }
+    $('rList').innerHTML = items.map(row).join('') + (again.length ? '<h3 class="rsub">もういちど かいた かんじ</h3>' + again.map(row).join('') : '');
     $('rPrint').disabled = !wrong.length;
     $('rPrint').textContent = wrong.length ? 'まちがえた かんじの プリント（' + wrong.length + '字）' : 'まちがえた かんじは ありません';
   }
   $('rPrint').onclick = function () {
-    printChars = uniq(lastResult.items.filter(function (x) { return x.result === 'wrong'; }).map(function (x) { return x.ch; }));
+    printChars = uniq(lastResult.items.filter(function (x) { return !x.again && x.result === 'wrong'; }).map(function (x) { return x.ch; }));
     printFrom = 'result'; go('print');
   };
   $('rAgain').onclick = function () {

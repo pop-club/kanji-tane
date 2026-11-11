@@ -76,7 +76,11 @@
     all: function () { return kanji; },
     save: function (rec) { kanji[rec.char] = rec; return write('kanji', rec); },
     sessions: function () { return sessions; },
-    addSession: function (s) { sessions.push(s); return write('sessions', s); },
+    addSession: function (s) {   // 同じ id は上書き（テスト中に1問ごとに保存するため）
+      var i = sessions.findIndex(function (x) { return x.id === s.id; });
+      if (i >= 0) sessions[i] = s; else sessions.push(s);
+      return write('sessions', s);
+    },
     exportData: function () {
       return { app: 'kanji-tane', version: 1, exportedAt: new Date().toISOString(),
         kanji: Object.keys(kanji).map(function (k) { return kanji[k]; }), sessions: sessions };

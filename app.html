@@ -56,6 +56,7 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 button, input, select { font: inherit; color: inherit; }
+button, a, label { touch-action: manipulation; }   /* 続けてタップしても拡大しない */
 a { color: var(--sky); }
 .app { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 
@@ -143,9 +144,42 @@ h2 { font-size: 1.15rem; }
 .pad { position: relative; width: 100%; aspect-ratio: 1; max-width: 100%; background: var(--surface); border: 3px solid var(--line); border-radius: var(--r); touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
 .pad canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; border-radius: var(--r); touch-action: none; }
 .pad.locked { opacity: .75; }
+.pad .padcount { position: absolute; top: 8px; left: 10px; padding: 2px 10px; border-radius: 99px; background: var(--bg); color: var(--muted); font-weight: 700; font-size: .95rem; font-variant-numeric: tabular-nums; pointer-events: none; }
 .pad .padhint { position: absolute; left: 0; right: 0; bottom: 12px; text-align: center; color: var(--muted); font-size: .9rem; pointer-events: none; }
 .controls { display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 10px; }
-.controls .btn { padding: 0 8px; }
+.controls .btn { padding: 0 8px; white-space: nowrap; }
+#tLabel.again { color: var(--accent); font-weight: 700; }
+/* スマホ：テスト中はヘッダーを隠し、問題・枠・ボタンを1画面に（枠の大きさは js の fitPad） */
+@media (max-width: 600px), (max-height: 560px) {
+  body.testing .top { display: none; }
+  body.testing { padding-block: 8px 12px; }
+  #v-test.view { display: flex; flex-direction: column; gap: 10px; }
+  .testgrid { gap: 10px; }
+  .testgrid .col { gap: 10px !important; }
+  .qcard { min-height: 0; padding: 12px 14px; gap: 6px; }
+  .qcard .sub { font-size: .82rem; }
+  .qtext { font-size: clamp(1.45rem, 6.4vw, 2rem); }
+  .fb { padding: 12px; gap: 8px; }
+  .fb .ans { font-size: 3.2rem; }
+  .fb .verdict { font-size: 1.25rem; }
+  .controls { gap: 8px; }
+  .controls .btn { min-height: 52px; font-size: .95rem; }
+  .skip { min-height: 40px; }
+  #tNextRow { position: sticky; bottom: max(8px, env(safe-area-inset-bottom, 0px)); z-index: 5; }
+  #tNextRow .btn { box-shadow: 0 6px 20px rgba(20, 40, 60, .18); }
+}
+#v-test.view[hidden] { display: none !important; }
+/* スマホ横向き：左に問題、右に枠（高さに合わせる） */
+@media (max-height: 560px) and (orientation: landscape) {
+  .testgrid { grid-template-columns: minmax(0, 1fr) auto; }
+  .writer { width: auto; display: grid; grid-template-columns: max(170px, calc(100vh - 96px)) 104px; align-content: start; gap: 8px; }
+  .writer > .pad { grid-row: 1 / span 3; }
+  .writer > :not(.pad) { grid-column: 2; }
+  .controls { grid-template-columns: 1fr; }
+  .controls .btn { min-height: 46px; font-size: .88rem; }
+  #tNextRow .btn { min-height: 46px; padding: 0 8px; }
+  .skip { min-height: 32px; }
+}
 .skip { align-self: center; background: none; border: none; color: var(--muted); text-decoration: underline; min-height: 44px; cursor: pointer; }
 
 .fb { border-radius: var(--r); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
@@ -176,6 +210,8 @@ h2 { font-size: 1.15rem; }
 .pill { font-size: .8rem; font-weight: 700; padding: 4px 10px; border-radius: 99px; white-space: nowrap; }
 .pill.correct { background: var(--ok-bg); color: var(--ok); }
 .pill.wrong { background: var(--ng-bg); color: var(--ng); }
+.ritem.again { background: transparent; border: 1px dashed var(--line); }
+.rsub { font-size: .95rem; color: var(--muted); margin-top: 6px; }
 .pill.recog { background: var(--retry-bg); color: var(--retry); }
 
 /* 苦手リスト */
@@ -280,7 +316,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
         <button data-n="10" aria-pressed="true">10もん</button>
         <button data-n="20" aria-pressed="false">20もん</button>
       </div>
-      <p class="sub">まだ おぼえて いない かんじから じゅんばんに でます。</p>
+      <p class="sub">まだ おぼえて いない かんじから じゅんばんに でます。にがての かんじも ときどき まざります。まちがえた かんじは、さいごに もういちど でます。</p>
       <button class="btn primary" id="gStart" disabled>はじめる</button>
     </div>
   </section>
@@ -302,7 +338,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
         <div id="tFb" hidden></div>
       </div>
       <div class="writer">
-        <div class="pad" id="tPad"><div class="padhint" id="tPadHint">ここに ゆびや ペンで かこう</div></div>
+        <div class="pad" id="tPad"><div class="padcount" id="tCount" hidden></div><div class="padhint" id="tPadHint">ここに ゆびや ペンで かこう</div></div>
         <div class="controls" id="tControls">
           <button class="btn" id="tUndo">1かく けす</button>
           <button class="btn" id="tClear">ぜんぶ けす</button>
