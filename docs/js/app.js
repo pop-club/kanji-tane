@@ -217,13 +217,20 @@
       items: chars.map(function (ch) { return { ch: ch, q: pickQuestion(ch), result: null, tries: 0 }; }) };
     if (!pad) pad = new window.PopKanjiPad($('tPad'), { onChange: function (n) {
       $('tPadHint').hidden = n > 0;
-      $('tCount').hidden = !n; $('tCount').textContent = n + 'かく';
+      showCount(n);
       updateAnswerBtn();
     } });
     go('test');
     showItem();
   }
   function cur() { return session.items[session.idx]; }
+  // 書く枠の左上：いまの画数 / その字の画数（ヒント）。ちょうどなら緑、多すぎたら黄色
+  function showCount(n) {
+    var el = $('tCount'), std = session && STD_STROKES[cur().ch];
+    el.hidden = !n && !std;
+    el.textContent = std ? n + ' / ' + std + 'かく' : n + 'かく';
+    el.className = 'padcount' + (std && n === std ? ' ok' : std && n > std ? ' over' : '');
+  }
   function updateAnswerBtn() {
     if (!pad || !session) return;
     var n = pad.strokes().length;
@@ -248,6 +255,7 @@
     $('tFb').hidden = true; $('tFb').innerHTML = '';
     $('tControls').hidden = false; $('tNextRow').hidden = true; $('tSkip').hidden = false;
     pad.lock(false); pad.clear();
+    showCount(0);
     updateAnswerBtn();
     window.scrollTo(0, 0);
     fitPad();

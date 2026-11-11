@@ -150,6 +150,8 @@ h2 { font-size: 1.15rem; }
 .pad canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; border-radius: var(--r); touch-action: none; }
 .pad.locked { opacity: .75; }
 .pad .padcount { position: absolute; top: 8px; left: 10px; padding: 2px 10px; border-radius: 99px; background: var(--bg); color: var(--muted); font-weight: 700; font-size: .95rem; font-variant-numeric: tabular-nums; pointer-events: none; }
+.pad .padcount.ok { background: var(--ok-bg); color: var(--ok); }
+.pad .padcount.over { background: var(--retry-bg); color: var(--retry); }
 .pad .padhint { position: absolute; left: 0; right: 0; bottom: 12px; text-align: center; color: var(--muted); font-size: .9rem; pointer-events: none; }
 .controls { display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 10px; }
 .controls .btn { padding: 0 8px; white-space: nowrap; }
