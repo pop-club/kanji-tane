@@ -1,6 +1,6 @@
 {
 "grade": 12,
-"count": 110,
+"count": 425,
 "sources": {
 "words": "JMdict (EDRDG, CC BY-SA 4.0) の共通語から選定",
 "sentences": "Pop-Kanji で作成"
@@ -368,22 +368,6 @@
 ],
 "words": []
 },
-"亶": {
-"grade": 12,
-"on": [
-"タン"
-],
-"kun": [
-"まことに"
-],
-"meaning": "まことに",
-"meaningTokens": [
-{
-"t": "まことに"
-}
-],
-"words": []
-},
 "从": {
 "grade": 12,
 "on": [
@@ -523,20 +507,6 @@
 "meaningTokens": [
 {
 "t": "せん"
-}
-],
-"words": []
-},
-"价": {
-"grade": 12,
-"on": [
-"カイ"
-],
-"kun": [],
-"meaning": "よい",
-"meaningTokens": [
-{
-"t": "よい"
 }
 ],
 "words": []
@@ -758,22 +728,6 @@
 ],
 "words": []
 },
-"侑": {
-"grade": 12,
-"on": [
-"ユウ"
-],
-"kun": [
-"すすめる"
-],
-"meaning": "すすめる",
-"meaningTokens": [
-{
-"t": "すすめる"
-}
-],
-"words": []
-},
 "佯": {
 "grade": 12,
 "on": [
@@ -837,22 +791,6 @@
 "words": [
 "我儘（わがまま）"
 ]
-},
-"俔": {
-"grade": 12,
-"on": [
-"ケン"
-],
-"kun": [
-"うかがう"
-],
-"meaning": "たとえる",
-"meaningTokens": [
-{
-"t": "たとえる"
-}
-],
-"words": []
 },
 "俟": {
 "grade": 12,
@@ -1100,22 +1038,6 @@
 ],
 "words": []
 },
-"俶": {
-"grade": 12,
-"on": [
-"シュク"
-],
-"kun": [
-"はじめ"
-],
-"meaning": "よい",
-"meaningTokens": [
-{
-"t": "よい"
-}
-],
-"words": []
-},
 "倡": {
 "grade": 12,
 "on": [
@@ -1144,36 +1066,6 @@
 "meaningTokens": [
 {
 "t": "うつくしい"
-}
-],
-"words": []
-},
-"倬": {
-"grade": 12,
-"on": [
-"タク"
-],
-"kun": [],
-"meaning": "おおきい",
-"meaningTokens": [
-{
-"t": "おおきい"
-}
-],
-"words": []
-},
-"俾": {
-"grade": 12,
-"on": [
-"ヒ"
-],
-"kun": [
-"しむ"
-],
-"meaning": "しむ",
-"meaningTokens": [
-{
-"t": "しむ"
 }
 ],
 "words": []
@@ -1508,22 +1400,6 @@
 ],
 "words": []
 },
-"僖": {
-"grade": 12,
-"on": [
-"キ"
-],
-"kun": [
-"よろこぶ"
-],
-"meaning": "よろこぶ",
-"meaningTokens": [
-{
-"t": "よろこぶ"
-}
-],
-"words": []
-},
 "僞": {
 "grade": 12,
 "on": [
@@ -1682,20 +1558,6 @@
 ],
 "words": []
 },
-"儖": {
-"grade": 12,
-"on": [
-"ラン"
-],
-"kun": [],
-"meaning": "みにくい",
-"meaningTokens": [
-{
-"t": "みにくい"
-}
-],
-"words": []
-},
 "儕": {
 "grade": 12,
 "on": [
@@ -1724,6 +1586,5122 @@
 "meaningTokens": [
 {
 "t": "ともがら"
+}
+],
+"words": []
+},
+"儚": {
+"grade": 12,
+"on": [
+"ボウ"
+],
+"kun": [
+"はかない"
+],
+"meaning": "はかない",
+"meaningTokens": [
+{
+"t": "はかない"
+}
+],
+"words": []
+},
+"儡": {
+"grade": 12,
+"on": [
+"ライ"
+],
+"kun": [],
+"meaning": "でく",
+"meaningTokens": [
+{
+"t": "でく"
+}
+],
+"words": []
+},
+"儺": {
+"grade": 12,
+"on": [
+"ナ"
+],
+"kun": [
+"おにやらい"
+],
+"meaning": "おにやらい",
+"meaningTokens": [
+{
+"t": "おにやらい"
+}
+],
+"words": []
+},
+"儷": {
+"grade": 12,
+"on": [
+"レイ"
+],
+"kun": [
+"つれあい"
+],
+"meaning": "つれあい",
+"meaningTokens": [
+{
+"t": "つれあい"
+}
+],
+"words": []
+},
+"儼": {
+"grade": 12,
+"on": [
+"ゲン"
+],
+"kun": [
+"おごそか"
+],
+"meaning": "おごそか",
+"meaningTokens": [
+{
+"t": "おごそか"
+}
+],
+"words": []
+},
+"儿": {
+"grade": 12,
+"on": [
+"ジン"
+],
+"kun": [],
+"meaning": "ひとあし",
+"meaningTokens": [
+{
+"t": "ひとあし"
+}
+],
+"words": []
+},
+"兀": {
+"grade": 12,
+"on": [
+"コツ"
+],
+"kun": [],
+"meaning": "たかい",
+"meaningTokens": [
+{
+"t": "たかい"
+}
+],
+"words": []
+},
+"兒": {
+"grade": 12,
+"on": [
+"ジ"
+],
+"kun": [
+"こ"
+],
+"meaning": "こ",
+"meaningTokens": [
+{
+"t": "こ"
+}
+],
+"words": []
+},
+"兌": {
+"grade": 12,
+"on": [
+"ダ"
+],
+"kun": [],
+"meaning": "とりかえる",
+"meaningTokens": [
+{
+"t": "とりかえる"
+}
+],
+"words": []
+},
+"兔": {
+"grade": 12,
+"on": [
+"ト"
+],
+"kun": [
+"うさぎ"
+],
+"meaning": "うさぎ",
+"meaningTokens": [
+{
+"t": "うさぎ"
+}
+],
+"words": []
+},
+"兢": {
+"grade": 12,
+"on": [
+"キョウ"
+],
+"kun": [
+"おそれる"
+],
+"meaning": "つつしむ",
+"meaningTokens": [
+{
+"t": "つつしむ"
+}
+],
+"words": []
+},
+"竸": {
+"grade": 12,
+"on": [
+"キョウ"
+],
+"kun": [
+"きそう"
+],
+"meaning": "きそう",
+"meaningTokens": [
+{
+"t": "きそう"
+}
+],
+"words": []
+},
+"兩": {
+"grade": 12,
+"on": [
+"リョウ"
+],
+"kun": [
+"ふたつ"
+],
+"meaning": "ふたつ",
+"meaningTokens": [
+{
+"t": "ふたつ"
+}
+],
+"words": []
+},
+"兮": {
+"grade": 12,
+"on": [
+"ケイ"
+],
+"kun": [],
+"meaning": "ことばの おわり",
+"meaningTokens": [
+{
+"t": "ことばの おわり"
+}
+],
+"words": []
+},
+"冀": {
+"grade": 12,
+"on": [
+"キ"
+],
+"kun": [
+"こいねがう"
+],
+"meaning": "こいねがう",
+"meaningTokens": [
+{
+"t": "こいねがう"
+}
+],
+"words": []
+},
+"冂": {
+"grade": 12,
+"on": [
+"ケイ"
+],
+"kun": [],
+"meaning": "どうがまえ",
+"meaningTokens": [
+{
+"t": "どうがまえ"
+}
+],
+"words": []
+},
+"囘": {
+"grade": 12,
+"on": [
+"カイ"
+],
+"kun": [
+"まわる"
+],
+"meaning": "まわる",
+"meaningTokens": [
+{
+"t": "まわる"
+}
+],
+"words": []
+},
+"册": {
+"grade": 12,
+"on": [
+"サツ"
+],
+"kun": [],
+"meaning": "ほん",
+"meaningTokens": [
+{
+"t": "ほん"
+}
+],
+"words": [
+"別册（べっさつ）"
+]
+},
+"冉": {
+"grade": 12,
+"on": [
+"ゼン"
+],
+"kun": [],
+"meaning": "すすむ",
+"meaningTokens": [
+{
+"t": "すすむ"
+}
+],
+"words": []
+},
+"冑": {
+"grade": 12,
+"on": [
+"チュウ"
+],
+"kun": [
+"かぶと"
+],
+"meaning": "かぶと",
+"meaningTokens": [
+{
+"t": "かぶと"
+}
+],
+"words": []
+},
+"冓": {
+"grade": 12,
+"on": [
+"コウ"
+],
+"kun": [
+"かまえる"
+],
+"meaning": "くみたてる",
+"meaningTokens": [
+{
+"t": "くみたてる"
+}
+],
+"words": []
+},
+"冕": {
+"grade": 12,
+"on": [
+"ベン"
+],
+"kun": [
+"かんむり"
+],
+"meaning": "かんむり",
+"meaningTokens": [
+{
+"t": "かんむり"
+}
+],
+"words": []
+},
+"冖": {
+"grade": 12,
+"on": [
+"ベキ"
+],
+"kun": [],
+"meaning": "わかんむり",
+"meaningTokens": [
+{
+"t": "わかんむり"
+}
+],
+"words": []
+},
+"冤": {
+"grade": 12,
+"on": [
+"エン"
+],
+"kun": [],
+"meaning": "ぬれぎぬ",
+"meaningTokens": [
+{
+"t": "ぬれぎぬ"
+}
+],
+"words": []
+},
+"冦": {
+"grade": 12,
+"on": [
+"コウ"
+],
+"kun": [
+"あだする"
+],
+"meaning": "あだ",
+"meaningTokens": [
+{
+"t": "あだ"
+}
+],
+"words": []
+},
+"冢": {
+"grade": 12,
+"on": [
+"チョウ"
+],
+"kun": [
+"つか"
+],
+"meaning": "つか",
+"meaningTokens": [
+{
+"t": "つか"
+}
+],
+"words": []
+},
+"冩": {
+"grade": 12,
+"on": [
+"シャ"
+],
+"kun": [
+"うつす"
+],
+"meaning": "うつす",
+"meaningTokens": [
+{
+"t": "うつす"
+}
+],
+"words": []
+},
+"冪": {
+"grade": 12,
+"on": [
+"ベキ"
+],
+"kun": [],
+"meaning": "おおう",
+"meaningTokens": [
+{
+"t": "おおう"
+}
+],
+"words": []
+},
+"冫": {
+"grade": 12,
+"on": [
+"ヒョウ"
+],
+"kun": [],
+"meaning": "にすい",
+"meaningTokens": [
+{
+"t": "にすい"
+}
+],
+"words": []
+},
+"决": {
+"grade": 12,
+"on": [
+"ケツ"
+],
+"kun": [
+"きめる"
+],
+"meaning": "きめる",
+"meaningTokens": [
+{
+"t": "きめる"
+}
+],
+"words": []
+},
+"冱": {
+"grade": 12,
+"on": [
+"ゴ"
+],
+"kun": [
+"さえる",
+"こおる"
+],
+"meaning": "こおる",
+"meaningTokens": [
+{
+"t": "こおる"
+}
+],
+"words": []
+},
+"冲": {
+"grade": 12,
+"on": [
+"チュウ"
+],
+"kun": [
+"おき"
+],
+"meaning": "おき",
+"meaningTokens": [
+{
+"t": "おき"
+}
+],
+"words": []
+},
+"冰": {
+"grade": 12,
+"on": [
+"ヒョウ"
+],
+"kun": [
+"こおり"
+],
+"meaning": "こおり",
+"meaningTokens": [
+{
+"t": "こおり"
+}
+],
+"words": []
+},
+"况": {
+"grade": 12,
+"on": [
+"キョウ"
+],
+"kun": [
+"いわんや"
+],
+"meaning": "いわんや",
+"meaningTokens": [
+{
+"t": "いわんや"
+}
+],
+"words": []
+},
+"冽": {
+"grade": 12,
+"on": [
+"レツ"
+],
+"kun": [
+"きよい"
+],
+"meaning": "きよい",
+"meaningTokens": [
+{
+"t": "きよい"
+}
+],
+"words": []
+},
+"凅": {
+"grade": 12,
+"on": [
+"コ"
+],
+"kun": [
+"かれる"
+],
+"meaning": "かれる",
+"meaningTokens": [
+{
+"t": "かれる"
+}
+],
+"words": []
+},
+"凉": {
+"grade": 12,
+"on": [
+"リョウ"
+],
+"kun": [
+"すずしい"
+],
+"meaning": "すずしい",
+"meaningTokens": [
+{
+"t": "すずしい"
+}
+],
+"words": []
+},
+"凛": {
+"grade": 12,
+"on": [
+"リン"
+],
+"kun": [
+"きびしい"
+],
+"meaning": "きびしい",
+"meaningTokens": [
+{
+"t": "きびしい"
+}
+],
+"words": []
+},
+"几": {
+"grade": 12,
+"on": [
+"キ"
+],
+"kun": [],
+"meaning": "つくえ",
+"meaningTokens": [
+{
+"t": "つくえ"
+}
+],
+"words": []
+},
+"處": {
+"grade": 12,
+"on": [
+"ショ"
+],
+"kun": [
+"ところ"
+],
+"meaning": "ところ",
+"meaningTokens": [
+{
+"t": "ところ"
+}
+],
+"words": []
+},
+"凩": {
+"grade": 12,
+"on": [],
+"kun": [
+"こがらし"
+],
+"meaning": "こがらし",
+"meaningTokens": [
+{
+"t": "こがらし"
+}
+],
+"words": []
+},
+"凭": {
+"grade": 12,
+"on": [
+"ヒョウ"
+],
+"kun": [
+"もたれる"
+],
+"meaning": "もたれる",
+"meaningTokens": [
+{
+"t": "もたれる"
+}
+],
+"words": []
+},
+"凰": {
+"grade": 12,
+"on": [
+"オウ"
+],
+"kun": [],
+"meaning": "おおとり",
+"meaningTokens": [
+{
+"t": "おおとり"
+}
+],
+"words": []
+},
+"凵": {
+"grade": 12,
+"on": [
+"カン"
+],
+"kun": [],
+"meaning": "かんにょう",
+"meaningTokens": [
+{
+"t": "かんにょう"
+}
+],
+"words": []
+},
+"凾": {
+"grade": 12,
+"on": [
+"カン"
+],
+"kun": [
+"はこ"
+],
+"meaning": "はこ",
+"meaningTokens": [
+{
+"t": "はこ"
+}
+],
+"words": []
+},
+"刄": {
+"grade": 12,
+"on": [
+"ジン"
+],
+"kun": [
+"やいば"
+],
+"meaning": "やいば",
+"meaningTokens": [
+{
+"t": "やいば"
+}
+],
+"words": []
+},
+"刋": {
+"grade": 12,
+"on": [
+"セン"
+],
+"kun": [
+"けずる"
+],
+"meaning": "けずる",
+"meaningTokens": [
+{
+"t": "けずる"
+}
+],
+"words": []
+},
+"刔": {
+"grade": 12,
+"on": [
+"ケツ"
+],
+"kun": [
+"えぐる"
+],
+"meaning": "えぐる",
+"meaningTokens": [
+{
+"t": "えぐる"
+}
+],
+"words": []
+},
+"刎": {
+"grade": 12,
+"on": [
+"フン"
+],
+"kun": [
+"はねる"
+],
+"meaning": "はねる",
+"meaningTokens": [
+{
+"t": "はねる"
+}
+],
+"words": []
+},
+"刧": {
+"grade": 12,
+"on": [
+"ゴウ"
+],
+"kun": [
+"おびやかす"
+],
+"meaning": "おびやかす",
+"meaningTokens": [
+{
+"t": "おびやかす"
+}
+],
+"words": []
+},
+"刪": {
+"grade": 12,
+"on": [
+"サン"
+],
+"kun": [
+"けずる"
+],
+"meaning": "けずる",
+"meaningTokens": [
+{
+"t": "けずる"
+}
+],
+"words": []
+},
+"刮": {
+"grade": 12,
+"on": [
+"カツ"
+],
+"kun": [
+"けずる"
+],
+"meaning": "こそげる",
+"meaningTokens": [
+{
+"t": "こそげる"
+}
+],
+"words": []
+},
+"刳": {
+"grade": 12,
+"on": [
+"コ"
+],
+"kun": [
+"えぐる",
+"くる"
+],
+"meaning": "くる",
+"meaningTokens": [
+{
+"t": "くる"
+}
+],
+"words": []
+},
+"剏": {
+"grade": 12,
+"on": [
+"ソウ"
+],
+"kun": [
+"はじめる"
+],
+"meaning": "はじめる",
+"meaningTokens": [
+{
+"t": "はじめる"
+}
+],
+"words": []
+},
+"剋": {
+"grade": 12,
+"on": [
+"コク"
+],
+"kun": [
+"かつ"
+],
+"meaning": "かつ",
+"meaningTokens": [
+{
+"t": "かつ"
+}
+],
+"words": []
+},
+"剌": {
+"grade": 12,
+"on": [
+"ラツ"
+],
+"kun": [
+"もとる"
+],
+"meaning": "もとる",
+"meaningTokens": [
+{
+"t": "もとる"
+}
+],
+"words": []
+},
+"剞": {
+"grade": 12,
+"on": [
+"キ"
+],
+"kun": [
+"きざむ"
+],
+"meaning": "きざむ",
+"meaningTokens": [
+{
+"t": "きざむ"
+}
+],
+"words": []
+},
+"剔": {
+"grade": 12,
+"on": [
+"テキ"
+],
+"kun": [
+"えぐる"
+],
+"meaning": "えぐる",
+"meaningTokens": [
+{
+"t": "えぐる"
+}
+],
+"words": []
+},
+"剪": {
+"grade": 12,
+"on": [
+"セン"
+],
+"kun": [
+"きる"
+],
+"meaning": "きる",
+"meaningTokens": [
+{
+"t": "きる"
+}
+],
+"words": []
+},
+"剴": {
+"grade": 12,
+"on": [
+"ガイ"
+],
+"kun": [],
+"meaning": "あてはまる",
+"meaningTokens": [
+{
+"t": "あてはまる"
+}
+],
+"words": []
+},
+"剩": {
+"grade": 12,
+"on": [
+"ジョウ"
+],
+"kun": [
+"あまる"
+],
+"meaning": "あまる",
+"meaningTokens": [
+{
+"t": "あまる"
+}
+],
+"words": []
+},
+"剳": {
+"grade": 12,
+"on": [
+"トウ"
+],
+"kun": [
+"さす"
+],
+"meaning": "さす",
+"meaningTokens": [
+{
+"t": "さす"
+}
+],
+"words": []
+},
+"剿": {
+"grade": 12,
+"on": [
+"ソウ"
+],
+"kun": [],
+"meaning": "ほろぼす",
+"meaningTokens": [
+{
+"t": "ほろぼす"
+}
+],
+"words": [
+"剿討（そうとう）"
+]
+},
+"剽": {
+"grade": 12,
+"on": [
+"ヒョウ"
+],
+"kun": [
+"おびやかす"
+],
+"meaning": "すばやい",
+"meaningTokens": [
+{
+"t": "すばやい"
+}
+],
+"words": []
+},
+"劍": {
+"grade": 12,
+"on": [
+"ケン"
+],
+"kun": [
+"つるぎ"
+],
+"meaning": "つるぎ",
+"meaningTokens": [
+{
+"t": "つるぎ"
+}
+],
+"words": []
+},
+"劔": {
+"grade": 12,
+"on": [
+"ケン"
+],
+"kun": [
+"つるぎ"
+],
+"meaning": "つるぎ",
+"meaningTokens": [
+{
+"t": "つるぎ"
+}
+],
+"words": []
+},
+"劒": {
+"grade": 12,
+"on": [
+"ケン"
+],
+"kun": [
+"つるぎ"
+],
+"meaning": "つるぎ",
+"meaningTokens": [
+{
+"t": "つるぎ"
+}
+],
+"words": []
+},
+"剱": {
+"grade": 12,
+"on": [
+"ケン"
+],
+"kun": [
+"つるぎ"
+],
+"meaning": "つるぎ",
+"meaningTokens": [
+{
+"t": "つるぎ"
+}
+],
+"words": []
+},
+"劈": {
+"grade": 12,
+"on": [
+"ヘキ"
+],
+"kun": [
+"つんざく"
+],
+"meaning": "さく",
+"meaningTokens": [
+{
+"t": "さく"
+}
+],
+"words": []
+},
+"劑": {
+"grade": 12,
+"on": [
+"ザイ"
+],
+"kun": [],
+"meaning": "くすり",
+"meaningTokens": [
+{
+"t": "くすり"
+}
+],
+"words": []
+},
+"辨": {
+"grade": 12,
+"on": [
+"ベン"
+],
+"kun": [
+"わきまえる"
+],
+"meaning": "わきまえる",
+"meaningTokens": [
+{
+"t": "わきまえる"
+}
+],
+"words": []
+},
+"辧": {
+"grade": 12,
+"on": [
+"ベン"
+],
+"kun": [],
+"meaning": "はなびら",
+"meaningTokens": [
+{
+"t": "はなびら"
+}
+],
+"words": []
+},
+"劬": {
+"grade": 12,
+"on": [
+"ク"
+],
+"kun": [
+"つかれる"
+],
+"meaning": "つとめる",
+"meaningTokens": [
+{
+"t": "つとめる"
+}
+],
+"words": []
+},
+"劵": {
+"grade": 12,
+"on": [
+"ケン"
+],
+"kun": [],
+"meaning": "つかれる",
+"meaningTokens": [
+{
+"t": "つかれる"
+}
+],
+"words": []
+},
+"勁": {
+"grade": 12,
+"on": [
+"ケイ"
+],
+"kun": [
+"つよい"
+],
+"meaning": "つよい",
+"meaningTokens": [
+{
+"t": "つよい"
+}
+],
+"words": []
+},
+"勍": {
+"grade": 12,
+"on": [
+"ケイ"
+],
+"kun": [
+"つよい"
+],
+"meaning": "つよい",
+"meaningTokens": [
+{
+"t": "つよい"
+}
+],
+"words": []
+},
+"勗": {
+"grade": 12,
+"on": [
+"キョク"
+],
+"kun": [
+"つとめる"
+],
+"meaning": "つとめる",
+"meaningTokens": [
+{
+"t": "つとめる"
+}
+],
+"words": []
+},
+"勞": {
+"grade": 12,
+"on": [
+"ロウ"
+],
+"kun": [
+"いたわる"
+],
+"meaning": "つかれる",
+"meaningTokens": [
+{
+"t": "つかれる"
+}
+],
+"words": [
+"苦勞（くろう）"
+]
+},
+"勣": {
+"grade": 12,
+"on": [
+"セキ"
+],
+"kun": [
+"いさお"
+],
+"meaning": "いさお",
+"meaningTokens": [
+{
+"t": "いさお"
+}
+],
+"words": []
+},
+"勦": {
+"grade": 12,
+"on": [
+"ソウ"
+],
+"kun": [],
+"meaning": "ほろぼす",
+"meaningTokens": [
+{
+"t": "ほろぼす"
+}
+],
+"words": []
+},
+"飭": {
+"grade": 12,
+"on": [
+"チョク"
+],
+"kun": [
+"いましめる"
+],
+"meaning": "ただす",
+"meaningTokens": [
+{
+"t": "ただす"
+}
+],
+"words": []
+},
+"勠": {
+"grade": 12,
+"on": [
+"リク"
+],
+"kun": [
+"あわせる"
+],
+"meaning": "あわせる",
+"meaningTokens": [
+{
+"t": "あわせる"
+}
+],
+"words": []
+},
+"勳": {
+"grade": 12,
+"on": [
+"クン"
+],
+"kun": [
+"いさお"
+],
+"meaning": "いさお",
+"meaningTokens": [
+{
+"t": "いさお"
+}
+],
+"words": []
+},
+"勵": {
+"grade": 12,
+"on": [
+"レイ"
+],
+"kun": [
+"はげむ"
+],
+"meaning": "はげむ",
+"meaningTokens": [
+{
+"t": "はげむ"
+}
+],
+"words": []
+},
+"勸": {
+"grade": 12,
+"on": [
+"カン"
+],
+"kun": [
+"すすめる"
+],
+"meaning": "すすめる",
+"meaningTokens": [
+{
+"t": "すすめる"
+}
+],
+"words": []
+},
+"勹": {
+"grade": 12,
+"on": [
+"ホウ"
+],
+"kun": [
+"つつむ"
+],
+"meaning": "つつみがまえ",
+"meaningTokens": [
+{
+"t": "つつみがまえ"
+}
+],
+"words": []
+},
+"匆": {
+"grade": 12,
+"on": [
+"ソウ"
+],
+"kun": [
+"いそがしい"
+],
+"meaning": "いそがしい",
+"meaningTokens": [
+{
+"t": "いそがしい"
+}
+],
+"words": []
+},
+"匈": {
+"grade": 12,
+"on": [
+"キョウ"
+],
+"kun": [],
+"meaning": "むね",
+"meaningTokens": [
+{
+"t": "むね"
+}
+],
+"words": []
+},
+"匍": {
+"grade": 12,
+"on": [
+"ホ"
+],
+"kun": [
+"はう"
+],
+"meaning": "はう",
+"meaningTokens": [
+{
+"t": "はう"
+}
+],
+"words": []
+},
+"匐": {
+"grade": 12,
+"on": [
+"フク"
+],
+"kun": [],
+"meaning": "はう",
+"meaningTokens": [
+{
+"t": "はう"
+}
+],
+"words": []
+},
+"匏": {
+"grade": 12,
+"on": [
+"ホウ"
+],
+"kun": [
+"ひさご"
+],
+"meaning": "ひさご",
+"meaningTokens": [
+{
+"t": "ひさご"
+}
+],
+"words": []
+},
+"匕": {
+"grade": 12,
+"on": [
+"ヒ"
+],
+"kun": [
+"さじ"
+],
+"meaning": "さじ",
+"meaningTokens": [
+{
+"t": "さじ"
+}
+],
+"words": []
+},
+"匚": {
+"grade": 12,
+"on": [
+"ホウ"
+],
+"kun": [],
+"meaning": "はこがまえ",
+"meaningTokens": [
+{
+"t": "はこがまえ"
+}
+],
+"words": []
+},
+"匣": {
+"grade": 12,
+"on": [
+"コウ"
+],
+"kun": [
+"はこ"
+],
+"meaning": "はこ",
+"meaningTokens": [
+{
+"t": "はこ"
+}
+],
+"words": []
+},
+"匱": {
+"grade": 12,
+"on": [
+"キ"
+],
+"kun": [
+"ひつ"
+],
+"meaning": "ひつ",
+"meaningTokens": [
+{
+"t": "ひつ"
+}
+],
+"words": []
+},
+"匳": {
+"grade": 12,
+"on": [
+"レン"
+],
+"kun": [
+"くしげ"
+],
+"meaning": "けしょうばこ",
+"meaningTokens": [
+{
+"t": "けしょうばこ"
+}
+],
+"words": []
+},
+"匸": {
+"grade": 12,
+"on": [
+"ケイ"
+],
+"kun": [],
+"meaning": "かくしがまえ",
+"meaningTokens": [
+{
+"t": "かくしがまえ"
+}
+],
+"words": []
+},
+"區": {
+"grade": 12,
+"on": [
+"ク"
+],
+"kun": [],
+"meaning": "くぎる",
+"meaningTokens": [
+{
+"t": "くぎる"
+}
+],
+"words": [
+"區別（くべつ）"
+]
+},
+"卆": {
+"grade": 12,
+"on": [
+"ソツ"
+],
+"kun": [
+"おわる"
+],
+"meaning": "おわる",
+"meaningTokens": [
+{
+"t": "おわる"
+}
+],
+"words": []
+},
+"卅": {
+"grade": 12,
+"on": [
+"ソウ"
+],
+"kun": [],
+"meaning": "さんじゅう",
+"meaningTokens": [
+{
+"t": "さんじゅう"
+}
+],
+"words": []
+},
+"丗": {
+"grade": 12,
+"on": [
+"セイ"
+],
+"kun": [
+"よ"
+],
+"meaning": "よ",
+"meaningTokens": [
+{
+"t": "よ"
+}
+],
+"words": []
+},
+"卉": {
+"grade": 12,
+"on": [
+"キ"
+],
+"kun": [
+"くさ"
+],
+"meaning": "くさ",
+"meaningTokens": [
+{
+"t": "くさ"
+}
+],
+"words": []
+},
+"卍": {
+"grade": 12,
+"on": [
+"マン"
+],
+"kun": [
+"まんじ"
+],
+"meaning": "まんじ",
+"meaningTokens": [
+{
+"t": "まんじ"
+}
+],
+"words": []
+},
+"凖": {
+"grade": 12,
+"on": [
+"ジュン"
+],
+"kun": [
+"なぞらえる"
+],
+"meaning": "なぞらえる",
+"meaningTokens": [
+{
+"t": "なぞらえる"
+}
+],
+"words": []
+},
+"卩": {
+"grade": 12,
+"on": [
+"セツ"
+],
+"kun": [
+"わりふ"
+],
+"meaning": "ふしづくり",
+"meaningTokens": [
+{
+"t": "ふしづくり"
+}
+],
+"words": []
+},
+"卮": {
+"grade": 12,
+"on": [
+"シ"
+],
+"kun": [
+"さかずき"
+],
+"meaning": "さかずき",
+"meaningTokens": [
+{
+"t": "さかずき"
+}
+],
+"words": []
+},
+"夘": {
+"grade": 12,
+"on": [
+"ボウ"
+],
+"kun": [
+"う"
+],
+"meaning": "う",
+"meaningTokens": [
+{
+"t": "う"
+}
+],
+"words": []
+},
+"卻": {
+"grade": 12,
+"on": [
+"キャク"
+],
+"kun": [
+"かえって"
+],
+"meaning": "しりぞける",
+"meaningTokens": [
+{
+"t": "しりぞける"
+}
+],
+"words": []
+},
+"卷": {
+"grade": 12,
+"on": [
+"カン"
+],
+"kun": [
+"まく"
+],
+"meaning": "まく",
+"meaningTokens": [
+{
+"t": "まく"
+}
+],
+"words": []
+},
+"厂": {
+"grade": 12,
+"on": [
+"カン"
+],
+"kun": [],
+"meaning": "がんだれ",
+"meaningTokens": [
+{
+"t": "がんだれ"
+}
+],
+"words": []
+},
+"厖": {
+"grade": 12,
+"on": [
+"ボウ"
+],
+"kun": [
+"おおきい"
+],
+"meaning": "おおきい",
+"meaningTokens": [
+{
+"t": "おおきい"
+}
+],
+"words": [
+"厖大（ぼうだい）"
+]
+},
+"厠": {
+"grade": 12,
+"on": [
+"シ"
+],
+"kun": [
+"かわや"
+],
+"meaning": "かわや",
+"meaningTokens": [
+{
+"t": "かわや"
+}
+],
+"words": []
+},
+"厦": {
+"grade": 12,
+"on": [
+"カ"
+],
+"kun": [
+"いえ"
+],
+"meaning": "おおきな いえ",
+"meaningTokens": [
+{
+"t": "おおきな いえ"
+}
+],
+"words": []
+},
+"厰": {
+"grade": 12,
+"on": [
+"ショウ"
+],
+"kun": [],
+"meaning": "こうば",
+"meaningTokens": [
+{
+"t": "こうば"
+}
+],
+"words": []
+},
+"厶": {
+"grade": 12,
+"on": [
+"ム"
+],
+"kun": [],
+"meaning": "む",
+"meaningTokens": [
+{
+"t": "む"
+}
+],
+"words": []
+},
+"參": {
+"grade": 12,
+"on": [
+"サン"
+],
+"kun": [
+"まいる"
+],
+"meaning": "まいる",
+"meaningTokens": [
+{
+"t": "まいる"
+}
+],
+"words": []
+},
+"簒": {
+"grade": 12,
+"on": [
+"サン"
+],
+"kun": [
+"うばう"
+],
+"meaning": "うばう",
+"meaningTokens": [
+{
+"t": "うばう"
+}
+],
+"words": []
+},
+"雙": {
+"grade": 12,
+"on": [
+"ソウ"
+],
+"kun": [
+"ふたつ"
+],
+"meaning": "ふたつ",
+"meaningTokens": [
+{
+"t": "ふたつ"
+}
+],
+"words": []
+},
+"叟": {
+"grade": 12,
+"on": [
+"ソウ"
+],
+"kun": [
+"おきな"
+],
+"meaning": "おきな",
+"meaningTokens": [
+{
+"t": "おきな"
+}
+],
+"words": []
+},
+"曼": {
+"grade": 12,
+"on": [
+"マン"
+],
+"kun": [
+"ながい"
+],
+"meaning": "ひろい",
+"meaningTokens": [
+{
+"t": "ひろい"
+}
+],
+"words": []
+},
+"叮": {
+"grade": 12,
+"on": [
+"テイ"
+],
+"kun": [],
+"meaning": "ねんごろ",
+"meaningTokens": [
+{
+"t": "ねんごろ"
+}
+],
+"words": [
+"叮嚀（ていねい）"
+]
+},
+"叭": {
+"grade": 12,
+"on": [
+"ハツ"
+],
+"kun": [],
+"meaning": "らっぱ",
+"meaningTokens": [
+{
+"t": "らっぱ"
+}
+],
+"words": []
+},
+"叺": {
+"grade": 12,
+"on": [],
+"kun": [
+"かます"
+],
+"meaning": "かます",
+"meaningTokens": [
+{
+"t": "かます"
+}
+],
+"words": []
+},
+"吁": {
+"grade": 12,
+"on": [
+"ウ"
+],
+"kun": [
+"ああ"
+],
+"meaning": "ああ",
+"meaningTokens": [
+{
+"t": "ああ"
+}
+],
+"words": []
+},
+"吽": {
+"grade": 12,
+"on": [
+"ウン"
+],
+"kun": [],
+"meaning": "うん",
+"meaningTokens": [
+{
+"t": "うん"
+}
+],
+"words": []
+},
+"听": {
+"grade": 12,
+"on": [
+"キン"
+],
+"kun": [
+"わらう"
+],
+"meaning": "ポンド",
+"meaningTokens": [
+{
+"t": "ポンド"
+}
+],
+"words": []
+},
+"吭": {
+"grade": 12,
+"on": [
+"コウ"
+],
+"kun": [
+"のど"
+],
+"meaning": "のど",
+"meaningTokens": [
+{
+"t": "のど"
+}
+],
+"words": []
+},
+"吼": {
+"grade": 12,
+"on": [
+"コウ"
+],
+"kun": [
+"ほえる"
+],
+"meaning": "ほえる",
+"meaningTokens": [
+{
+"t": "ほえる"
+}
+],
+"words": []
+},
+"吶": {
+"grade": 12,
+"on": [
+"トツ"
+],
+"kun": [
+"どもる"
+],
+"meaning": "どもる",
+"meaningTokens": [
+{
+"t": "どもる"
+}
+],
+"words": []
+},
+"吝": {
+"grade": 12,
+"on": [
+"リン"
+],
+"kun": [
+"おしむ",
+"やぶさか"
+],
+"meaning": "おしむ",
+"meaningTokens": [
+{
+"t": "おしむ"
+}
+],
+"words": []
+},
+"呎": {
+"grade": 12,
+"on": [
+"セキ"
+],
+"kun": [],
+"meaning": "フィート",
+"meaningTokens": [
+{
+"t": "フィート"
+}
+],
+"words": []
+},
+"咏": {
+"grade": 12,
+"on": [
+"エイ"
+],
+"kun": [
+"うたう"
+],
+"meaning": "うたう",
+"meaningTokens": [
+{
+"t": "うたう"
+}
+],
+"words": []
+},
+"呵": {
+"grade": 12,
+"on": [
+"カ"
+],
+"kun": [
+"しかる"
+],
+"meaning": "しかる",
+"meaningTokens": [
+{
+"t": "しかる"
+}
+],
+"words": []
+},
+"咎": {
+"grade": 12,
+"on": [
+"キュウ"
+],
+"kun": [
+"とがめる"
+],
+"meaning": "とがめる",
+"meaningTokens": [
+{
+"t": "とがめる"
+}
+],
+"words": []
+},
+"呟": {
+"grade": 12,
+"on": [
+"ゲン"
+],
+"kun": [
+"つぶやく"
+],
+"meaning": "つぶやく",
+"meaningTokens": [
+{
+"t": "つぶやく"
+}
+],
+"words": []
+},
+"呱": {
+"grade": 12,
+"on": [
+"コ"
+],
+"kun": [],
+"meaning": "なきごえ",
+"meaningTokens": [
+{
+"t": "なきごえ"
+}
+],
+"words": []
+},
+"呷": {
+"grade": 12,
+"on": [
+"コウ"
+],
+"kun": [
+"あおる"
+],
+"meaning": "あおる",
+"meaningTokens": [
+{
+"t": "あおる"
+}
+],
+"words": []
+},
+"咒": {
+"grade": 12,
+"on": [
+"ジュ"
+],
+"kun": [
+"のろう"
+],
+"meaning": "まじない",
+"meaningTokens": [
+{
+"t": "まじない"
+}
+],
+"words": []
+},
+"呻": {
+"grade": 12,
+"on": [
+"シン"
+],
+"kun": [
+"うめく"
+],
+"meaning": "うめく",
+"meaningTokens": [
+{
+"t": "うめく"
+}
+],
+"words": []
+},
+"咀": {
+"grade": 12,
+"on": [
+"ソ"
+],
+"kun": [
+"かむ"
+],
+"meaning": "かむ",
+"meaningTokens": [
+{
+"t": "かむ"
+}
+],
+"words": []
+},
+"呶": {
+"grade": 12,
+"on": [
+"ド"
+],
+"kun": [],
+"meaning": "かまびすしい",
+"meaningTokens": [
+{
+"t": "かまびすしい"
+}
+],
+"words": []
+},
+"咄": {
+"grade": 12,
+"on": [
+"トツ"
+],
+"kun": [],
+"meaning": "したうち",
+"meaningTokens": [
+{
+"t": "したうち"
+}
+],
+"words": []
+},
+"咆": {
+"grade": 12,
+"on": [
+"ホウ"
+],
+"kun": [
+"ほえる"
+],
+"meaning": "ほえる",
+"meaningTokens": [
+{
+"t": "ほえる"
+}
+],
+"words": []
+},
+"咥": {
+"grade": 12,
+"on": [
+"テツ"
+],
+"kun": [
+"くわえる"
+],
+"meaning": "くわえる",
+"meaningTokens": [
+{
+"t": "くわえる"
+}
+],
+"words": []
+},
+"咬": {
+"grade": 12,
+"on": [
+"コウ"
+],
+"kun": [
+"かむ"
+],
+"meaning": "かむ",
+"meaningTokens": [
+{
+"t": "かむ"
+}
+],
+"words": []
+},
+"哄": {
+"grade": 12,
+"on": [
+"コウ"
+],
+"kun": [],
+"meaning": "どっと わらう",
+"meaningTokens": [
+{
+"t": "どっと わらう"
+}
+],
+"words": []
+},
+"咨": {
+"grade": 12,
+"on": [
+"シ"
+],
+"kun": [
+"はかる"
+],
+"meaning": "はかる",
+"meaningTokens": [
+{
+"t": "はかる"
+}
+],
+"words": []
+},
+"咫": {
+"grade": 12,
+"on": [
+"シ"
+],
+"kun": [],
+"meaning": "た",
+"meaningTokens": [
+{
+"t": "た"
+}
+],
+"words": []
+},
+"哂": {
+"grade": 12,
+"on": [
+"シン"
+],
+"kun": [
+"わらう"
+],
+"meaning": "あざわらう",
+"meaningTokens": [
+{
+"t": "あざわらう"
+}
+],
+"words": []
+},
+"咤": {
+"grade": 12,
+"on": [
+"タ"
+],
+"kun": [
+"しかる"
+],
+"meaning": "しかる",
+"meaningTokens": [
+{
+"t": "しかる"
+}
+],
+"words": []
+},
+"咼": {
+"grade": 12,
+"on": [
+"カ"
+],
+"kun": [
+"ゆがむ"
+],
+"meaning": "ゆがむ",
+"meaningTokens": [
+{
+"t": "ゆがむ"
+}
+],
+"words": []
+},
+"哥": {
+"grade": 12,
+"on": [
+"カ"
+],
+"kun": [
+"あに",
+"うた"
+],
+"meaning": "うた",
+"meaningTokens": [
+{
+"t": "うた"
+}
+],
+"words": []
+},
+"哽": {
+"grade": 12,
+"on": [
+"コウ"
+],
+"kun": [
+"むせぶ"
+],
+"meaning": "むせぶ",
+"meaningTokens": [
+{
+"t": "むせぶ"
+}
+],
+"words": []
+},
+"哮": {
+"grade": 12,
+"on": [
+"コウ"
+],
+"kun": [
+"たける",
+"ほえる"
+],
+"meaning": "ほえる",
+"meaningTokens": [
+{
+"t": "ほえる"
+}
+],
+"words": []
+},
+"哭": {
+"grade": 12,
+"on": [
+"コク"
+],
+"kun": [
+"なく"
+],
+"meaning": "なく",
+"meaningTokens": [
+{
+"t": "なく"
+}
+],
+"words": []
+},
+"哢": {
+"grade": 12,
+"on": [
+"ロウ"
+],
+"kun": [
+"さえずる"
+],
+"meaning": "さえずる",
+"meaningTokens": [
+{
+"t": "さえずる"
+}
+],
+"words": []
+},
+"啀": {
+"grade": 12,
+"on": [
+"ガイ"
+],
+"kun": [
+"いがむ"
+],
+"meaning": "いがむ",
+"meaningTokens": [
+{
+"t": "いがむ"
+}
+],
+"words": []
+},
+"啣": {
+"grade": 12,
+"on": [
+"カン"
+],
+"kun": [
+"くわえる"
+],
+"meaning": "くわえる",
+"meaningTokens": [
+{
+"t": "くわえる"
+}
+],
+"words": []
+},
+"啜": {
+"grade": 12,
+"on": [
+"セツ"
+],
+"kun": [
+"すする"
+],
+"meaning": "すする",
+"meaningTokens": [
+{
+"t": "すする"
+}
+],
+"words": []
+},
+"啖": {
+"grade": 12,
+"on": [
+"タン"
+],
+"kun": [
+"くう",
+"くらう"
+],
+"meaning": "くう",
+"meaningTokens": [
+{
+"t": "くう"
+}
+],
+"words": []
+},
+"啗": {
+"grade": 12,
+"on": [
+"タン"
+],
+"kun": [
+"くらう"
+],
+"meaning": "くらわす",
+"meaningTokens": [
+{
+"t": "くらわす"
+}
+],
+"words": []
+},
+"唸": {
+"grade": 12,
+"on": [
+"テン"
+],
+"kun": [
+"うなる"
+],
+"meaning": "うなる",
+"meaningTokens": [
+{
+"t": "うなる"
+}
+],
+"words": []
+},
+"唳": {
+"grade": 12,
+"on": [
+"レイ"
+],
+"kun": [],
+"meaning": "なく",
+"meaningTokens": [
+{
+"t": "なく"
+}
+],
+"words": []
+},
+"喙": {
+"grade": 12,
+"on": [
+"カイ"
+],
+"kun": [
+"くちばし"
+],
+"meaning": "くちばし",
+"meaningTokens": [
+{
+"t": "くちばし"
+}
+],
+"words": []
+},
+"喀": {
+"grade": 12,
+"on": [
+"カク"
+],
+"kun": [
+"はく"
+],
+"meaning": "はく",
+"meaningTokens": [
+{
+"t": "はく"
+}
+],
+"words": []
+},
+"喊": {
+"grade": 12,
+"on": [
+"カン"
+],
+"kun": [
+"さけぶ"
+],
+"meaning": "さけぶ",
+"meaningTokens": [
+{
+"t": "さけぶ"
+}
+],
+"words": []
+},
+"喟": {
+"grade": 12,
+"on": [
+"キ"
+],
+"kun": [
+"なげく"
+],
+"meaning": "なげく",
+"meaningTokens": [
+{
+"t": "なげく"
+}
+],
+"words": []
+},
+"啻": {
+"grade": 12,
+"on": [
+"シ"
+],
+"kun": [
+"ただに"
+],
+"meaning": "ただに",
+"meaningTokens": [
+{
+"t": "ただに"
+}
+],
+"words": []
+},
+"啾": {
+"grade": 12,
+"on": [
+"シュウ"
+],
+"kun": [
+"なく"
+],
+"meaning": "なく",
+"meaningTokens": [
+{
+"t": "なく"
+}
+],
+"words": []
+},
+"喘": {
+"grade": 12,
+"on": [
+"ゼン"
+],
+"kun": [
+"あえぐ"
+],
+"meaning": "あえぐ",
+"meaningTokens": [
+{
+"t": "あえぐ"
+}
+],
+"words": []
+},
+"喞": {
+"grade": 12,
+"on": [
+"ソク"
+],
+"kun": [
+"かこつ"
+],
+"meaning": "かこつ",
+"meaningTokens": [
+{
+"t": "かこつ"
+}
+],
+"words": []
+},
+"單": {
+"grade": 12,
+"on": [
+"タン"
+],
+"kun": [
+"ひとえ"
+],
+"meaning": "ひとつ",
+"meaningTokens": [
+{
+"t": "ひとつ"
+}
+],
+"words": []
+},
+"啼": {
+"grade": 12,
+"on": [
+"テイ"
+],
+"kun": [
+"なく"
+],
+"meaning": "なく",
+"meaningTokens": [
+{
+"t": "なく"
+}
+],
+"words": []
+},
+"喃": {
+"grade": 12,
+"on": [
+"ナン"
+],
+"kun": [],
+"meaning": "ぺちゃくちゃ",
+"meaningTokens": [
+{
+"t": "ぺちゃくちゃ"
+}
+],
+"words": []
+},
+"喇": {
+"grade": 12,
+"on": [
+"ラ"
+],
+"kun": [],
+"meaning": "らっぱ",
+"meaningTokens": [
+{
+"t": "らっぱ"
+}
+],
+"words": []
+},
+"嗚": {
+"grade": 12,
+"on": [
+"オ"
+],
+"kun": [
+"ああ"
+],
+"meaning": "ああ",
+"meaningTokens": [
+{
+"t": "ああ"
+}
+],
+"words": []
+},
+"嗟": {
+"grade": 12,
+"on": [
+"サ"
+],
+"kun": [
+"ああ",
+"なげく"
+],
+"meaning": "なげく",
+"meaningTokens": [
+{
+"t": "なげく"
+}
+],
+"words": []
+},
+"嗄": {
+"grade": 12,
+"on": [
+"サ"
+],
+"kun": [
+"かれる",
+"しゃがれる"
+],
+"meaning": "かれる",
+"meaningTokens": [
+{
+"t": "かれる"
+}
+],
+"words": []
+},
+"嗜": {
+"grade": 12,
+"on": [
+"シ"
+],
+"kun": [
+"たしなむ"
+],
+"meaning": "たしなむ",
+"meaningTokens": [
+{
+"t": "たしなむ"
+}
+],
+"words": []
+},
+"嗤": {
+"grade": 12,
+"on": [
+"シ"
+],
+"kun": [
+"わらう"
+],
+"meaning": "あざける",
+"meaningTokens": [
+{
+"t": "あざける"
+}
+],
+"words": []
+},
+"嘔": {
+"grade": 12,
+"on": [
+"オウ"
+],
+"kun": [
+"はく"
+],
+"meaning": "はく",
+"meaningTokens": [
+{
+"t": "はく"
+}
+],
+"words": [
+"嘔吐（おうと）"
+]
+},
+"嗷": {
+"grade": 12,
+"on": [
+"ゴウ"
+],
+"kun": [
+"かまびすしい"
+],
+"meaning": "かまびすしい",
+"meaningTokens": [
+{
+"t": "かまびすしい"
+}
+],
+"words": []
+},
+"嘖": {
+"grade": 12,
+"on": [
+"サク"
+],
+"kun": [
+"さいなむ"
+],
+"meaning": "さけぶ",
+"meaningTokens": [
+{
+"t": "さけぶ"
+}
+],
+"words": []
+},
+"嗾": {
+"grade": 12,
+"on": [
+"ソウ"
+],
+"kun": [
+"けしかける"
+],
+"meaning": "そそのかす",
+"meaningTokens": [
+{
+"t": "そそのかす"
+}
+],
+"words": []
+},
+"嗽": {
+"grade": 12,
+"on": [
+"ソウ"
+],
+"kun": [
+"うがい"
+],
+"meaning": "うがい",
+"meaningTokens": [
+{
+"t": "うがい"
+}
+],
+"words": []
+},
+"嘛": {
+"grade": 12,
+"on": [
+"マ"
+],
+"kun": [],
+"meaning": "らま",
+"meaningTokens": [
+{
+"t": "らま"
+}
+],
+"words": []
+},
+"噎": {
+"grade": 12,
+"on": [
+"エツ"
+],
+"kun": [
+"むせる",
+"むせぶ"
+],
+"meaning": "むせぶ",
+"meaningTokens": [
+{
+"t": "むせぶ"
+}
+],
+"words": []
+},
+"噐": {
+"grade": 12,
+"on": [
+"キ"
+],
+"kun": [
+"うつわ"
+],
+"meaning": "うつわ",
+"meaningTokens": [
+{
+"t": "うつわ"
+}
+],
+"words": []
+},
+"營": {
+"grade": 12,
+"on": [
+"エイ"
+],
+"kun": [
+"いとなむ"
+],
+"meaning": "いとなむ",
+"meaningTokens": [
+{
+"t": "いとなむ"
+}
+],
+"words": []
+},
+"嘴": {
+"grade": 12,
+"on": [
+"シ"
+],
+"kun": [
+"くちばし"
+],
+"meaning": "くちばし",
+"meaningTokens": [
+{
+"t": "くちばし"
+}
+],
+"words": []
+},
+"嘶": {
+"grade": 12,
+"on": [
+"セイ"
+],
+"kun": [
+"いななく"
+],
+"meaning": "いななく",
+"meaningTokens": [
+{
+"t": "いななく"
+}
+],
+"words": []
+},
+"嘸": {
+"grade": 12,
+"on": [
+"ム"
+],
+"kun": [
+"さぞ"
+],
+"meaning": "さぞ",
+"meaningTokens": [
+{
+"t": "さぞ"
+}
+],
+"words": []
+},
+"噫": {
+"grade": 12,
+"on": [
+"アイ"
+],
+"kun": [
+"ああ",
+"おくび"
+],
+"meaning": "ああ",
+"meaningTokens": [
+{
+"t": "ああ"
+}
+],
+"words": []
+},
+"噤": {
+"grade": 12,
+"on": [
+"キン"
+],
+"kun": [
+"つぐむ"
+],
+"meaning": "つぐむ",
+"meaningTokens": [
+{
+"t": "つぐむ"
+}
+],
+"words": []
+},
+"嘯": {
+"grade": 12,
+"on": [
+"ショウ"
+],
+"kun": [
+"うそぶく"
+],
+"meaning": "うそぶく",
+"meaningTokens": [
+{
+"t": "うそぶく"
+}
+],
+"words": []
+},
+"噬": {
+"grade": 12,
+"on": [
+"ゼイ"
+],
+"kun": [
+"かむ"
+],
+"meaning": "かむ",
+"meaningTokens": [
+{
+"t": "かむ"
+}
+],
+"words": []
+},
+"噪": {
+"grade": 12,
+"on": [
+"ソウ"
+],
+"kun": [
+"さわぐ"
+],
+"meaning": "さわぐ",
+"meaningTokens": [
+{
+"t": "さわぐ"
+}
+],
+"words": []
+},
+"嚆": {
+"grade": 12,
+"on": [
+"コウ"
+],
+"kun": [
+"さけぶ"
+],
+"meaning": "かぶらや",
+"meaningTokens": [
+{
+"t": "かぶらや"
+}
+],
+"words": []
+},
+"嚀": {
+"grade": 12,
+"on": [
+"ネイ"
+],
+"kun": [],
+"meaning": "ねんごろ",
+"meaningTokens": [
+{
+"t": "ねんごろ"
+}
+],
+"words": [
+"叮嚀（ていねい）"
+]
+},
+"嚊": {
+"grade": 12,
+"on": [
+"ヒ"
+],
+"kun": [
+"かかあ"
+],
+"meaning": "かかあ",
+"meaningTokens": [
+{
+"t": "かかあ"
+}
+],
+"words": []
+},
+"嚔": {
+"grade": 12,
+"on": [
+"テイ"
+],
+"kun": [
+"くしゃみ"
+],
+"meaning": "くしゃみ",
+"meaningTokens": [
+{
+"t": "くしゃみ"
+}
+],
+"words": []
+},
+"嚏": {
+"grade": 12,
+"on": [
+"テイ"
+],
+"kun": [
+"くしゃみ"
+],
+"meaning": "くしゃみ",
+"meaningTokens": [
+{
+"t": "くしゃみ"
+}
+],
+"words": []
+},
+"嚥": {
+"grade": 12,
+"on": [
+"エン"
+],
+"kun": [
+"のむ"
+],
+"meaning": "のむ",
+"meaningTokens": [
+{
+"t": "のむ"
+}
+],
+"words": []
+},
+"嚮": {
+"grade": 12,
+"on": [
+"キョウ"
+],
+"kun": [
+"むかう",
+"さきに"
+],
+"meaning": "むかう",
+"meaningTokens": [
+{
+"t": "むかう"
+}
+],
+"words": []
+},
+"嚶": {
+"grade": 12,
+"on": [
+"オウ"
+],
+"kun": [
+"なく"
+],
+"meaning": "なく",
+"meaningTokens": [
+{
+"t": "なく"
+}
+],
+"words": []
+},
+"嚴": {
+"grade": 12,
+"on": [
+"ゲン"
+],
+"kun": [
+"おごそか",
+"きびしい"
+],
+"meaning": "きびしい",
+"meaningTokens": [
+{
+"t": "きびしい"
+}
+],
+"words": []
+},
+"囂": {
+"grade": 12,
+"on": [
+"ゴウ"
+],
+"kun": [
+"かまびすしい"
+],
+"meaning": "かまびすしい",
+"meaningTokens": [
+{
+"t": "かまびすしい"
+}
+],
+"words": []
+},
+"嚼": {
+"grade": 12,
+"on": [
+"シャク"
+],
+"kun": [
+"かむ"
+],
+"meaning": "かむ",
+"meaningTokens": [
+{
+"t": "かむ"
+}
+],
+"words": []
+},
+"囁": {
+"grade": 12,
+"on": [
+"ショウ"
+],
+"kun": [
+"ささやく"
+],
+"meaning": "ささやく",
+"meaningTokens": [
+{
+"t": "ささやく"
+}
+],
+"words": []
+},
+"囃": {
+"grade": 12,
+"on": [
+"ソウ"
+],
+"kun": [
+"はやす"
+],
+"meaning": "はやす",
+"meaningTokens": [
+{
+"t": "はやす"
+}
+],
+"words": []
+},
+"囀": {
+"grade": 12,
+"on": [
+"テン"
+],
+"kun": [
+"さえずる"
+],
+"meaning": "さえずる",
+"meaningTokens": [
+{
+"t": "さえずる"
+}
+],
+"words": []
+},
+"囈": {
+"grade": 12,
+"on": [
+"ゲイ"
+],
+"kun": [],
+"meaning": "うわごと",
+"meaningTokens": [
+{
+"t": "うわごと"
+}
+],
+"words": []
+},
+"囑": {
+"grade": 12,
+"on": [
+"ショク"
+],
+"kun": [
+"たのむ"
+],
+"meaning": "たのむ",
+"meaningTokens": [
+{
+"t": "たのむ"
+}
+],
+"words": []
+},
+"囓": {
+"grade": 12,
+"on": [
+"ゲツ"
+],
+"kun": [
+"かじる"
+],
+"meaning": "かじる",
+"meaningTokens": [
+{
+"t": "かじる"
+}
+],
+"words": []
+},
+"囗": {
+"grade": 12,
+"on": [
+"イ"
+],
+"kun": [],
+"meaning": "くにがまえ",
+"meaningTokens": [
+{
+"t": "くにがまえ"
+}
+],
+"words": []
+},
+"囮": {
+"grade": 12,
+"on": [
+"カ"
+],
+"kun": [
+"おとり"
+],
+"meaning": "おとり",
+"meaningTokens": [
+{
+"t": "おとり"
+}
+],
+"words": []
+},
+"囹": {
+"grade": 12,
+"on": [
+"レイ"
+],
+"kun": [],
+"meaning": "ひとや",
+"meaningTokens": [
+{
+"t": "ひとや"
+}
+],
+"words": []
+},
+"圀": {
+"grade": 12,
+"on": [
+"コク"
+],
+"kun": [
+"くに"
+],
+"meaning": "くに",
+"meaningTokens": [
+{
+"t": "くに"
+}
+],
+"words": []
+},
+"囿": {
+"grade": 12,
+"on": [
+"ユウ"
+],
+"kun": [
+"その"
+],
+"meaning": "その",
+"meaningTokens": [
+{
+"t": "その"
+}
+],
+"words": []
+},
+"圄": {
+"grade": 12,
+"on": [
+"ゴ"
+],
+"kun": [
+"ひとや"
+],
+"meaning": "ひとや",
+"meaningTokens": [
+{
+"t": "ひとや"
+}
+],
+"words": []
+},
+"圈": {
+"grade": 12,
+"on": [
+"ケン"
+],
+"kun": [
+"かこい"
+],
+"meaning": "かこい",
+"meaningTokens": [
+{
+"t": "かこい"
+}
+],
+"words": []
+},
+"國": {
+"grade": 12,
+"on": [
+"コク"
+],
+"kun": [
+"くに"
+],
+"meaning": "くに",
+"meaningTokens": [
+{
+"t": "くに"
+}
+],
+"words": [
+"國語（こくご）"
+]
+},
+"圍": {
+"grade": 12,
+"on": [
+"イ"
+],
+"kun": [
+"かこむ"
+],
+"meaning": "かこむ",
+"meaningTokens": [
+{
+"t": "かこむ"
+}
+],
+"words": []
+},
+"圓": {
+"grade": 12,
+"on": [
+"エン"
+],
+"kun": [
+"まるい"
+],
+"meaning": "まるい",
+"meaningTokens": [
+{
+"t": "まるい"
+}
+],
+"words": []
+},
+"團": {
+"grade": 12,
+"on": [
+"ダン"
+],
+"kun": [
+"かたまり"
+],
+"meaning": "まるい",
+"meaningTokens": [
+{
+"t": "まるい"
+}
+],
+"words": []
+},
+"圖": {
+"grade": 12,
+"on": [
+"ズ"
+],
+"kun": [
+"はかる"
+],
+"meaning": "え",
+"meaningTokens": [
+{
+"t": "え"
+}
+],
+"words": []
+},
+"嗇": {
+"grade": 12,
+"on": [
+"ショク"
+],
+"kun": [
+"おしむ",
+"やぶさか"
+],
+"meaning": "おしむ",
+"meaningTokens": [
+{
+"t": "おしむ"
+}
+],
+"words": []
+},
+"圜": {
+"grade": 12,
+"on": [
+"エン"
+],
+"kun": [
+"まるい"
+],
+"meaning": "めぐる",
+"meaningTokens": [
+{
+"t": "めぐる"
+}
+],
+"words": []
+},
+"圦": {
+"grade": 12,
+"on": [],
+"kun": [
+"いり"
+],
+"meaning": "ひのくち",
+"meaningTokens": [
+{
+"t": "ひのくち"
+}
+],
+"words": []
+},
+"圻": {
+"grade": 12,
+"on": [
+"キ"
+],
+"kun": [
+"さかい"
+],
+"meaning": "さかい",
+"meaningTokens": [
+{
+"t": "さかい"
+}
+],
+"words": []
+},
+"址": {
+"grade": 12,
+"on": [
+"シ"
+],
+"kun": [
+"あと"
+],
+"meaning": "あと",
+"meaningTokens": [
+{
+"t": "あと"
+}
+],
+"words": []
+},
+"坏": {
+"grade": 12,
+"on": [
+"ハイ"
+],
+"kun": [
+"つき"
+],
+"meaning": "さかずき",
+"meaningTokens": [
+{
+"t": "さかずき"
+}
+],
+"words": []
+},
+"坩": {
+"grade": 12,
+"on": [
+"カン"
+],
+"kun": [
+"つぼ"
+],
+"meaning": "つぼ",
+"meaningTokens": [
+{
+"t": "つぼ"
+}
+],
+"words": []
+},
+"埀": {
+"grade": 12,
+"on": [
+"スイ"
+],
+"kun": [
+"たれる"
+],
+"meaning": "たれる",
+"meaningTokens": [
+{
+"t": "たれる"
+}
+],
+"words": []
+},
+"垓": {
+"grade": 12,
+"on": [
+"ガイ"
+],
+"kun": [
+"はて"
+],
+"meaning": "はて",
+"meaningTokens": [
+{
+"t": "はて"
+}
+],
+"words": []
+},
+"垠": {
+"grade": 12,
+"on": [
+"ギン"
+],
+"kun": [
+"きし",
+"さかい"
+],
+"meaning": "はて",
+"meaningTokens": [
+{
+"t": "はて"
+}
+],
+"words": []
+},
+"垤": {
+"grade": 12,
+"on": [
+"テツ"
+],
+"kun": [
+"ありづか"
+],
+"meaning": "ありづか",
+"meaningTokens": [
+{
+"t": "ありづか"
+}
+],
+"words": []
+},
+"埃": {
+"grade": 12,
+"on": [
+"アイ"
+],
+"kun": [
+"ほこり",
+"ちり"
+],
+"meaning": "ほこり",
+"meaningTokens": [
+{
+"t": "ほこり"
+}
+],
+"words": []
+},
+"埒": {
+"grade": 12,
+"on": [
+"ラチ"
+],
+"kun": [
+"かこい"
+],
+"meaning": "かこい",
+"meaningTokens": [
+{
+"t": "かこい"
+}
+],
+"words": []
+},
+"埓": {
+"grade": 12,
+"on": [
+"ラチ"
+],
+"kun": [
+"かこい"
+],
+"meaning": "かこい",
+"meaningTokens": [
+{
+"t": "かこい"
+}
+],
+"words": []
+},
+"堊": {
+"grade": 12,
+"on": [
+"アク"
+],
+"kun": [
+"しろつち"
+],
+"meaning": "しろつち",
+"meaningTokens": [
+{
+"t": "しろつち"
+}
+],
+"words": []
+},
+"埖": {
+"grade": 12,
+"on": [],
+"kun": [
+"ごみ"
+],
+"meaning": "ごみ",
+"meaningTokens": [
+{
+"t": "ごみ"
+}
+],
+"words": []
+},
+"堙": {
+"grade": 12,
+"on": [
+"イン"
+],
+"kun": [
+"ふさぐ"
+],
+"meaning": "ふさぐ",
+"meaningTokens": [
+{
+"t": "ふさぐ"
+}
+],
+"words": [
+"堙滅（いんめつ）"
+]
+},
+"堝": {
+"grade": 12,
+"on": [
+"カ"
+],
+"kun": [
+"るつぼ"
+],
+"meaning": "るつぼ",
+"meaningTokens": [
+{
+"t": "るつぼ"
+}
+],
+"words": []
+},
+"塲": {
+"grade": 12,
+"on": [
+"ジョウ"
+],
+"kun": [
+"ば"
+],
+"meaning": "ば",
+"meaningTokens": [
+{
+"t": "ば"
+}
+],
+"words": []
+},
+"堡": {
+"grade": 12,
+"on": [
+"ホウ"
+],
+"kun": [
+"とりで"
+],
+"meaning": "とりで",
+"meaningTokens": [
+{
+"t": "とりで"
+}
+],
+"words": []
+},
+"塋": {
+"grade": 12,
+"on": [
+"エイ"
+],
+"kun": [
+"はか"
+],
+"meaning": "はか",
+"meaningTokens": [
+{
+"t": "はか"
+}
+],
+"words": []
+},
+"塒": {
+"grade": 12,
+"on": [
+"ジ"
+],
+"kun": [
+"ねぐら",
+"とぐろ"
+],
+"meaning": "ねぐら",
+"meaningTokens": [
+{
+"t": "ねぐら"
+}
+],
+"words": []
+},
+"塹": {
+"grade": 12,
+"on": [
+"ザン"
+],
+"kun": [
+"ほり"
+],
+"meaning": "ほり",
+"meaningTokens": [
+{
+"t": "ほり"
+}
+],
+"words": []
+},
+"墅": {
+"grade": 12,
+"on": [
+"ショ"
+],
+"kun": [
+"しもやしき"
+],
+"meaning": "べっそう",
+"meaningTokens": [
+{
+"t": "べっそう"
+}
+],
+"words": []
+},
+"墟": {
+"grade": 12,
+"on": [
+"キョ"
+],
+"kun": [
+"あと"
+],
+"meaning": "あと",
+"meaningTokens": [
+{
+"t": "あと"
+}
+],
+"words": [
+"廃墟（はいきょ）"
+]
+},
+"墺": {
+"grade": 12,
+"on": [
+"オウ"
+],
+"kun": [],
+"meaning": "オーストリア",
+"meaningTokens": [
+{
+"t": "オーストリア"
+}
+],
+"words": []
+},
+"壞": {
+"grade": 12,
+"on": [
+"カイ"
+],
+"kun": [
+"こわす"
+],
+"meaning": "こわす",
+"meaningTokens": [
+{
+"t": "こわす"
+}
+],
+"words": []
+},
+"墻": {
+"grade": 12,
+"on": [
+"ショウ"
+],
+"kun": [
+"かき"
+],
+"meaning": "かき",
+"meaningTokens": [
+{
+"t": "かき"
+}
+],
+"words": [
+"墻壁（しょうへき）"
+]
+},
+"墮": {
+"grade": 12,
+"on": [
+"ダ"
+],
+"kun": [
+"おちる"
+],
+"meaning": "おちる",
+"meaningTokens": [
+{
+"t": "おちる"
+}
+],
+"words": []
+},
+"壅": {
+"grade": 12,
+"on": [
+"ヨウ"
+],
+"kun": [
+"ふさぐ"
+],
+"meaning": "ふさぐ",
+"meaningTokens": [
+{
+"t": "ふさぐ"
+}
+],
+"words": []
+},
+"壓": {
+"grade": 12,
+"on": [
+"アツ"
+],
+"kun": [
+"おさえる"
+],
+"meaning": "おす",
+"meaningTokens": [
+{
+"t": "おす"
+}
+],
+"words": []
+},
+"壑": {
+"grade": 12,
+"on": [
+"ガク"
+],
+"kun": [
+"たに"
+],
+"meaning": "たに",
+"meaningTokens": [
+{
+"t": "たに"
+}
+],
+"words": []
+},
+"壙": {
+"grade": 12,
+"on": [
+"コウ"
+],
+"kun": [
+"あな"
+],
+"meaning": "あな",
+"meaningTokens": [
+{
+"t": "あな"
+}
+],
+"words": []
+},
+"壘": {
+"grade": 12,
+"on": [
+"ルイ"
+],
+"kun": [
+"とりで"
+],
+"meaning": "とりで",
+"meaningTokens": [
+{
+"t": "とりで"
+}
+],
+"words": []
+},
+"壜": {
+"grade": 12,
+"on": [
+"タン"
+],
+"kun": [
+"びん"
+],
+"meaning": "びん",
+"meaningTokens": [
+{
+"t": "びん"
+}
+],
+"words": []
+},
+"壤": {
+"grade": 12,
+"on": [
+"ジョウ"
+],
+"kun": [
+"つち"
+],
+"meaning": "つち",
+"meaningTokens": [
+{
+"t": "つち"
+}
+],
+"words": []
+},
+"壟": {
+"grade": 12,
+"on": [
+"ロウ"
+],
+"kun": [
+"うね",
+"つか"
+],
+"meaning": "うね",
+"meaningTokens": [
+{
+"t": "うね"
+}
+],
+"words": []
+},
+"壯": {
+"grade": 12,
+"on": [
+"ソウ"
+],
+"kun": [
+"さかん"
+],
+"meaning": "さかん",
+"meaningTokens": [
+{
+"t": "さかん"
+}
+],
+"words": []
+},
+"壺": {
+"grade": 12,
+"on": [
+"コ"
+],
+"kun": [
+"つぼ"
+],
+"meaning": "つぼ",
+"meaningTokens": [
+{
+"t": "つぼ"
+}
+],
+"words": []
+},
+"壹": {
+"grade": 12,
+"on": [
+"イチ"
+],
+"kun": [
+"ひとつ"
+],
+"meaning": "ひとつ",
+"meaningTokens": [
+{
+"t": "ひとつ"
+}
+],
+"words": []
+},
+"壻": {
+"grade": 12,
+"on": [
+"セイ"
+],
+"kun": [
+"むこ"
+],
+"meaning": "むこ",
+"meaningTokens": [
+{
+"t": "むこ"
+}
+],
+"words": [
+"花壻（はなむこ）"
+]
+},
+"壽": {
+"grade": 12,
+"on": [
+"ジュ"
+],
+"kun": [
+"ことぶき"
+],
+"meaning": "ことぶき",
+"meaningTokens": [
+{
+"t": "ことぶき"
+}
+],
+"words": []
+},
+"夂": {
+"grade": 12,
+"on": [
+"チ"
+],
+"kun": [],
+"meaning": "ふゆがしら",
+"meaningTokens": [
+{
+"t": "ふゆがしら"
+}
+],
+"words": []
+},
+"夊": {
+"grade": 12,
+"on": [
+"スイ"
+],
+"kun": [],
+"meaning": "すいにょう",
+"meaningTokens": [
+{
+"t": "すいにょう"
+}
+],
+"words": []
+},
+"夐": {
+"grade": 12,
+"on": [
+"ケイ"
+],
+"kun": [
+"はるか"
+],
+"meaning": "はるか",
+"meaningTokens": [
+{
+"t": "はるか"
+}
+],
+"words": []
+},
+"夛": {
+"grade": 12,
+"on": [
+"タ"
+],
+"kun": [
+"おおい"
+],
+"meaning": "おおい",
+"meaningTokens": [
+{
+"t": "おおい"
+}
+],
+"words": []
+},
+"梦": {
+"grade": 12,
+"on": [
+"ム"
+],
+"kun": [
+"ゆめ"
+],
+"meaning": "ゆめ",
+"meaningTokens": [
+{
+"t": "ゆめ"
+}
+],
+"words": []
+},
+"夥": {
+"grade": 12,
+"on": [
+"カ"
+],
+"kun": [
+"おびただしい"
+],
+"meaning": "おびただしい",
+"meaningTokens": [
+{
+"t": "おびただしい"
+}
+],
+"words": []
+},
+"夬": {
+"grade": 12,
+"on": [
+"カイ"
+],
+"kun": [
+"わける"
+],
+"meaning": "きめる",
+"meaningTokens": [
+{
+"t": "きめる"
+}
+],
+"words": []
+},
+"夭": {
+"grade": 12,
+"on": [
+"ヨウ"
+],
+"kun": [
+"わかい"
+],
+"meaning": "わかじに",
+"meaningTokens": [
+{
+"t": "わかじに"
+}
+],
+"words": []
+},
+"夲": {
+"grade": 12,
+"on": [
+"ホン"
+],
+"kun": [
+"もと"
+],
+"meaning": "もと",
+"meaningTokens": [
+{
+"t": "もと"
+}
+],
+"words": []
+},
+"夸": {
+"grade": 12,
+"on": [
+"コ"
+],
+"kun": [
+"ほこる"
+],
+"meaning": "ほこる",
+"meaningTokens": [
+{
+"t": "ほこる"
+}
+],
+"words": []
+},
+"夾": {
+"grade": 12,
+"on": [
+"キョウ"
+],
+"kun": [
+"はさむ"
+],
+"meaning": "はさむ",
+"meaningTokens": [
+{
+"t": "はさむ"
+}
+],
+"words": []
+},
+"竒": {
+"grade": 12,
+"on": [
+"キ"
+],
+"kun": [
+"めずらしい"
+],
+"meaning": "あやしい",
+"meaningTokens": [
+{
+"t": "あやしい"
+}
+],
+"words": []
+},
+"奕": {
+"grade": 12,
+"on": [
+"エキ"
+],
+"kun": [],
+"meaning": "おおきい",
+"meaningTokens": [
+{
+"t": "おおきい"
+}
+],
+"words": []
+},
+"奐": {
+"grade": 12,
+"on": [
+"カン"
+],
+"kun": [
+"あきらか"
+],
+"meaning": "あきらか",
+"meaningTokens": [
+{
+"t": "あきらか"
+}
+],
+"words": []
+},
+"奎": {
+"grade": 12,
+"on": [
+"ケイ"
+],
+"kun": [],
+"meaning": "ほしの なまえ",
+"meaningTokens": [
+{
+"t": "ほしの なまえ"
+}
+],
+"words": []
+},
+"奚": {
+"grade": 12,
+"on": [
+"ケイ"
+],
+"kun": [
+"なんぞ"
+],
+"meaning": "なんぞ",
+"meaningTokens": [
+{
+"t": "なんぞ"
+}
+],
+"words": []
+},
+"奘": {
+"grade": 12,
+"on": [
+"ジョウ"
+],
+"kun": [
+"さかん"
+],
+"meaning": "さかん",
+"meaningTokens": [
+{
+"t": "さかん"
+}
+],
+"words": []
+},
+"奢": {
+"grade": 12,
+"on": [
+"シャ"
+],
+"kun": [
+"おごる"
+],
+"meaning": "おごる",
+"meaningTokens": [
+{
+"t": "おごる"
+}
+],
+"words": []
+},
+"奠": {
+"grade": 12,
+"on": [
+"テン"
+],
+"kun": [
+"まつる"
+],
+"meaning": "さだめる",
+"meaningTokens": [
+{
+"t": "さだめる"
+}
+],
+"words": []
+},
+"奧": {
+"grade": 12,
+"on": [
+"オウ"
+],
+"kun": [
+"おく"
+],
+"meaning": "おく",
+"meaningTokens": [
+{
+"t": "おく"
+}
+],
+"words": []
+},
+"奬": {
+"grade": 12,
+"on": [
+"ショウ"
+],
+"kun": [
+"すすめる"
+],
+"meaning": "すすめる",
+"meaningTokens": [
+{
+"t": "すすめる"
+}
+],
+"words": []
+},
+"奩": {
+"grade": 12,
+"on": [
+"レン"
+],
+"kun": [
+"くしげ"
+],
+"meaning": "けしょうばこ",
+"meaningTokens": [
+{
+"t": "けしょうばこ"
+}
+],
+"words": []
+},
+"奸": {
+"grade": 12,
+"on": [
+"カン"
+],
+"kun": [
+"おかす"
+],
+"meaning": "わるもの",
+"meaningTokens": [
+{
+"t": "わるもの"
+}
+],
+"words": []
+},
+"妁": {
+"grade": 12,
+"on": [
+"シャク"
+],
+"kun": [
+"なこうど"
+],
+"meaning": "なこうど",
+"meaningTokens": [
+{
+"t": "なこうど"
+}
+],
+"words": [
+"媒妁（ばいしゃく）"
+]
+},
+"妝": {
+"grade": 12,
+"on": [
+"ショウ"
+],
+"kun": [
+"よそおう"
+],
+"meaning": "よそおう",
+"meaningTokens": [
+{
+"t": "よそおう"
+}
+],
+"words": []
+},
+"佞": {
+"grade": 12,
+"on": [
+"ネイ"
+],
+"kun": [
+"おもねる"
+],
+"meaning": "へつらう",
+"meaningTokens": [
+{
+"t": "へつらう"
+}
+],
+"words": []
+},
+"侫": {
+"grade": 12,
+"on": [
+"ネイ"
+],
+"kun": [
+"おもねる"
+],
+"meaning": "へつらう",
+"meaningTokens": [
+{
+"t": "へつらう"
+}
+],
+"words": []
+},
+"妣": {
+"grade": 12,
+"on": [
+"ヒ"
+],
+"kun": [
+"なきはは"
+],
+"meaning": "なきはは",
+"meaningTokens": [
+{
+"t": "なきはは"
+}
+],
+"words": []
+},
+"姆": {
+"grade": 12,
+"on": [
+"ボ"
+],
+"kun": [
+"うば"
+],
+"meaning": "うば",
+"meaningTokens": [
+{
+"t": "うば"
+}
+],
+"words": [
+"保姆（ほぼ）"
+]
+},
+"姨": {
+"grade": 12,
+"on": [
+"イ"
+],
+"kun": [
+"おば"
+],
+"meaning": "おば",
+"meaningTokens": [
+{
+"t": "おば"
+}
+],
+"words": []
+},
+"姜": {
+"grade": 12,
+"on": [
+"キョウ"
+],
+"kun": [],
+"meaning": "しょうが",
+"meaningTokens": [
+{
+"t": "しょうが"
+}
+],
+"words": [
+"生姜（しょうが）"
+]
+},
+"妍": {
+"grade": 12,
+"on": [
+"ケン"
+],
+"kun": [
+"うつくしい"
+],
+"meaning": "うつくしい",
+"meaningTokens": [
+{
+"t": "うつくしい"
+}
+],
+"words": []
+},
+"姙": {
+"grade": 12,
+"on": [
+"ニン"
+],
+"kun": [
+"はらむ"
+],
+"meaning": "はらむ",
+"meaningTokens": [
+{
+"t": "はらむ"
+}
+],
+"words": []
+},
+"姚": {
+"grade": 12,
+"on": [
+"ヨウ"
+],
+"kun": [
+"うつくしい"
+],
+"meaning": "うつくしい",
+"meaningTokens": [
+{
+"t": "うつくしい"
+}
+],
+"words": []
+},
+"娥": {
+"grade": 12,
+"on": [
+"ガ"
+],
+"kun": [],
+"meaning": "うつくしい",
+"meaningTokens": [
+{
+"t": "うつくしい"
+}
+],
+"words": []
+},
+"娑": {
+"grade": 12,
+"on": [
+"シャ"
+],
+"kun": [],
+"meaning": "しゃば",
+"meaningTokens": [
+{
+"t": "しゃば"
+}
+],
+"words": []
+},
+"娜": {
+"grade": 12,
+"on": [
+"ナ"
+],
+"kun": [],
+"meaning": "しなやか",
+"meaningTokens": [
+{
+"t": "しなやか"
+}
+],
+"words": []
+},
+"娚": {
+"grade": 12,
+"on": [
+"ナン"
+],
+"kun": [
+"めおと"
+],
+"meaning": "めおと",
+"meaningTokens": [
+{
+"t": "めおと"
+}
+],
+"words": []
+},
+"婀": {
+"grade": 12,
+"on": [
+"ア"
+],
+"kun": [
+"たおやか"
+],
+"meaning": "たおやか",
+"meaningTokens": [
+{
+"t": "たおやか"
+}
+],
+"words": []
+},
+"婬": {
+"grade": 12,
+"on": [
+"イン"
+],
+"kun": [
+"みだら"
+],
+"meaning": "みだら",
+"meaningTokens": [
+{
+"t": "みだら"
+}
+],
+"words": []
+},
+"婉": {
+"grade": 12,
+"on": [
+"エン"
+],
+"kun": [
+"したがう"
+],
+"meaning": "しとやか",
+"meaningTokens": [
+{
+"t": "しとやか"
+}
+],
+"words": [
+"婉曲（えんきょく）"
+]
+},
+"娵": {
+"grade": 12,
+"on": [
+"シュ"
+],
+"kun": [
+"よめ"
+],
+"meaning": "よめ",
+"meaningTokens": [
+{
+"t": "よめ"
+}
+],
+"words": []
+},
+"娶": {
+"grade": 12,
+"on": [
+"シュ"
+],
+"kun": [
+"めとる"
+],
+"meaning": "めとる",
+"meaningTokens": [
+{
+"t": "めとる"
+}
+],
+"words": []
+},
+"婢": {
+"grade": 12,
+"on": [
+"ヒ"
+],
+"kun": [
+"はしため"
+],
+"meaning": "めしつかい",
+"meaningTokens": [
+{
+"t": "めしつかい"
+}
+],
+"words": []
+},
+"婪": {
+"grade": 12,
+"on": [
+"ラン"
+],
+"kun": [
+"むさぼる"
+],
+"meaning": "むさぼる",
+"meaningTokens": [
+{
+"t": "むさぼる"
+}
+],
+"words": []
+},
+"媚": {
+"grade": 12,
+"on": [
+"ビ"
+],
+"kun": [
+"こびる"
+],
+"meaning": "こびる",
+"meaningTokens": [
+{
+"t": "こびる"
+}
+],
+"words": []
+},
+"媼": {
+"grade": 12,
+"on": [
+"オウ"
+],
+"kun": [
+"おうな"
+],
+"meaning": "おうな",
+"meaningTokens": [
+{
+"t": "おうな"
+}
+],
+"words": []
+},
+"媾": {
+"grade": 12,
+"on": [
+"コウ"
+],
+"kun": [
+"よしみ"
+],
+"meaning": "よしみ",
+"meaningTokens": [
+{
+"t": "よしみ"
+}
+],
+"words": [
+"媾和（こうわ）"
+]
+},
+"嫋": {
+"grade": 12,
+"on": [
+"ジョウ"
+],
+"kun": [
+"しなやか",
+"たおやか"
+],
+"meaning": "しなやか",
+"meaningTokens": [
+{
+"t": "しなやか"
+}
+],
+"words": []
+},
+"嫂": {
+"grade": 12,
+"on": [
+"ソウ"
+],
+"kun": [
+"あによめ"
+],
+"meaning": "あによめ",
+"meaningTokens": [
+{
+"t": "あによめ"
+}
+],
+"words": []
+},
+"媽": {
+"grade": 12,
+"on": [
+"ボ"
+],
+"kun": [
+"はは"
+],
+"meaning": "はは",
+"meaningTokens": [
+{
+"t": "はは"
+}
+],
+"words": []
+},
+"嫣": {
+"grade": 12,
+"on": [
+"エン"
+],
+"kun": [],
+"meaning": "うつくしい",
+"meaningTokens": [
+{
+"t": "うつくしい"
+}
+],
+"words": []
+},
+"嫗": {
+"grade": 12,
+"on": [
+"オウ"
+],
+"kun": [
+"おうな"
+],
+"meaning": "おうな",
+"meaningTokens": [
+{
+"t": "おうな"
+}
+],
+"words": []
+},
+"嫦": {
+"grade": 12,
+"on": [
+"ジョウ"
+],
+"kun": [],
+"meaning": "つきの めがみ",
+"meaningTokens": [
+{
+"t": "つきの めがみ"
+}
+],
+"words": []
+},
+"嫩": {
+"grade": 12,
+"on": [
+"ドン"
+],
+"kun": [
+"わかい"
+],
+"meaning": "わかい",
+"meaningTokens": [
+{
+"t": "わかい"
+}
+],
+"words": [
+"嫩葉（どんよう）"
+]
+},
+"嫺": {
+"grade": 12,
+"on": [
+"カン"
+],
+"kun": [
+"ならう"
+],
+"meaning": "みやびやか",
+"meaningTokens": [
+{
+"t": "みやびやか"
 }
 ],
 "words": []
@@ -2392,41 +7370,6 @@
 ]
 },
 {
-"id": "g12-亶-1",
-"kanji": "亶",
-"type": "sentence",
-"tokens": [
-{
-"b": "亶",
-"r": "たん"
-},
-{
-"t": "の "
-},
-{
-"k": "字",
-"r": "じ"
-},
-{
-"t": "を "
-},
-{
-"k": "名前",
-"r": "なまえ"
-},
-{
-"t": "に "
-},
-{
-"k": "使",
-"r": "つか"
-},
-{
-"t": "う"
-}
-]
-},
-{
 "id": "g12-从-1",
 "kanji": "从",
 "type": "sentence",
@@ -2672,41 +7615,6 @@
 },
 {
 "t": "く"
-}
-]
-},
-{
-"id": "g12-价-1",
-"kanji": "价",
-"type": "sentence",
-"tokens": [
-{
-"b": "价",
-"r": "かい"
-},
-{
-"t": "の "
-},
-{
-"k": "字",
-"r": "じ"
-},
-{
-"t": "を "
-},
-{
-"k": "名前",
-"r": "なまえ"
-},
-{
-"t": "に "
-},
-{
-"k": "使",
-"r": "つか"
-},
-{
-"t": "う"
 }
 ]
 },
@@ -3065,41 +7973,6 @@
 ]
 },
 {
-"id": "g12-侑-1",
-"kanji": "侑",
-"type": "sentence",
-"tokens": [
-{
-"b": "侑",
-"r": "ゆう"
-},
-{
-"t": "の "
-},
-{
-"k": "字",
-"r": "じ"
-},
-{
-"t": "を "
-},
-{
-"k": "名前",
-"r": "なまえ"
-},
-{
-"t": "に "
-},
-{
-"k": "使",
-"r": "つか"
-},
-{
-"t": "う"
-}
-]
-},
-{
 "id": "g12-佯-1",
 "kanji": "佯",
 "type": "word",
@@ -3216,34 +8089,6 @@
 },
 {
 "t": "う"
-}
-]
-},
-{
-"id": "g12-俔-1",
-"kanji": "俔",
-"type": "sentence",
-"tokens": [
-{
-"b": "俔",
-"r": "けん"
-},
-{
-"t": "の "
-},
-{
-"k": "字",
-"r": "じ"
-},
-{
-"t": "を "
-},
-{
-"k": "書",
-"r": "か"
-},
-{
-"t": "く"
 }
 ]
 },
@@ -3640,41 +8485,6 @@
 ]
 },
 {
-"id": "g12-俶-1",
-"kanji": "俶",
-"type": "sentence",
-"tokens": [
-{
-"b": "俶",
-"r": "しゅく"
-},
-{
-"t": "の "
-},
-{
-"k": "字",
-"r": "じ"
-},
-{
-"t": "を "
-},
-{
-"k": "名前",
-"r": "なまえ"
-},
-{
-"t": "に "
-},
-{
-"k": "使",
-"r": "つか"
-},
-{
-"t": "う"
-}
-]
-},
-{
 "id": "g12-倡-1",
 "kanji": "倡",
 "type": "sentence",
@@ -3713,69 +8523,6 @@
 },
 {
 "t": "うに"
-}
-]
-},
-{
-"id": "g12-倬-1",
-"kanji": "倬",
-"type": "sentence",
-"tokens": [
-{
-"b": "倬",
-"r": "たく"
-},
-{
-"t": "の "
-},
-{
-"k": "字",
-"r": "じ"
-},
-{
-"t": "を "
-},
-{
-"k": "名前",
-"r": "なまえ"
-},
-{
-"t": "に "
-},
-{
-"k": "使",
-"r": "つか"
-},
-{
-"t": "う"
-}
-]
-},
-{
-"id": "g12-俾-1",
-"kanji": "俾",
-"type": "sentence",
-"tokens": [
-{
-"b": "俾",
-"r": "ひ"
-},
-{
-"t": "の "
-},
-{
-"k": "字",
-"r": "じ"
-},
-{
-"t": "を "
-},
-{
-"k": "書",
-"r": "か"
-},
-{
-"t": "く"
 }
 ]
 },
@@ -4341,41 +9088,6 @@
 ]
 },
 {
-"id": "g12-僖-1",
-"kanji": "僖",
-"type": "sentence",
-"tokens": [
-{
-"b": "僖",
-"r": "き"
-},
-{
-"t": "の "
-},
-{
-"k": "字",
-"r": "じ"
-},
-{
-"t": "を "
-},
-{
-"k": "名前",
-"r": "なまえ"
-},
-{
-"t": "に "
-},
-{
-"k": "使",
-"r": "つか"
-},
-{
-"t": "う"
-}
-]
-},
-{
 "id": "g12-僞-1",
 "kanji": "僞",
 "type": "word",
@@ -4634,34 +9346,6 @@
 ]
 },
 {
-"id": "g12-儖-1",
-"kanji": "儖",
-"type": "sentence",
-"tokens": [
-{
-"b": "儖",
-"r": "らん"
-},
-{
-"t": "の "
-},
-{
-"k": "字",
-"r": "じ"
-},
-{
-"t": "を "
-},
-{
-"k": "書",
-"r": "か"
-},
-{
-"t": "く"
-}
-]
-},
-{
 "id": "g12-儕-1",
 "kanji": "儕",
 "type": "word",
@@ -4708,6 +9392,8139 @@
 },
 {
 "t": "が ない"
+}
+]
+},
+{
+"id": "g12-儚-1",
+"kanji": "儚",
+"type": "sentence",
+"tokens": [
+{
+"b": "儚",
+"r": "はかな"
+},
+{
+"t": "い "
+},
+{
+"k": "夢",
+"r": "ゆめ"
+}
+]
+},
+{
+"id": "g12-儡-1",
+"kanji": "儡",
+"type": "word",
+"tokens": [
+{
+"k": "傀",
+"r": "かい"
+},
+{
+"b": "儡",
+"r": "らい"
+},
+{
+"t": "を "
+},
+{
+"k": "操",
+"r": "あやつ"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-儺-1",
+"kanji": "儺",
+"type": "word",
+"tokens": [
+{
+"k": "追",
+"r": "つい"
+},
+{
+"b": "儺",
+"r": "な"
+},
+{
+"t": "の "
+},
+{
+"k": "行事",
+"r": "ぎょうじ"
+}
+]
+},
+{
+"id": "g12-儷-1",
+"kanji": "儷",
+"type": "word",
+"tokens": [
+{
+"k": "伉",
+"r": "こう"
+},
+{
+"b": "儷",
+"r": "れい"
+},
+{
+"t": "の "
+},
+{
+"k": "契",
+"r": "ちぎ"
+},
+{
+"t": "り"
+}
+]
+},
+{
+"id": "g12-儼-1",
+"kanji": "儼",
+"type": "word",
+"tokens": [
+{
+"b": "儼",
+"r": "げん"
+},
+{
+"k": "然",
+"r": "ぜん"
+},
+{
+"t": "たる "
+},
+{
+"k": "事実",
+"r": "じじつ"
+}
+]
+},
+{
+"id": "g12-儿-1",
+"kanji": "儿",
+"type": "sentence",
+"tokens": [
+{
+"b": "儿",
+"r": "ひとあし"
+},
+{
+"t": "は "
+},
+{
+"k": "部首",
+"r": "ぶしゅ"
+},
+{
+"t": "の "
+},
+{
+"k": "一",
+"r": "ひと"
+},
+{
+"t": "つ"
+}
+]
+},
+{
+"id": "g12-兀-1",
+"kanji": "兀",
+"type": "word",
+"tokens": [
+{
+"b": "兀",
+"r": "こつ"
+},
+{
+"k": "然",
+"r": "ぜん"
+},
+{
+"t": "と そびえる "
+},
+{
+"k": "山",
+"r": "やま"
+}
+]
+},
+{
+"id": "g12-兒-1",
+"kanji": "兒",
+"type": "word",
+"tokens": [
+{
+"k": "幼",
+"r": "よう"
+},
+{
+"b": "兒",
+"r": "じ"
+},
+{
+"t": "を "
+},
+{
+"k": "育",
+"r": "そだ"
+},
+{
+"t": "てる"
+}
+]
+},
+{
+"id": "g12-兌-1",
+"kanji": "兌",
+"type": "word",
+"tokens": [
+{
+"k": "紙幣",
+"r": "しへい"
+},
+{
+"t": "を "
+},
+{
+"k": "金",
+"r": "きん"
+},
+{
+"t": "に "
+},
+{
+"b": "兌",
+"r": "だ"
+},
+{
+"k": "換",
+"r": "かん"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-兔-1",
+"kanji": "兔",
+"type": "sentence",
+"tokens": [
+{
+"b": "兔",
+"r": "うさぎ"
+},
+{
+"t": "が "
+},
+{
+"k": "跳",
+"r": "は"
+},
+{
+"t": "ねる"
+}
+]
+},
+{
+"id": "g12-兢-1",
+"kanji": "兢",
+"type": "word",
+"tokens": [
+{
+"k": "戦々",
+"r": "せんせん"
+},
+{
+"b": "兢",
+"r": "きょう"
+},
+{
+"k": "々",
+"r": "きょう"
+},
+{
+"t": "と する"
+}
+]
+},
+{
+"id": "g12-竸-1",
+"kanji": "竸",
+"type": "sentence",
+"tokens": [
+{
+"k": "速",
+"r": "はや"
+},
+{
+"t": "さを "
+},
+{
+"b": "竸",
+"r": "きそ"
+},
+{
+"t": "う"
+}
+]
+},
+{
+"id": "g12-兩-1",
+"kanji": "兩",
+"type": "word",
+"tokens": [
+{
+"b": "兩",
+"r": "りょう"
+},
+{
+"k": "手",
+"r": "て"
+},
+{
+"t": "で "
+},
+{
+"k": "持",
+"r": "も"
+},
+{
+"t": "つ"
+}
+]
+},
+{
+"id": "g12-兮-1",
+"kanji": "兮",
+"type": "sentence",
+"tokens": [
+{
+"k": "漢詩",
+"r": "かんし"
+},
+{
+"t": "に "
+},
+{
+"b": "兮",
+"r": "けい"
+},
+{
+"t": "の "
+},
+{
+"k": "字",
+"r": "じ"
+},
+{
+"t": "が "
+},
+{
+"k": "出",
+"r": "で"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-冀-1",
+"kanji": "冀",
+"type": "sentence",
+"tokens": [
+{
+"k": "平和",
+"r": "へいわ"
+},
+{
+"t": "を "
+},
+{
+"b": "冀",
+"r": "こいねが"
+},
+{
+"t": "う"
+}
+]
+},
+{
+"id": "g12-冂-1",
+"kanji": "冂",
+"type": "sentence",
+"tokens": [
+{
+"b": "冂",
+"r": "どうがまえ"
+},
+{
+"t": "は "
+},
+{
+"k": "部首",
+"r": "ぶしゅ"
+},
+{
+"t": "の "
+},
+{
+"k": "一",
+"r": "ひと"
+},
+{
+"t": "つ"
+}
+]
+},
+{
+"id": "g12-囘-1",
+"kanji": "囘",
+"type": "word",
+"tokens": [
+{
+"k": "第",
+"r": "だい"
+},
+{
+"k": "一",
+"r": "いっ"
+},
+{
+"b": "囘",
+"r": "かい"
+},
+{
+"t": "の "
+},
+{
+"k": "会議",
+"r": "かいぎ"
+}
+]
+},
+{
+"id": "g12-册-1",
+"kanji": "册",
+"type": "word",
+"tokens": [
+{
+"k": "別",
+"r": "べっ"
+},
+{
+"b": "册",
+"r": "さつ"
+},
+{
+"t": "の "
+},
+{
+"k": "付録",
+"r": "ふろく"
+}
+]
+},
+{
+"id": "g12-冉-1",
+"kanji": "冉",
+"type": "word",
+"tokens": [
+{
+"b": "冉",
+"r": "ぜん"
+},
+{
+"k": "々",
+"r": "ぜん"
+},
+{
+"t": "と "
+},
+{
+"k": "進",
+"r": "すす"
+},
+{
+"t": "む"
+}
+]
+},
+{
+"id": "g12-冑-1",
+"kanji": "冑",
+"type": "word",
+"tokens": [
+{
+"k": "甲",
+"r": "かっ"
+},
+{
+"b": "冑",
+"r": "ちゅう"
+},
+{
+"t": "を "
+},
+{
+"k": "身",
+"r": "み"
+},
+{
+"t": "に つける"
+}
+]
+},
+{
+"id": "g12-冓-1",
+"kanji": "冓",
+"type": "sentence",
+"tokens": [
+{
+"b": "冓",
+"r": "こう"
+},
+{
+"t": "の "
+},
+{
+"k": "字",
+"r": "じ"
+},
+{
+"t": "は "
+},
+{
+"k": "構",
+"r": "こう"
+},
+{
+"t": "の "
+},
+{
+"k": "一部",
+"r": "いちぶ"
+},
+{
+"t": "だ"
+}
+]
+},
+{
+"id": "g12-冕-1",
+"kanji": "冕",
+"type": "word",
+"tokens": [
+{
+"k": "王",
+"r": "おう"
+},
+{
+"t": "が "
+},
+{
+"b": "冕",
+"r": "べん"
+},
+{
+"k": "冠",
+"r": "かん"
+},
+{
+"t": "を かぶる"
+}
+]
+},
+{
+"id": "g12-冖-1",
+"kanji": "冖",
+"type": "sentence",
+"tokens": [
+{
+"b": "冖",
+"r": "わかんむり"
+},
+{
+"t": "は "
+},
+{
+"k": "部首",
+"r": "ぶしゅ"
+},
+{
+"t": "の "
+},
+{
+"k": "一",
+"r": "ひと"
+},
+{
+"t": "つ"
+}
+]
+},
+{
+"id": "g12-冤-1",
+"kanji": "冤",
+"type": "word",
+"tokens": [
+{
+"b": "冤",
+"r": "えん"
+},
+{
+"k": "罪",
+"r": "ざい"
+},
+{
+"t": "を "
+},
+{
+"k": "晴",
+"r": "は"
+},
+{
+"t": "らす"
+}
+]
+},
+{
+"id": "g12-冦-1",
+"kanji": "冦",
+"type": "word",
+"tokens": [
+{
+"k": "外",
+"r": "がい"
+},
+{
+"b": "冦",
+"r": "こう"
+},
+{
+"t": "を "
+},
+{
+"k": "防",
+"r": "ふせ"
+},
+{
+"t": "ぐ"
+}
+]
+},
+{
+"id": "g12-冢-1",
+"kanji": "冢",
+"type": "word",
+"tokens": [
+{
+"k": "古",
+"r": "ふる"
+},
+{
+"t": "い "
+},
+{
+"b": "冢",
+"r": "ちょう"
+},
+{
+"k": "墓",
+"r": "ぼ"
+},
+{
+"t": "を "
+},
+{
+"k": "調",
+"r": "しら"
+},
+{
+"t": "べる"
+}
+]
+},
+{
+"id": "g12-冩-1",
+"kanji": "冩",
+"type": "sentence",
+"tokens": [
+{
+"k": "手本",
+"r": "てほん"
+},
+{
+"t": "を "
+},
+{
+"b": "冩",
+"r": "うつ"
+},
+{
+"t": "す"
+}
+]
+},
+{
+"id": "g12-冪-1",
+"kanji": "冪",
+"type": "sentence",
+"tokens": [
+{
+"k": "二",
+"r": "に"
+},
+{
+"t": "の "
+},
+{
+"k": "三",
+"r": "さん"
+},
+{
+"k": "乗",
+"r": "じょう"
+},
+{
+"t": "を "
+},
+{
+"b": "冪",
+"r": "べき"
+},
+{
+"t": "と いう"
+}
+]
+},
+{
+"id": "g12-冫-1",
+"kanji": "冫",
+"type": "sentence",
+"tokens": [
+{
+"b": "冫",
+"r": "にすい"
+},
+{
+"t": "は "
+},
+{
+"k": "部首",
+"r": "ぶしゅ"
+},
+{
+"t": "の "
+},
+{
+"k": "一",
+"r": "ひと"
+},
+{
+"t": "つ"
+}
+]
+},
+{
+"id": "g12-决-1",
+"kanji": "决",
+"type": "word",
+"tokens": [
+{
+"b": "决",
+"r": "けっ"
+},
+{
+"k": "定",
+"r": "てい"
+},
+{
+"t": "を "
+},
+{
+"k": "下",
+"r": "くだ"
+},
+{
+"t": "す"
+}
+]
+},
+{
+"id": "g12-冱-1",
+"kanji": "冱",
+"type": "word",
+"tokens": [
+{
+"b": "冱",
+"r": "ご"
+},
+{
+"k": "寒",
+"r": "かん"
+},
+{
+"t": "の "
+},
+{
+"k": "地",
+"r": "ち"
+}
+]
+},
+{
+"id": "g12-冲-1",
+"kanji": "冲",
+"type": "word",
+"tokens": [
+{
+"b": "冲",
+"r": "ちゅう"
+},
+{
+"k": "天",
+"r": "てん"
+},
+{
+"t": "の "
+},
+{
+"k": "勢",
+"r": "いきお"
+},
+{
+"t": "い"
+}
+]
+},
+{
+"id": "g12-冰-1",
+"kanji": "冰",
+"type": "sentence",
+"tokens": [
+{
+"b": "冰",
+"r": "こおり"
+},
+{
+"t": "が "
+},
+{
+"k": "張",
+"r": "は"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-况-1",
+"kanji": "况",
+"type": "word",
+"tokens": [
+{
+"k": "現",
+"r": "げん"
+},
+{
+"b": "况",
+"r": "きょう"
+},
+{
+"t": "を "
+},
+{
+"k": "報告",
+"r": "ほうこく"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-冽-1",
+"kanji": "冽",
+"type": "word",
+"tokens": [
+{
+"k": "清",
+"r": "せい"
+},
+{
+"b": "冽",
+"r": "れつ"
+},
+{
+"t": "な "
+},
+{
+"k": "泉",
+"r": "いずみ"
+}
+]
+},
+{
+"id": "g12-凅-1",
+"kanji": "凅",
+"type": "sentence",
+"tokens": [
+{
+"k": "井戸",
+"r": "いど"
+},
+{
+"t": "の "
+},
+{
+"k": "水",
+"r": "みず"
+},
+{
+"t": "が "
+},
+{
+"b": "凅",
+"r": "か"
+},
+{
+"t": "れる"
+}
+]
+},
+{
+"id": "g12-凉-1",
+"kanji": "凉",
+"type": "sentence",
+"tokens": [
+{
+"b": "凉",
+"r": "すず"
+},
+{
+"t": "しい "
+},
+{
+"k": "風",
+"r": "かぜ"
+}
+]
+},
+{
+"id": "g12-凛-1",
+"kanji": "凛",
+"type": "sentence",
+"tokens": [
+{
+"b": "凛",
+"r": "りん"
+},
+{
+"t": "と した "
+},
+{
+"k": "姿",
+"r": "すがた"
+}
+]
+},
+{
+"id": "g12-几-1",
+"kanji": "几",
+"type": "word",
+"tokens": [
+{
+"k": "床",
+"r": "しょう"
+},
+{
+"b": "几",
+"r": "ぎ"
+},
+{
+"t": "に "
+},
+{
+"k": "腰",
+"r": "こし"
+},
+{
+"t": "かける"
+}
+]
+},
+{
+"id": "g12-處-1",
+"kanji": "處",
+"type": "word",
+"tokens": [
+{
+"k": "適",
+"r": "てき"
+},
+{
+"b": "處",
+"r": "しょ"
+},
+{
+"t": "に "
+},
+{
+"k": "置",
+"r": "お"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-凩-1",
+"kanji": "凩",
+"type": "sentence",
+"tokens": [
+{
+"b": "凩",
+"r": "こがらし"
+},
+{
+"t": "が "
+},
+{
+"k": "吹",
+"r": "ふ"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-凭-1",
+"kanji": "凭",
+"type": "sentence",
+"tokens": [
+{
+"k": "壁",
+"r": "かべ"
+},
+{
+"t": "に "
+},
+{
+"b": "凭",
+"r": "もた"
+},
+{
+"t": "れる"
+}
+]
+},
+{
+"id": "g12-凰-1",
+"kanji": "凰",
+"type": "word",
+"tokens": [
+{
+"k": "鳳",
+"r": "ほう"
+},
+{
+"b": "凰",
+"r": "おう"
+},
+{
+"t": "が "
+},
+{
+"k": "舞",
+"r": "ま"
+},
+{
+"t": "う"
+}
+]
+},
+{
+"id": "g12-凵-1",
+"kanji": "凵",
+"type": "sentence",
+"tokens": [
+{
+"b": "凵",
+"r": "かんにょう"
+},
+{
+"t": "は "
+},
+{
+"k": "部首",
+"r": "ぶしゅ"
+},
+{
+"t": "の "
+},
+{
+"k": "一",
+"r": "ひと"
+},
+{
+"t": "つ"
+}
+]
+},
+{
+"id": "g12-凾-1",
+"kanji": "凾",
+"type": "word",
+"tokens": [
+{
+"k": "郵便",
+"r": "ゆうびん"
+},
+{
+"t": "を "
+},
+{
+"k": "投",
+"r": "とう"
+},
+{
+"b": "凾",
+"r": "かん"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-刄-1",
+"kanji": "刄",
+"type": "sentence",
+"tokens": [
+{
+"k": "刀",
+"r": "かたな"
+},
+{
+"t": "の "
+},
+{
+"b": "刄",
+"r": "は"
+},
+{
+"t": "が "
+},
+{
+"k": "光",
+"r": "ひか"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-刋-1",
+"kanji": "刋",
+"type": "sentence",
+"tokens": [
+{
+"b": "刋",
+"r": "せん"
+},
+{
+"t": "の "
+},
+{
+"k": "字",
+"r": "じ"
+},
+{
+"t": "は "
+},
+{
+"k": "刊",
+"r": "かん"
+},
+{
+"t": "と ちがう"
+}
+]
+},
+{
+"id": "g12-刔-1",
+"kanji": "刔",
+"type": "sentence",
+"tokens": [
+{
+"k": "刀",
+"r": "かたな"
+},
+{
+"t": "で "
+},
+{
+"b": "刔",
+"r": "えぐ"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-刎-1",
+"kanji": "刎",
+"type": "word",
+"tokens": [
+{
+"b": "刎",
+"r": "ふん"
+},
+{
+"k": "頸",
+"r": "けい"
+},
+{
+"t": "の "
+},
+{
+"k": "交",
+"r": "まじ"
+},
+{
+"t": "わり"
+}
+]
+},
+{
+"id": "g12-刧-1",
+"kanji": "刧",
+"type": "word",
+"tokens": [
+{
+"k": "永",
+"r": "えい"
+},
+{
+"b": "刧",
+"r": "ごう"
+},
+{
+"t": "の "
+},
+{
+"k": "時",
+"r": "とき"
+}
+]
+},
+{
+"id": "g12-刪-1",
+"kanji": "刪",
+"type": "word",
+"tokens": [
+{
+"k": "文章",
+"r": "ぶんしょう"
+},
+{
+"t": "を "
+},
+{
+"b": "刪",
+"r": "さん"
+},
+{
+"k": "除",
+"r": "じょ"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-刮-1",
+"kanji": "刮",
+"type": "word",
+"tokens": [
+{
+"b": "刮",
+"r": "かつ"
+},
+{
+"k": "目",
+"r": "もく"
+},
+{
+"t": "して "
+},
+{
+"k": "待",
+"r": "ま"
+},
+{
+"t": "つ"
+}
+]
+},
+{
+"id": "g12-刳-1",
+"kanji": "刳",
+"type": "sentence",
+"tokens": [
+{
+"k": "木",
+"r": "き"
+},
+{
+"t": "を "
+},
+{
+"b": "刳",
+"r": "く"
+},
+{
+"t": "り"
+},
+{
+"k": "抜",
+"r": "ぬ"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-剏-1",
+"kanji": "剏",
+"type": "word",
+"tokens": [
+{
+"k": "新",
+"r": "あら"
+},
+{
+"t": "たに "
+},
+{
+"k": "寺",
+"r": "てら"
+},
+{
+"t": "を "
+},
+{
+"b": "剏",
+"r": "そう"
+},
+{
+"k": "建",
+"r": "けん"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-剋-1",
+"kanji": "剋",
+"type": "word",
+"tokens": [
+{
+"k": "相",
+"r": "そう"
+},
+{
+"b": "剋",
+"r": "こく"
+},
+{
+"t": "に "
+},
+{
+"k": "悩",
+"r": "なや"
+},
+{
+"t": "む"
+}
+]
+},
+{
+"id": "g12-剌-1",
+"kanji": "剌",
+"type": "word",
+"tokens": [
+{
+"k": "元気",
+"r": "げんき"
+},
+{
+"t": " "
+},
+{
+"k": "溌",
+"r": "はつ"
+},
+{
+"b": "剌",
+"r": "らつ"
+},
+{
+"t": "と する"
+}
+]
+},
+{
+"id": "g12-剞-1",
+"kanji": "剞",
+"type": "sentence",
+"tokens": [
+{
+"b": "剞",
+"r": "き"
+},
+{
+"t": "けつの "
+},
+{
+"k": "技",
+"r": "わざ"
+}
+]
+},
+{
+"id": "g12-剔-1",
+"kanji": "剔",
+"type": "word",
+"tokens": [
+{
+"k": "不正",
+"r": "ふせい"
+},
+{
+"t": "を "
+},
+{
+"b": "剔",
+"r": "てっ"
+},
+{
+"k": "抉",
+"r": "けつ"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-剪-1",
+"kanji": "剪",
+"type": "word",
+"tokens": [
+{
+"k": "庭木",
+"r": "にわき"
+},
+{
+"t": "を "
+},
+{
+"b": "剪",
+"r": "せん"
+},
+{
+"k": "定",
+"r": "てい"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-剴-1",
+"kanji": "剴",
+"type": "word",
+"tokens": [
+{
+"b": "剴",
+"r": "がい"
+},
+{
+"k": "切",
+"r": "せつ"
+},
+{
+"t": "な "
+},
+{
+"k": "意見",
+"r": "いけん"
+}
+]
+},
+{
+"id": "g12-剩-1",
+"kanji": "剩",
+"type": "word",
+"tokens": [
+{
+"k": "余",
+"r": "よ"
+},
+{
+"b": "剩",
+"r": "じょう"
+},
+{
+"k": "金",
+"r": "きん"
+},
+{
+"t": "が "
+},
+{
+"k": "出",
+"r": "で"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-剳-1",
+"kanji": "剳",
+"type": "word",
+"tokens": [
+{
+"k": "読書",
+"r": "どくしょ"
+},
+{
+"t": "の "
+},
+{
+"b": "剳",
+"r": "とう"
+},
+{
+"k": "記",
+"r": "き"
+},
+{
+"t": "を "
+},
+{
+"k": "書",
+"r": "か"
+},
+{
+"t": "き"
+},
+{
+"k": "留",
+"r": "と"
+},
+{
+"t": "める"
+}
+]
+},
+{
+"id": "g12-剿-1",
+"kanji": "剿",
+"type": "word",
+"tokens": [
+{
+"k": "賊",
+"r": "ぞく"
+},
+{
+"t": "を "
+},
+{
+"b": "剿",
+"r": "そう"
+},
+{
+"k": "討",
+"r": "とう"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-剽-1",
+"kanji": "剽",
+"type": "word",
+"tokens": [
+{
+"b": "剽",
+"r": "ひょう"
+},
+{
+"k": "窃",
+"r": "せつ"
+},
+{
+"t": "を "
+},
+{
+"k": "禁",
+"r": "きん"
+},
+{
+"t": "じる"
+}
+]
+},
+{
+"id": "g12-劍-1",
+"kanji": "劍",
+"type": "word",
+"tokens": [
+{
+"b": "劍",
+"r": "けん"
+},
+{
+"k": "道",
+"r": "どう"
+},
+{
+"t": "を "
+},
+{
+"k": "習",
+"r": "なら"
+},
+{
+"t": "う"
+}
+]
+},
+{
+"id": "g12-劔-1",
+"kanji": "劔",
+"type": "sentence",
+"tokens": [
+{
+"b": "劔",
+"r": "つるぎ"
+},
+{
+"t": "を "
+},
+{
+"k": "抜",
+"r": "ぬ"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-劒-1",
+"kanji": "劒",
+"type": "word",
+"tokens": [
+{
+"k": "真",
+"r": "しん"
+},
+{
+"b": "劒",
+"r": "けん"
+},
+{
+"t": "な "
+},
+{
+"k": "顔",
+"r": "かお"
+}
+]
+},
+{
+"id": "g12-剱-1",
+"kanji": "剱",
+"type": "word",
+"tokens": [
+{
+"b": "剱",
+"r": "つるぎ"
+},
+{
+"k": "岳",
+"r": "だけ"
+},
+{
+"t": "に "
+},
+{
+"k": "登",
+"r": "のぼ"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-劈-1",
+"kanji": "劈",
+"type": "sentence",
+"tokens": [
+{
+"k": "耳",
+"r": "みみ"
+},
+{
+"t": "を "
+},
+{
+"b": "劈",
+"r": "つんざ"
+},
+{
+"t": "く "
+},
+{
+"k": "音",
+"r": "おと"
+}
+]
+},
+{
+"id": "g12-劑-1",
+"kanji": "劑",
+"type": "word",
+"tokens": [
+{
+"k": "薬",
+"r": "やく"
+},
+{
+"b": "劑",
+"r": "ざい"
+},
+{
+"k": "師",
+"r": "し"
+},
+{
+"t": "に "
+},
+{
+"k": "聞",
+"r": "き"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-辨-1",
+"kanji": "辨",
+"type": "word",
+"tokens": [
+{
+"k": "駅",
+"r": "えき"
+},
+{
+"b": "辨",
+"r": "べん"
+},
+{
+"t": "を "
+},
+{
+"k": "買",
+"r": "か"
+},
+{
+"t": "う"
+}
+]
+},
+{
+"id": "g12-辧-1",
+"kanji": "辧",
+"type": "word",
+"tokens": [
+{
+"k": "花",
+"r": "か"
+},
+{
+"b": "辧",
+"r": "べん"
+},
+{
+"t": "の "
+},
+{
+"k": "数",
+"r": "かず"
+},
+{
+"t": "を "
+},
+{
+"k": "数",
+"r": "かぞ"
+},
+{
+"t": "える"
+}
+]
+},
+{
+"id": "g12-劬-1",
+"kanji": "劬",
+"type": "word",
+"tokens": [
+{
+"k": "親",
+"r": "おや"
+},
+{
+"t": "の "
+},
+{
+"b": "劬",
+"r": "く"
+},
+{
+"k": "労",
+"r": "ろう"
+},
+{
+"t": "を ねぎらう"
+}
+]
+},
+{
+"id": "g12-劵-1",
+"kanji": "劵",
+"type": "sentence",
+"tokens": [
+{
+"b": "劵",
+"r": "けん"
+},
+{
+"t": "の "
+},
+{
+"k": "字",
+"r": "じ"
+},
+{
+"t": "は "
+},
+{
+"k": "券",
+"r": "けん"
+},
+{
+"t": "と ちがう"
+}
+]
+},
+{
+"id": "g12-勁-1",
+"kanji": "勁",
+"type": "word",
+"tokens": [
+{
+"k": "雄",
+"r": "ゆう"
+},
+{
+"b": "勁",
+"r": "けい"
+},
+{
+"t": "な "
+},
+{
+"k": "筆",
+"r": "ふで"
+},
+{
+"t": "づかい"
+}
+]
+},
+{
+"id": "g12-勍-1",
+"kanji": "勍",
+"type": "word",
+"tokens": [
+{
+"b": "勍",
+"r": "けい"
+},
+{
+"k": "敵",
+"r": "てき"
+},
+{
+"t": "に "
+},
+{
+"k": "立",
+"r": "た"
+},
+{
+"t": "ち"
+},
+{
+"k": "向",
+"r": "む"
+},
+{
+"t": "かう"
+}
+]
+},
+{
+"id": "g12-勗-1",
+"kanji": "勗",
+"type": "sentence",
+"tokens": [
+{
+"k": "学問",
+"r": "がくもん"
+},
+{
+"t": "に "
+},
+{
+"b": "勗",
+"r": "つと"
+},
+{
+"t": "める"
+}
+]
+},
+{
+"id": "g12-勞-1",
+"kanji": "勞",
+"type": "word",
+"tokens": [
+{
+"k": "苦",
+"r": "く"
+},
+{
+"b": "勞",
+"r": "ろう"
+},
+{
+"t": "を "
+},
+{
+"k": "重",
+"r": "かさ"
+},
+{
+"t": "ねる"
+}
+]
+},
+{
+"id": "g12-勣-1",
+"kanji": "勣",
+"type": "word",
+"tokens": [
+{
+"k": "功",
+"r": "こう"
+},
+{
+"b": "勣",
+"r": "せき"
+},
+{
+"t": "を "
+},
+{
+"k": "立",
+"r": "た"
+},
+{
+"t": "てる"
+}
+]
+},
+{
+"id": "g12-勦-1",
+"kanji": "勦",
+"type": "word",
+"tokens": [
+{
+"k": "敵",
+"r": "てき"
+},
+{
+"t": "を "
+},
+{
+"b": "勦",
+"r": "そう"
+},
+{
+"k": "滅",
+"r": "めつ"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-飭-1",
+"kanji": "飭",
+"type": "word",
+"tokens": [
+{
+"k": "部下",
+"r": "ぶか"
+},
+{
+"t": "を "
+},
+{
+"k": "戒",
+"r": "かい"
+},
+{
+"b": "飭",
+"r": "ちょく"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-勠-1",
+"kanji": "勠",
+"type": "sentence",
+"tokens": [
+{
+"k": "力",
+"r": "ちから"
+},
+{
+"t": "を "
+},
+{
+"b": "勠",
+"r": "あわ"
+},
+{
+"t": "せる"
+}
+]
+},
+{
+"id": "g12-勳-1",
+"kanji": "勳",
+"type": "word",
+"tokens": [
+{
+"b": "勳",
+"r": "くん"
+},
+{
+"k": "章",
+"r": "しょう"
+},
+{
+"t": "を "
+},
+{
+"k": "受",
+"r": "う"
+},
+{
+"t": "ける"
+}
+]
+},
+{
+"id": "g12-勵-1",
+"kanji": "勵",
+"type": "sentence",
+"tokens": [
+{
+"k": "勉強",
+"r": "べんきょう"
+},
+{
+"t": "に "
+},
+{
+"b": "勵",
+"r": "はげ"
+},
+{
+"t": "む"
+}
+]
+},
+{
+"id": "g12-勸-1",
+"kanji": "勸",
+"type": "sentence",
+"tokens": [
+{
+"k": "入会",
+"r": "にゅうかい"
+},
+{
+"t": "を "
+},
+{
+"b": "勸",
+"r": "すす"
+},
+{
+"t": "める"
+}
+]
+},
+{
+"id": "g12-勹-1",
+"kanji": "勹",
+"type": "sentence",
+"tokens": [
+{
+"b": "勹",
+"r": "つつみがまえ"
+},
+{
+"t": "は "
+},
+{
+"k": "部首",
+"r": "ぶしゅ"
+},
+{
+"t": "の "
+},
+{
+"k": "一",
+"r": "ひと"
+},
+{
+"t": "つ"
+}
+]
+},
+{
+"id": "g12-匆-1",
+"kanji": "匆",
+"type": "word",
+"tokens": [
+{
+"b": "匆",
+"r": "そう"
+},
+{
+"k": "々",
+"r": "そう"
+},
+{
+"t": "に "
+},
+{
+"k": "立",
+"r": "た"
+},
+{
+"t": "ち"
+},
+{
+"k": "去",
+"r": "さ"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-匈-1",
+"kanji": "匈",
+"type": "word",
+"tokens": [
+{
+"b": "匈",
+"r": "きょう"
+},
+{
+"k": "奴",
+"r": "ど"
+},
+{
+"t": "の "
+},
+{
+"k": "歴史",
+"r": "れきし"
+},
+{
+"t": "を "
+},
+{
+"k": "学",
+"r": "まな"
+},
+{
+"t": "ぶ"
+}
+]
+},
+{
+"id": "g12-匍-1",
+"kanji": "匍",
+"type": "word",
+"tokens": [
+{
+"b": "匍",
+"r": "ほ"
+},
+{
+"k": "匐",
+"r": "ふく"
+},
+{
+"k": "前進",
+"r": "ぜんしん"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-匐-1",
+"kanji": "匐",
+"type": "word",
+"tokens": [
+{
+"k": "匍",
+"r": "ほ"
+},
+{
+"b": "匐",
+"r": "ふく"
+},
+{
+"t": "して "
+},
+{
+"k": "進",
+"r": "すす"
+},
+{
+"t": "む"
+}
+]
+},
+{
+"id": "g12-匏-1",
+"kanji": "匏",
+"type": "sentence",
+"tokens": [
+{
+"b": "匏",
+"r": "ひさご"
+},
+{
+"t": "に "
+},
+{
+"k": "水",
+"r": "みず"
+},
+{
+"t": "を "
+},
+{
+"k": "入",
+"r": "い"
+},
+{
+"t": "れる"
+}
+]
+},
+{
+"id": "g12-匕-1",
+"kanji": "匕",
+"type": "word",
+"tokens": [
+{
+"b": "匕",
+"r": "ひ"
+},
+{
+"k": "首",
+"r": "しゅ"
+},
+{
+"t": "を "
+},
+{
+"k": "突",
+"r": "つ"
+},
+{
+"t": "きつける"
+}
+]
+},
+{
+"id": "g12-匚-1",
+"kanji": "匚",
+"type": "sentence",
+"tokens": [
+{
+"b": "匚",
+"r": "はこがまえ"
+},
+{
+"t": "は "
+},
+{
+"k": "部首",
+"r": "ぶしゅ"
+},
+{
+"t": "の "
+},
+{
+"k": "一",
+"r": "ひと"
+},
+{
+"t": "つ"
+}
+]
+},
+{
+"id": "g12-匣-1",
+"kanji": "匣",
+"type": "sentence",
+"tokens": [
+{
+"k": "玉",
+"r": "たま"
+},
+{
+"t": "を "
+},
+{
+"b": "匣",
+"r": "はこ"
+},
+{
+"t": "に "
+},
+{
+"k": "納",
+"r": "おさ"
+},
+{
+"t": "める"
+}
+]
+},
+{
+"id": "g12-匱-1",
+"kanji": "匱",
+"type": "sentence",
+"tokens": [
+{
+"k": "米",
+"r": "こめ"
+},
+{
+"t": "を "
+},
+{
+"b": "匱",
+"r": "ひつ"
+},
+{
+"t": "に "
+},
+{
+"k": "入",
+"r": "い"
+},
+{
+"t": "れる"
+}
+]
+},
+{
+"id": "g12-匳-1",
+"kanji": "匳",
+"type": "sentence",
+"tokens": [
+{
+"k": "鏡",
+"r": "かがみ"
+},
+{
+"t": "を "
+},
+{
+"b": "匳",
+"r": "れん"
+},
+{
+"t": "に しまう"
+}
+]
+},
+{
+"id": "g12-匸-1",
+"kanji": "匸",
+"type": "sentence",
+"tokens": [
+{
+"b": "匸",
+"r": "かくしがまえ"
+},
+{
+"t": "は "
+},
+{
+"k": "部首",
+"r": "ぶしゅ"
+},
+{
+"t": "の "
+},
+{
+"k": "一",
+"r": "ひと"
+},
+{
+"t": "つ"
+}
+]
+},
+{
+"id": "g12-區-1",
+"kanji": "區",
+"type": "word",
+"tokens": [
+{
+"k": "二",
+"r": "ふた"
+},
+{
+"t": "つを "
+},
+{
+"b": "區",
+"r": "く"
+},
+{
+"k": "別",
+"r": "べつ"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-卆-1",
+"kanji": "卆",
+"type": "word",
+"tokens": [
+{
+"k": "大学",
+"r": "だいがく"
+},
+{
+"t": "を "
+},
+{
+"b": "卆",
+"r": "そつ"
+},
+{
+"k": "業",
+"r": "ぎょう"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-卅-1",
+"kanji": "卅",
+"type": "word",
+"tokens": [
+{
+"b": "卅",
+"r": "さんじゅう"
+},
+{
+"k": "年",
+"r": "ねん"
+},
+{
+"t": "の "
+},
+{
+"k": "歳月",
+"r": "さいげつ"
+}
+]
+},
+{
+"id": "g12-丗-1",
+"kanji": "丗",
+"type": "word",
+"tokens": [
+{
+"k": "後",
+"r": "こう"
+},
+{
+"b": "丗",
+"r": "せい"
+},
+{
+"t": "に "
+},
+{
+"k": "伝",
+"r": "つた"
+},
+{
+"t": "える"
+}
+]
+},
+{
+"id": "g12-卉-1",
+"kanji": "卉",
+"type": "word",
+"tokens": [
+{
+"k": "花",
+"r": "か"
+},
+{
+"b": "卉",
+"r": "き"
+},
+{
+"t": "を "
+},
+{
+"k": "育",
+"r": "そだ"
+},
+{
+"t": "てる"
+}
+]
+},
+{
+"id": "g12-卍-1",
+"kanji": "卍",
+"type": "sentence",
+"tokens": [
+{
+"k": "地図",
+"r": "ちず"
+},
+{
+"t": "の "
+},
+{
+"b": "卍",
+"r": "まんじ"
+},
+{
+"t": "は "
+},
+{
+"k": "寺",
+"r": "てら"
+},
+{
+"t": "の "
+},
+{
+"k": "記号",
+"r": "きごう"
+}
+]
+},
+{
+"id": "g12-凖-1",
+"kanji": "凖",
+"type": "word",
+"tokens": [
+{
+"k": "基",
+"r": "き"
+},
+{
+"b": "凖",
+"r": "じゅん"
+},
+{
+"t": "を "
+},
+{
+"k": "決",
+"r": "き"
+},
+{
+"t": "める"
+}
+]
+},
+{
+"id": "g12-卩-1",
+"kanji": "卩",
+"type": "sentence",
+"tokens": [
+{
+"b": "卩",
+"r": "ふしづくり"
+},
+{
+"t": "は "
+},
+{
+"k": "部首",
+"r": "ぶしゅ"
+},
+{
+"t": "の "
+},
+{
+"k": "一",
+"r": "ひと"
+},
+{
+"t": "つ"
+}
+]
+},
+{
+"id": "g12-卮-1",
+"kanji": "卮",
+"type": "sentence",
+"tokens": [
+{
+"b": "卮",
+"r": "さかずき"
+},
+{
+"t": "を "
+},
+{
+"k": "傾",
+"r": "かたむ"
+},
+{
+"t": "ける"
+}
+]
+},
+{
+"id": "g12-夘-1",
+"kanji": "夘",
+"type": "sentence",
+"tokens": [
+{
+"b": "夘",
+"r": "う"
+},
+{
+"t": "の "
+},
+{
+"k": "年",
+"r": "とし"
+},
+{
+"t": "に "
+},
+{
+"k": "生",
+"r": "う"
+},
+{
+"t": "まれる"
+}
+]
+},
+{
+"id": "g12-卻-1",
+"kanji": "卻",
+"type": "word",
+"tokens": [
+{
+"k": "訴",
+"r": "うった"
+},
+{
+"t": "えを "
+},
+{
+"b": "卻",
+"r": "きゃっ"
+},
+{
+"k": "下",
+"r": "か"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-卷-1",
+"kanji": "卷",
+"type": "sentence",
+"tokens": [
+{
+"k": "糸",
+"r": "いと"
+},
+{
+"t": "を "
+},
+{
+"b": "卷",
+"r": "ま"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-厂-1",
+"kanji": "厂",
+"type": "sentence",
+"tokens": [
+{
+"b": "厂",
+"r": "がんだれ"
+},
+{
+"t": "は "
+},
+{
+"k": "部首",
+"r": "ぶしゅ"
+},
+{
+"t": "の "
+},
+{
+"k": "一",
+"r": "ひと"
+},
+{
+"t": "つ"
+}
+]
+},
+{
+"id": "g12-厖-1",
+"kanji": "厖",
+"type": "word",
+"tokens": [
+{
+"b": "厖",
+"r": "ぼう"
+},
+{
+"k": "大",
+"r": "だい"
+},
+{
+"t": "な "
+},
+{
+"k": "資料",
+"r": "しりょう"
+}
+]
+},
+{
+"id": "g12-厠-1",
+"kanji": "厠",
+"type": "sentence",
+"tokens": [
+{
+"b": "厠",
+"r": "かわや"
+},
+{
+"t": "へ "
+},
+{
+"k": "行",
+"r": "い"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-厦-1",
+"kanji": "厦",
+"type": "word",
+"tokens": [
+{
+"k": "大",
+"r": "たい"
+},
+{
+"b": "厦",
+"r": "か"
+},
+{
+"k": "高",
+"r": "こう"
+},
+{
+"k": "楼",
+"r": "ろう"
+},
+{
+"t": "が "
+},
+{
+"k": "並",
+"r": "なら"
+},
+{
+"t": "ぶ"
+}
+]
+},
+{
+"id": "g12-厰-1",
+"kanji": "厰",
+"type": "word",
+"tokens": [
+{
+"k": "工",
+"r": "こう"
+},
+{
+"b": "厰",
+"r": "しょう"
+},
+{
+"t": "で "
+},
+{
+"k": "働",
+"r": "はたら"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-厶-1",
+"kanji": "厶",
+"type": "sentence",
+"tokens": [
+{
+"b": "厶",
+"r": "む"
+},
+{
+"t": "は "
+},
+{
+"k": "部首",
+"r": "ぶしゅ"
+},
+{
+"t": "の "
+},
+{
+"k": "一",
+"r": "ひと"
+},
+{
+"t": "つ"
+}
+]
+},
+{
+"id": "g12-參-1",
+"kanji": "參",
+"type": "sentence",
+"tokens": [
+{
+"k": "神社",
+"r": "じんじゃ"
+},
+{
+"t": "に "
+},
+{
+"b": "參",
+"r": "まい"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-簒-1",
+"kanji": "簒",
+"type": "word",
+"tokens": [
+{
+"k": "王位",
+"r": "おうい"
+},
+{
+"t": "を "
+},
+{
+"b": "簒",
+"r": "さん"
+},
+{
+"k": "奪",
+"r": "だつ"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-雙-1",
+"kanji": "雙",
+"type": "word",
+"tokens": [
+{
+"b": "雙",
+"r": "そう"
+},
+{
+"k": "方",
+"r": "ほう"
+},
+{
+"t": "の "
+},
+{
+"k": "意見",
+"r": "いけん"
+}
+]
+},
+{
+"id": "g12-叟-1",
+"kanji": "叟",
+"type": "word",
+"tokens": [
+{
+"k": "老",
+"r": "ろう"
+},
+{
+"b": "叟",
+"r": "そう"
+},
+{
+"t": "が "
+},
+{
+"k": "語",
+"r": "かた"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-曼-1",
+"kanji": "曼",
+"type": "word",
+"tokens": [
+{
+"b": "曼",
+"r": "まん"
+},
+{
+"k": "陀",
+"r": "だ"
+},
+{
+"k": "羅",
+"r": "ら"
+},
+{
+"t": "を "
+},
+{
+"k": "描",
+"r": "えが"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-叮-1",
+"kanji": "叮",
+"type": "word",
+"tokens": [
+{
+"b": "叮",
+"r": "てい"
+},
+{
+"k": "嚀",
+"r": "ねい"
+},
+{
+"t": "に "
+},
+{
+"k": "説明",
+"r": "せつめい"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-叭-1",
+"kanji": "叭",
+"type": "word",
+"tokens": [
+{
+"k": "喇",
+"r": "らっ"
+},
+{
+"b": "叭",
+"r": "ぱ"
+},
+{
+"t": "を "
+},
+{
+"k": "吹",
+"r": "ふ"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-叺-1",
+"kanji": "叺",
+"type": "sentence",
+"tokens": [
+{
+"b": "叺",
+"r": "かます"
+},
+{
+"t": "に "
+},
+{
+"k": "塩",
+"r": "しお"
+},
+{
+"t": "を "
+},
+{
+"k": "詰",
+"r": "つ"
+},
+{
+"t": "める"
+}
+]
+},
+{
+"id": "g12-吁-1",
+"kanji": "吁",
+"type": "sentence",
+"tokens": [
+{
+"b": "吁",
+"r": "ああ"
+},
+{
+"t": "、なんと "
+},
+{
+"k": "悲",
+"r": "かな"
+},
+{
+"t": "しい ことか"
+}
+]
+},
+{
+"id": "g12-吽-1",
+"kanji": "吽",
+"type": "word",
+"tokens": [
+{
+"k": "阿",
+"r": "あ"
+},
+{
+"b": "吽",
+"r": "うん"
+},
+{
+"t": "の "
+},
+{
+"k": "呼吸",
+"r": "こきゅう"
+}
+]
+},
+{
+"id": "g12-听-1",
+"kanji": "听",
+"type": "word",
+"tokens": [
+{
+"k": "一",
+"r": "いち"
+},
+{
+"b": "听",
+"r": "ぽんど"
+},
+{
+"t": "の "
+},
+{
+"k": "紅茶",
+"r": "こうちゃ"
+}
+]
+},
+{
+"id": "g12-吭-1",
+"kanji": "吭",
+"type": "sentence",
+"tokens": [
+{
+"b": "吭",
+"r": "のど"
+},
+{
+"t": "を "
+},
+{
+"k": "潤",
+"r": "うるお"
+},
+{
+"t": "す"
+}
+]
+},
+{
+"id": "g12-吼-1",
+"kanji": "吼",
+"type": "word",
+"tokens": [
+{
+"k": "獅子",
+"r": "しし"
+},
+{
+"b": "吼",
+"r": "く"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-吶-1",
+"kanji": "吶",
+"type": "word",
+"tokens": [
+{
+"b": "吶",
+"r": "とつ"
+},
+{
+"k": "喊",
+"r": "かん"
+},
+{
+"t": "の "
+},
+{
+"k": "声",
+"r": "こえ"
+},
+{
+"t": "を "
+},
+{
+"k": "上",
+"r": "あ"
+},
+{
+"t": "げる"
+}
+]
+},
+{
+"id": "g12-吝-1",
+"kanji": "吝",
+"type": "sentence",
+"tokens": [
+{
+"k": "協力",
+"r": "きょうりょく"
+},
+{
+"t": "に "
+},
+{
+"b": "吝",
+"r": "やぶさ"
+},
+{
+"t": "かでない"
+}
+]
+},
+{
+"id": "g12-呎-1",
+"kanji": "呎",
+"type": "word",
+"tokens": [
+{
+"k": "十",
+"r": "じゅう"
+},
+{
+"b": "呎",
+"r": "ふぃーと"
+},
+{
+"t": "の "
+},
+{
+"k": "高",
+"r": "たか"
+},
+{
+"t": "さ"
+}
+]
+},
+{
+"id": "g12-咏-1",
+"kanji": "咏",
+"type": "sentence",
+"tokens": [
+{
+"k": "和歌",
+"r": "わか"
+},
+{
+"t": "を "
+},
+{
+"b": "咏",
+"r": "えい"
+},
+{
+"t": "じる"
+}
+]
+},
+{
+"id": "g12-呵-1",
+"kanji": "呵",
+"type": "word",
+"tokens": [
+{
+"k": "一",
+"r": "いっ"
+},
+{
+"k": "気",
+"r": "き"
+},
+{
+"b": "呵",
+"r": "か"
+},
+{
+"k": "成",
+"r": "せい"
+},
+{
+"t": "に "
+},
+{
+"k": "書",
+"r": "か"
+},
+{
+"t": "き"
+},
+{
+"k": "上",
+"r": "あ"
+},
+{
+"t": "げる"
+}
+]
+},
+{
+"id": "g12-咎-1",
+"kanji": "咎",
+"type": "sentence",
+"tokens": [
+{
+"k": "良心",
+"r": "りょうしん"
+},
+{
+"t": "が "
+},
+{
+"b": "咎",
+"r": "とが"
+},
+{
+"t": "める"
+}
+]
+},
+{
+"id": "g12-呟-1",
+"kanji": "呟",
+"type": "sentence",
+"tokens": [
+{
+"k": "小",
+"r": "ちい"
+},
+{
+"t": "さな "
+},
+{
+"k": "声",
+"r": "こえ"
+},
+{
+"t": "で "
+},
+{
+"b": "呟",
+"r": "つぶや"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-呱-1",
+"kanji": "呱",
+"type": "word",
+"tokens": [
+{
+"b": "呱",
+"r": "こ"
+},
+{
+"k": "々",
+"r": "こ"
+},
+{
+"t": "の "
+},
+{
+"k": "声",
+"r": "こえ"
+},
+{
+"t": "を "
+},
+{
+"k": "上",
+"r": "あ"
+},
+{
+"t": "げて "
+},
+{
+"k": "生",
+"r": "う"
+},
+{
+"t": "まれる"
+}
+]
+},
+{
+"id": "g12-呷-1",
+"kanji": "呷",
+"type": "sentence",
+"tokens": [
+{
+"k": "酒",
+"r": "さけ"
+},
+{
+"t": "を "
+},
+{
+"b": "呷",
+"r": "あお"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-咒-1",
+"kanji": "咒",
+"type": "word",
+"tokens": [
+{
+"b": "咒",
+"r": "じゅ"
+},
+{
+"k": "文",
+"r": "もん"
+},
+{
+"t": "を "
+},
+{
+"k": "唱",
+"r": "とな"
+},
+{
+"t": "える"
+}
+]
+},
+{
+"id": "g12-呻-1",
+"kanji": "呻",
+"type": "sentence",
+"tokens": [
+{
+"k": "痛",
+"r": "いた"
+},
+{
+"t": "みに "
+},
+{
+"b": "呻",
+"r": "うめ"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-咀-1",
+"kanji": "咀",
+"type": "word",
+"tokens": [
+{
+"t": "よく "
+},
+{
+"b": "咀",
+"r": "そ"
+},
+{
+"k": "嚼",
+"r": "しゃく"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-呶-1",
+"kanji": "呶",
+"type": "word",
+"tokens": [
+{
+"b": "呶",
+"r": "ど"
+},
+{
+"k": "々",
+"r": "ど"
+},
+{
+"t": "と "
+},
+{
+"k": "述",
+"r": "の"
+},
+{
+"t": "べる"
+}
+]
+},
+{
+"id": "g12-咄-1",
+"kanji": "咄",
+"type": "word",
+"tokens": [
+{
+"b": "咄",
+"r": "とっ"
+},
+{
+"k": "嗟",
+"r": "さ"
+},
+{
+"t": "に "
+},
+{
+"k": "身",
+"r": "み"
+},
+{
+"t": "を かわす"
+}
+]
+},
+{
+"id": "g12-咆-1",
+"kanji": "咆",
+"type": "word",
+"tokens": [
+{
+"k": "猛獣",
+"r": "もうじゅう"
+},
+{
+"t": "が "
+},
+{
+"b": "咆",
+"r": "ほう"
+},
+{
+"k": "哮",
+"r": "こう"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-咥-1",
+"kanji": "咥",
+"type": "sentence",
+"tokens": [
+{
+"k": "犬",
+"r": "いぬ"
+},
+{
+"t": "が "
+},
+{
+"k": "骨",
+"r": "ほね"
+},
+{
+"t": "を "
+},
+{
+"b": "咥",
+"r": "くわ"
+},
+{
+"t": "える"
+}
+]
+},
+{
+"id": "g12-咬-1",
+"kanji": "咬",
+"type": "sentence",
+"tokens": [
+{
+"k": "犬",
+"r": "いぬ"
+},
+{
+"t": "に "
+},
+{
+"b": "咬",
+"r": "か"
+},
+{
+"t": "まれる"
+}
+]
+},
+{
+"id": "g12-哄-1",
+"kanji": "哄",
+"type": "word",
+"tokens": [
+{
+"b": "哄",
+"r": "こう"
+},
+{
+"k": "笑",
+"r": "しょう"
+},
+{
+"t": "が "
+},
+{
+"k": "起",
+"r": "お"
+},
+{
+"t": "こる"
+}
+]
+},
+{
+"id": "g12-咨-1",
+"kanji": "咨",
+"type": "word",
+"tokens": [
+{
+"b": "咨",
+"r": "し"
+},
+{
+"k": "問",
+"r": "もん"
+},
+{
+"t": "に "
+},
+{
+"k": "答",
+"r": "こた"
+},
+{
+"t": "える"
+}
+]
+},
+{
+"id": "g12-咫-1",
+"kanji": "咫",
+"type": "word",
+"tokens": [
+{
+"k": "八",
+"r": "や"
+},
+{
+"b": "咫",
+"r": "た"
+},
+{
+"t": "の "
+},
+{
+"k": "鏡",
+"r": "かがみ"
+}
+]
+},
+{
+"id": "g12-哂-1",
+"kanji": "哂",
+"type": "sentence",
+"tokens": [
+{
+"k": "人",
+"r": "ひと"
+},
+{
+"t": "の "
+},
+{
+"k": "失敗",
+"r": "しっぱい"
+},
+{
+"t": "を "
+},
+{
+"b": "哂",
+"r": "わら"
+},
+{
+"t": "う"
+}
+]
+},
+{
+"id": "g12-咤-1",
+"kanji": "咤",
+"type": "word",
+"tokens": [
+{
+"k": "叱",
+"r": "しっ"
+},
+{
+"b": "咤",
+"r": "た"
+},
+{
+"k": "激励",
+"r": "げきれい"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-咼-1",
+"kanji": "咼",
+"type": "sentence",
+"tokens": [
+{
+"b": "咼",
+"r": "か"
+},
+{
+"t": "の "
+},
+{
+"k": "字",
+"r": "じ"
+},
+{
+"t": "は "
+},
+{
+"k": "渦",
+"r": "うず"
+},
+{
+"t": "の "
+},
+{
+"k": "右",
+"r": "みぎ"
+},
+{
+"t": "がわ"
+}
+]
+},
+{
+"id": "g12-哥-1",
+"kanji": "哥",
+"type": "word",
+"tokens": [
+{
+"k": "墨西",
+"r": "めき"
+},
+{
+"b": "哥",
+"r": "しこ"
+},
+{
+"t": "は メキシコの こと"
+}
+]
+},
+{
+"id": "g12-哽-1",
+"kanji": "哽",
+"type": "sentence",
+"tokens": [
+{
+"k": "涙",
+"r": "なみだ"
+},
+{
+"t": "に "
+},
+{
+"b": "哽",
+"r": "むせ"
+},
+{
+"t": "ぶ"
+}
+]
+},
+{
+"id": "g12-哮-1",
+"kanji": "哮",
+"type": "word",
+"tokens": [
+{
+"k": "咆",
+"r": "ほう"
+},
+{
+"b": "哮",
+"r": "こう"
+},
+{
+"t": "する "
+},
+{
+"k": "虎",
+"r": "とら"
+}
+]
+},
+{
+"id": "g12-哭-1",
+"kanji": "哭",
+"type": "word",
+"tokens": [
+{
+"k": "慟",
+"r": "どう"
+},
+{
+"b": "哭",
+"r": "こく"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-哢-1",
+"kanji": "哢",
+"type": "sentence",
+"tokens": [
+{
+"k": "小鳥",
+"r": "ことり"
+},
+{
+"t": "が "
+},
+{
+"b": "哢",
+"r": "さえず"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-啀-1",
+"kanji": "啀",
+"type": "sentence",
+"tokens": [
+{
+"k": "犬",
+"r": "いぬ"
+},
+{
+"t": "が "
+},
+{
+"b": "啀",
+"r": "いが"
+},
+{
+"t": "み"
+},
+{
+"k": "合",
+"r": "あ"
+},
+{
+"t": "う"
+}
+]
+},
+{
+"id": "g12-啣-1",
+"kanji": "啣",
+"type": "sentence",
+"tokens": [
+{
+"k": "煙管",
+"r": "きせる"
+},
+{
+"t": "を "
+},
+{
+"b": "啣",
+"r": "くわ"
+},
+{
+"t": "える"
+}
+]
+},
+{
+"id": "g12-啜-1",
+"kanji": "啜",
+"type": "sentence",
+"tokens": [
+{
+"k": "茶",
+"r": "ちゃ"
+},
+{
+"t": "を "
+},
+{
+"b": "啜",
+"r": "すす"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-啖-1",
+"kanji": "啖",
+"type": "word",
+"tokens": [
+{
+"k": "大",
+"r": "おお"
+},
+{
+"b": "啖",
+"r": "ぐ"
+},
+{
+"t": "いの "
+},
+{
+"k": "人",
+"r": "ひと"
+}
+]
+},
+{
+"id": "g12-啗-1",
+"kanji": "啗",
+"type": "sentence",
+"tokens": [
+{
+"k": "利",
+"r": "り"
+},
+{
+"t": "を もって "
+},
+{
+"b": "啗",
+"r": "くら"
+},
+{
+"t": "わす"
+}
+]
+},
+{
+"id": "g12-唸-1",
+"kanji": "唸",
+"type": "sentence",
+"tokens": [
+{
+"k": "犬",
+"r": "いぬ"
+},
+{
+"t": "が "
+},
+{
+"b": "唸",
+"r": "うな"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-唳-1",
+"kanji": "唳",
+"type": "word",
+"tokens": [
+{
+"k": "風声",
+"r": "ふうせい"
+},
+{
+"k": "鶴",
+"r": "かく"
+},
+{
+"b": "唳",
+"r": "れい"
+},
+{
+"t": "に "
+},
+{
+"k": "驚",
+"r": "おどろ"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-喙-1",
+"kanji": "喙",
+"type": "word",
+"tokens": [
+{
+"k": "容",
+"r": "よう"
+},
+{
+"b": "喙",
+"r": "かい"
+},
+{
+"t": "する "
+},
+{
+"k": "余地",
+"r": "よち"
+},
+{
+"t": "が ない"
+}
+]
+},
+{
+"id": "g12-喀-1",
+"kanji": "喀",
+"type": "word",
+"tokens": [
+{
+"b": "喀",
+"r": "かっ"
+},
+{
+"k": "血",
+"r": "けつ"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-喊-1",
+"kanji": "喊",
+"type": "word",
+"tokens": [
+{
+"k": "吶",
+"r": "とっ"
+},
+{
+"b": "喊",
+"r": "かん"
+},
+{
+"t": "して "
+},
+{
+"k": "突",
+"r": "つ"
+},
+{
+"t": "き"
+},
+{
+"k": "進",
+"r": "すす"
+},
+{
+"t": "む"
+}
+]
+},
+{
+"id": "g12-喟-1",
+"kanji": "喟",
+"type": "word",
+"tokens": [
+{
+"b": "喟",
+"r": "き"
+},
+{
+"k": "然",
+"r": "ぜん"
+},
+{
+"t": "と して "
+},
+{
+"k": "嘆",
+"r": "なげ"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-啻-1",
+"kanji": "啻",
+"type": "sentence",
+"tokens": [
+{
+"b": "啻",
+"r": "ただ"
+},
+{
+"t": "ならぬ "
+},
+{
+"k": "気配",
+"r": "けはい"
+}
+]
+},
+{
+"id": "g12-啾-1",
+"kanji": "啾",
+"type": "word",
+"tokens": [
+{
+"k": "鬼",
+"r": "き"
+},
+{
+"k": "哭",
+"r": "こく"
+},
+{
+"b": "啾",
+"r": "しゅう"
+},
+{
+"k": "々",
+"r": "しゅう"
+},
+{
+"t": "と "
+},
+{
+"k": "響",
+"r": "ひび"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-喘-1",
+"kanji": "喘",
+"type": "sentence",
+"tokens": [
+{
+"k": "苦",
+"r": "くる"
+},
+{
+"t": "しさに "
+},
+{
+"b": "喘",
+"r": "あえ"
+},
+{
+"t": "ぐ"
+}
+]
+},
+{
+"id": "g12-喞-1",
+"kanji": "喞",
+"type": "sentence",
+"tokens": [
+{
+"k": "不運",
+"r": "ふうん"
+},
+{
+"t": "を "
+},
+{
+"b": "喞",
+"r": "かこ"
+},
+{
+"t": "つ"
+}
+]
+},
+{
+"id": "g12-單-1",
+"kanji": "單",
+"type": "word",
+"tokens": [
+{
+"b": "單",
+"r": "たん"
+},
+{
+"k": "語",
+"r": "ご"
+},
+{
+"t": "を "
+},
+{
+"k": "覚",
+"r": "おぼ"
+},
+{
+"t": "える"
+}
+]
+},
+{
+"id": "g12-啼-1",
+"kanji": "啼",
+"type": "sentence",
+"tokens": [
+{
+"k": "鳥",
+"r": "とり"
+},
+{
+"t": "が "
+},
+{
+"b": "啼",
+"r": "な"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-喃-1",
+"kanji": "喃",
+"type": "word",
+"tokens": [
+{
+"b": "喃",
+"r": "なん"
+},
+{
+"k": "語",
+"r": "ご"
+},
+{
+"t": "を "
+},
+{
+"k": "話",
+"r": "はな"
+},
+{
+"t": "す "
+},
+{
+"k": "赤",
+"r": "あか"
+},
+{
+"t": "ちゃん"
+}
+]
+},
+{
+"id": "g12-喇-1",
+"kanji": "喇",
+"type": "word",
+"tokens": [
+{
+"b": "喇",
+"r": "らっ"
+},
+{
+"k": "叭",
+"r": "ぱ"
+},
+{
+"t": "の "
+},
+{
+"k": "音",
+"r": "おと"
+},
+{
+"t": "が "
+},
+{
+"k": "響",
+"r": "ひび"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-嗚-1",
+"kanji": "嗚",
+"type": "word",
+"tokens": [
+{
+"b": "嗚",
+"r": "お"
+},
+{
+"k": "咽",
+"r": "えつ"
+},
+{
+"t": "を こらえる"
+}
+]
+},
+{
+"id": "g12-嗟-1",
+"kanji": "嗟",
+"type": "word",
+"tokens": [
+{
+"k": "咄",
+"r": "とっ"
+},
+{
+"b": "嗟",
+"r": "さ"
+},
+{
+"t": "の "
+},
+{
+"k": "判断",
+"r": "はんだん"
+}
+]
+},
+{
+"id": "g12-嗄-1",
+"kanji": "嗄",
+"type": "sentence",
+"tokens": [
+{
+"k": "声",
+"r": "こえ"
+},
+{
+"t": "が "
+},
+{
+"b": "嗄",
+"r": "か"
+},
+{
+"t": "れる"
+}
+]
+},
+{
+"id": "g12-嗜-1",
+"kanji": "嗜",
+"type": "sentence",
+"tokens": [
+{
+"k": "茶道",
+"r": "さどう"
+},
+{
+"t": "を "
+},
+{
+"b": "嗜",
+"r": "たしな"
+},
+{
+"t": "む"
+}
+]
+},
+{
+"id": "g12-嗤-1",
+"kanji": "嗤",
+"type": "sentence",
+"tokens": [
+{
+"k": "人",
+"r": "ひと"
+},
+{
+"t": "の "
+},
+{
+"k": "失敗",
+"r": "しっぱい"
+},
+{
+"t": "を "
+},
+{
+"b": "嗤",
+"r": "わら"
+},
+{
+"t": "う"
+}
+]
+},
+{
+"id": "g12-嘔-1",
+"kanji": "嘔",
+"type": "word",
+"tokens": [
+{
+"b": "嘔",
+"r": "おう"
+},
+{
+"k": "吐",
+"r": "と"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-嗷-1",
+"kanji": "嗷",
+"type": "word",
+"tokens": [
+{
+"k": "世論",
+"r": "せろん"
+},
+{
+"t": "が "
+},
+{
+"b": "嗷",
+"r": "ごう"
+},
+{
+"k": "々",
+"r": "ごう"
+},
+{
+"t": "と "
+},
+{
+"k": "起",
+"r": "お"
+},
+{
+"t": "こる"
+}
+]
+},
+{
+"id": "g12-嘖-1",
+"kanji": "嘖",
+"type": "word",
+"tokens": [
+{
+"k": "名声",
+"r": "めいせい"
+},
+{
+"t": " "
+},
+{
+"b": "嘖",
+"r": "さく"
+},
+{
+"k": "々",
+"r": "さく"
+},
+{
+"t": "たる "
+},
+{
+"k": "人物",
+"r": "じんぶつ"
+}
+]
+},
+{
+"id": "g12-嗾-1",
+"kanji": "嗾",
+"type": "sentence",
+"tokens": [
+{
+"k": "犬",
+"r": "いぬ"
+},
+{
+"t": "を "
+},
+{
+"b": "嗾",
+"r": "けしか"
+},
+{
+"t": "ける"
+}
+]
+},
+{
+"id": "g12-嗽-1",
+"kanji": "嗽",
+"type": "word",
+"tokens": [
+{
+"k": "含",
+"r": "がん"
+},
+{
+"b": "嗽",
+"r": "そう"
+},
+{
+"k": "剤",
+"r": "ざい"
+},
+{
+"t": "で うがいする"
+}
+]
+},
+{
+"id": "g12-嘛-1",
+"kanji": "嘛",
+"type": "word",
+"tokens": [
+{
+"k": "喇",
+"r": "ら"
+},
+{
+"b": "嘛",
+"r": "ま"
+},
+{
+"k": "教",
+"r": "きょう"
+},
+{
+"t": "の "
+},
+{
+"k": "寺院",
+"r": "じいん"
+}
+]
+},
+{
+"id": "g12-噎-1",
+"kanji": "噎",
+"type": "sentence",
+"tokens": [
+{
+"k": "煙",
+"r": "けむり"
+},
+{
+"t": "に "
+},
+{
+"b": "噎",
+"r": "む"
+},
+{
+"t": "せる"
+}
+]
+},
+{
+"id": "g12-噐-1",
+"kanji": "噐",
+"type": "word",
+"tokens": [
+{
+"k": "食",
+"r": "しょっ"
+},
+{
+"b": "噐",
+"r": "き"
+},
+{
+"t": "を "
+},
+{
+"k": "洗",
+"r": "あら"
+},
+{
+"t": "う"
+}
+]
+},
+{
+"id": "g12-營-1",
+"kanji": "營",
+"type": "sentence",
+"tokens": [
+{
+"k": "店",
+"r": "みせ"
+},
+{
+"t": "を "
+},
+{
+"b": "營",
+"r": "いとな"
+},
+{
+"t": "む"
+}
+]
+},
+{
+"id": "g12-嘴-1",
+"kanji": "嘴",
+"type": "sentence",
+"tokens": [
+{
+"k": "鳥",
+"r": "とり"
+},
+{
+"t": "の "
+},
+{
+"b": "嘴",
+"r": "くちばし"
+}
+]
+},
+{
+"id": "g12-嘶-1",
+"kanji": "嘶",
+"type": "sentence",
+"tokens": [
+{
+"k": "馬",
+"r": "うま"
+},
+{
+"t": "が "
+},
+{
+"b": "嘶",
+"r": "いなな"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-嘸-1",
+"kanji": "嘸",
+"type": "sentence",
+"tokens": [
+{
+"b": "嘸",
+"r": "さぞ"
+},
+{
+"t": " "
+},
+{
+"k": "寒",
+"r": "さむ"
+},
+{
+"t": "かった でしょう"
+}
+]
+},
+{
+"id": "g12-噫-1",
+"kanji": "噫",
+"type": "sentence",
+"tokens": [
+{
+"b": "噫",
+"r": "ああ"
+},
+{
+"t": "、"
+},
+{
+"k": "無情",
+"r": "むじょう"
+},
+{
+"t": "なる かな"
+}
+]
+},
+{
+"id": "g12-噤-1",
+"kanji": "噤",
+"type": "sentence",
+"tokens": [
+{
+"k": "口",
+"r": "くち"
+},
+{
+"t": "を "
+},
+{
+"b": "噤",
+"r": "つぐ"
+},
+{
+"t": "む"
+}
+]
+},
+{
+"id": "g12-嘯-1",
+"kanji": "嘯",
+"type": "sentence",
+"tokens": [
+{
+"k": "平気",
+"r": "へいき"
+},
+{
+"t": "だと "
+},
+{
+"b": "嘯",
+"r": "うそぶ"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-噬-1",
+"kanji": "噬",
+"type": "sentence",
+"tokens": [
+{
+"k": "臍",
+"r": "ほぞ"
+},
+{
+"t": "を "
+},
+{
+"b": "噬",
+"r": "か"
+},
+{
+"t": "む"
+}
+]
+},
+{
+"id": "g12-噪-1",
+"kanji": "噪",
+"type": "word",
+"tokens": [
+{
+"k": "喧",
+"r": "けん"
+},
+{
+"b": "噪",
+"r": "そう"
+},
+{
+"t": "の "
+},
+{
+"k": "街",
+"r": "まち"
+}
+]
+},
+{
+"id": "g12-嚆-1",
+"kanji": "嚆",
+"type": "word",
+"tokens": [
+{
+"b": "嚆",
+"r": "こう"
+},
+{
+"k": "矢",
+"r": "し"
+},
+{
+"t": "と なる "
+},
+{
+"k": "出来事",
+"r": "できごと"
+}
+]
+},
+{
+"id": "g12-嚀-1",
+"kanji": "嚀",
+"type": "word",
+"tokens": [
+{
+"k": "叮",
+"r": "てい"
+},
+{
+"b": "嚀",
+"r": "ねい"
+},
+{
+"t": "に "
+},
+{
+"k": "教",
+"r": "おし"
+},
+{
+"t": "える"
+}
+]
+},
+{
+"id": "g12-嚊-1",
+"kanji": "嚊",
+"type": "word",
+"tokens": [
+{
+"b": "嚊",
+"r": "かかあ"
+},
+{
+"k": "天下",
+"r": "でんか"
+},
+{
+"t": "の "
+},
+{
+"k": "家",
+"r": "いえ"
+}
+]
+},
+{
+"id": "g12-嚔-1",
+"kanji": "嚔",
+"type": "sentence",
+"tokens": [
+{
+"b": "嚔",
+"r": "くしゃみ"
+},
+{
+"t": "が "
+},
+{
+"k": "出",
+"r": "で"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-嚏-1",
+"kanji": "嚏",
+"type": "sentence",
+"tokens": [
+{
+"k": "大",
+"r": "おお"
+},
+{
+"t": "きな "
+},
+{
+"b": "嚏",
+"r": "くしゃみ"
+},
+{
+"t": "を する"
+}
+]
+},
+{
+"id": "g12-嚥-1",
+"kanji": "嚥",
+"type": "word",
+"tokens": [
+{
+"k": "薬",
+"r": "くすり"
+},
+{
+"t": "を "
+},
+{
+"b": "嚥",
+"r": "えん"
+},
+{
+"k": "下",
+"r": "げ"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-嚮-1",
+"kanji": "嚮",
+"type": "word",
+"tokens": [
+{
+"b": "嚮",
+"r": "きょう"
+},
+{
+"k": "導",
+"r": "どう"
+},
+{
+"k": "犬",
+"r": "けん"
+},
+{
+"t": "と "
+},
+{
+"k": "歩",
+"r": "ある"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-嚶-1",
+"kanji": "嚶",
+"type": "word",
+"tokens": [
+{
+"b": "嚶",
+"r": "おう"
+},
+{
+"k": "鳴",
+"r": "めい"
+},
+{
+"t": "の "
+},
+{
+"k": "友",
+"r": "とも"
+}
+]
+},
+{
+"id": "g12-嚴-1",
+"kanji": "嚴",
+"type": "word",
+"tokens": [
+{
+"b": "嚴",
+"r": "げん"
+},
+{
+"k": "重",
+"r": "じゅう"
+},
+{
+"t": "に "
+},
+{
+"k": "注意",
+"r": "ちゅうい"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-囂-1",
+"kanji": "囂",
+"type": "word",
+"tokens": [
+{
+"k": "喧",
+"r": "けん"
+},
+{
+"k": "々",
+"r": "けん"
+},
+{
+"b": "囂",
+"r": "ごう"
+},
+{
+"k": "々",
+"r": "ごう"
+},
+{
+"t": "の "
+},
+{
+"k": "議論",
+"r": "ぎろん"
+}
+]
+},
+{
+"id": "g12-嚼-1",
+"kanji": "嚼",
+"type": "word",
+"tokens": [
+{
+"k": "咀",
+"r": "そ"
+},
+{
+"b": "嚼",
+"r": "しゃく"
+},
+{
+"t": "して "
+},
+{
+"k": "飲",
+"r": "の"
+},
+{
+"t": "み"
+},
+{
+"k": "込",
+"r": "こ"
+},
+{
+"t": "む"
+}
+]
+},
+{
+"id": "g12-囁-1",
+"kanji": "囁",
+"type": "sentence",
+"tokens": [
+{
+"k": "耳元",
+"r": "みみもと"
+},
+{
+"t": "で "
+},
+{
+"b": "囁",
+"r": "ささや"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-囃-1",
+"kanji": "囃",
+"type": "sentence",
+"tokens": [
+{
+"k": "祭",
+"r": "まつ"
+},
+{
+"t": "り"
+},
+{
+"b": "囃",
+"r": "ばや"
+},
+{
+"t": "しが "
+},
+{
+"k": "聞",
+"r": "き"
+},
+{
+"t": "こえる"
+}
+]
+},
+{
+"id": "g12-囀-1",
+"kanji": "囀",
+"type": "sentence",
+"tokens": [
+{
+"k": "小鳥",
+"r": "ことり"
+},
+{
+"t": "が "
+},
+{
+"b": "囀",
+"r": "さえず"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-囈-1",
+"kanji": "囈",
+"type": "word",
+"tokens": [
+{
+"k": "熱",
+"r": "ねつ"
+},
+{
+"t": "で "
+},
+{
+"b": "囈",
+"r": "げい"
+},
+{
+"k": "語",
+"r": "ご"
+},
+{
+"t": "を "
+},
+{
+"k": "言",
+"r": "い"
+},
+{
+"t": "う"
+}
+]
+},
+{
+"id": "g12-囑-1",
+"kanji": "囑",
+"type": "word",
+"tokens": [
+{
+"k": "将来",
+"r": "しょうらい"
+},
+{
+"t": "を "
+},
+{
+"b": "囑",
+"r": "しょく"
+},
+{
+"k": "望",
+"r": "ぼう"
+},
+{
+"t": "される"
+}
+]
+},
+{
+"id": "g12-囓-1",
+"kanji": "囓",
+"type": "sentence",
+"tokens": [
+{
+"k": "林檎",
+"r": "りんご"
+},
+{
+"t": "を "
+},
+{
+"b": "囓",
+"r": "かじ"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-囗-1",
+"kanji": "囗",
+"type": "sentence",
+"tokens": [
+{
+"b": "囗",
+"r": "くにがまえ"
+},
+{
+"t": "は "
+},
+{
+"k": "部首",
+"r": "ぶしゅ"
+},
+{
+"t": "の "
+},
+{
+"k": "一",
+"r": "ひと"
+},
+{
+"t": "つ"
+}
+]
+},
+{
+"id": "g12-囮-1",
+"kanji": "囮",
+"type": "word",
+"tokens": [
+{
+"b": "囮",
+"r": "おとり"
+},
+{
+"k": "捜査",
+"r": "そうさ"
+},
+{
+"t": "を "
+},
+{
+"k": "行",
+"r": "おこな"
+},
+{
+"t": "う"
+}
+]
+},
+{
+"id": "g12-囹-1",
+"kanji": "囹",
+"type": "word",
+"tokens": [
+{
+"b": "囹",
+"r": "れい"
+},
+{
+"k": "圄",
+"r": "ご"
+},
+{
+"t": "の "
+},
+{
+"k": "身",
+"r": "み"
+},
+{
+"t": "と なる"
+}
+]
+},
+{
+"id": "g12-圀-1",
+"kanji": "圀",
+"type": "word",
+"tokens": [
+{
+"k": "水戸",
+"r": "みと"
+},
+{
+"k": "光",
+"r": "みつ"
+},
+{
+"b": "圀",
+"r": "くに"
+},
+{
+"t": "の "
+},
+{
+"k": "話",
+"r": "はなし"
+}
+]
+},
+{
+"id": "g12-囿-1",
+"kanji": "囿",
+"type": "word",
+"tokens": [
+{
+"k": "苑",
+"r": "えん"
+},
+{
+"b": "囿",
+"r": "ゆう"
+},
+{
+"t": "の "
+},
+{
+"k": "鹿",
+"r": "しか"
+}
+]
+},
+{
+"id": "g12-圄-1",
+"kanji": "圄",
+"type": "word",
+"tokens": [
+{
+"k": "囹",
+"r": "れい"
+},
+{
+"b": "圄",
+"r": "ご"
+},
+{
+"t": "に つながれる"
+}
+]
+},
+{
+"id": "g12-圈-1",
+"kanji": "圈",
+"type": "word",
+"tokens": [
+{
+"k": "首都",
+"r": "しゅと"
+},
+{
+"b": "圈",
+"r": "けん"
+},
+{
+"t": "に "
+},
+{
+"k": "住",
+"r": "す"
+},
+{
+"t": "む"
+}
+]
+},
+{
+"id": "g12-國-1",
+"kanji": "國",
+"type": "word",
+"tokens": [
+{
+"b": "國",
+"r": "こく"
+},
+{
+"k": "語",
+"r": "ご"
+},
+{
+"t": "の "
+},
+{
+"k": "授業",
+"r": "じゅぎょう"
+}
+]
+},
+{
+"id": "g12-圍-1",
+"kanji": "圍",
+"type": "word",
+"tokens": [
+{
+"k": "周",
+"r": "しゅう"
+},
+{
+"b": "圍",
+"r": "い"
+},
+{
+"t": "を "
+},
+{
+"k": "見回",
+"r": "みまわ"
+},
+{
+"t": "す"
+}
+]
+},
+{
+"id": "g12-圓-1",
+"kanji": "圓",
+"type": "word",
+"tokens": [
+{
+"k": "一",
+"r": "いち"
+},
+{
+"k": "万",
+"r": "まん"
+},
+{
+"b": "圓",
+"r": "えん"
+},
+{
+"t": "を "
+},
+{
+"k": "払",
+"r": "はら"
+},
+{
+"t": "う"
+}
+]
+},
+{
+"id": "g12-團-1",
+"kanji": "團",
+"type": "word",
+"tokens": [
+{
+"k": "集",
+"r": "しゅう"
+},
+{
+"b": "團",
+"r": "だん"
+},
+{
+"t": "で "
+},
+{
+"k": "行動",
+"r": "こうどう"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-圖-1",
+"kanji": "圖",
+"type": "word",
+"tokens": [
+{
+"k": "地",
+"r": "ち"
+},
+{
+"b": "圖",
+"r": "ず"
+},
+{
+"t": "を "
+},
+{
+"k": "広",
+"r": "ひろ"
+},
+{
+"t": "げる"
+}
+]
+},
+{
+"id": "g12-嗇-1",
+"kanji": "嗇",
+"type": "word",
+"tokens": [
+{
+"k": "吝",
+"r": "りん"
+},
+{
+"b": "嗇",
+"r": "しょく"
+},
+{
+"t": "な "
+},
+{
+"k": "人",
+"r": "ひと"
+}
+]
+},
+{
+"id": "g12-圜-1",
+"kanji": "圜",
+"type": "sentence",
+"tokens": [
+{
+"b": "圜",
+"r": "かん"
+},
+{
+"t": "の "
+},
+{
+"k": "字",
+"r": "じ"
+},
+{
+"t": "は "
+},
+{
+"k": "環",
+"r": "かん"
+},
+{
+"t": "と "
+},
+{
+"k": "近",
+"r": "ちか"
+},
+{
+"t": "い "
+},
+{
+"k": "意味",
+"r": "いみ"
+}
+]
+},
+{
+"id": "g12-圦-1",
+"kanji": "圦",
+"type": "sentence",
+"tokens": [
+{
+"k": "用水",
+"r": "ようすい"
+},
+{
+"t": "の "
+},
+{
+"b": "圦",
+"r": "いり"
+},
+{
+"t": "を "
+},
+{
+"k": "開",
+"r": "ひら"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-圻-1",
+"kanji": "圻",
+"type": "word",
+"tokens": [
+{
+"k": "京",
+"r": "けい"
+},
+{
+"b": "圻",
+"r": "き"
+},
+{
+"t": "の "
+},
+{
+"k": "地",
+"r": "ち"
+}
+]
+},
+{
+"id": "g12-址-1",
+"kanji": "址",
+"type": "word",
+"tokens": [
+{
+"k": "城",
+"r": "じょう"
+},
+{
+"b": "址",
+"r": "し"
+},
+{
+"t": "を "
+},
+{
+"k": "訪",
+"r": "たず"
+},
+{
+"t": "ねる"
+}
+]
+},
+{
+"id": "g12-坏-1",
+"kanji": "坏",
+"type": "word",
+"tokens": [
+{
+"k": "土",
+"r": "ど"
+},
+{
+"b": "坏",
+"r": "はい"
+},
+{
+"t": "の "
+},
+{
+"k": "器",
+"r": "うつわ"
+}
+]
+},
+{
+"id": "g12-坩-1",
+"kanji": "坩",
+"type": "sentence",
+"tokens": [
+{
+"k": "人種",
+"r": "じんしゅ"
+},
+{
+"t": "の "
+},
+{
+"b": "坩",
+"r": "る"
+},
+{
+"t": "つぼ"
+}
+]
+},
+{
+"id": "g12-埀-1",
+"kanji": "埀",
+"type": "sentence",
+"tokens": [
+{
+"k": "枝",
+"r": "えだ"
+},
+{
+"t": "が "
+},
+{
+"b": "埀",
+"r": "た"
+},
+{
+"t": "れる"
+}
+]
+},
+{
+"id": "g12-垓-1",
+"kanji": "垓",
+"type": "sentence",
+"tokens": [
+{
+"k": "京",
+"r": "けい"
+},
+{
+"t": "の "
+},
+{
+"k": "上",
+"r": "うえ"
+},
+{
+"t": "の "
+},
+{
+"k": "位",
+"r": "くらい"
+},
+{
+"t": "は "
+},
+{
+"b": "垓",
+"r": "がい"
+}
+]
+},
+{
+"id": "g12-垠-1",
+"kanji": "垠",
+"type": "word",
+"tokens": [
+{
+"k": "無",
+"r": "む"
+},
+{
+"b": "垠",
+"r": "ぎん"
+},
+{
+"t": "の "
+},
+{
+"k": "宇宙",
+"r": "うちゅう"
+}
+]
+},
+{
+"id": "g12-垤-1",
+"kanji": "垤",
+"type": "word",
+"tokens": [
+{
+"k": "蟻",
+"r": "ぎ"
+},
+{
+"b": "垤",
+"r": "てつ"
+},
+{
+"t": "の ような "
+},
+{
+"k": "小",
+"r": "ちい"
+},
+{
+"t": "さな "
+},
+{
+"k": "山",
+"r": "やま"
+}
+]
+},
+{
+"id": "g12-埃-1",
+"kanji": "埃",
+"type": "sentence",
+"tokens": [
+{
+"k": "机",
+"r": "つくえ"
+},
+{
+"t": "の "
+},
+{
+"b": "埃",
+"r": "ほこり"
+},
+{
+"t": "を "
+},
+{
+"k": "払",
+"r": "はら"
+},
+{
+"t": "う"
+}
+]
+},
+{
+"id": "g12-埒-1",
+"kanji": "埒",
+"type": "sentence",
+"tokens": [
+{
+"k": "話",
+"r": "はなし"
+},
+{
+"t": "の "
+},
+{
+"b": "埒",
+"r": "らち"
+},
+{
+"t": "が "
+},
+{
+"k": "明",
+"r": "あ"
+},
+{
+"t": "かない"
+}
+]
+},
+{
+"id": "g12-埓-1",
+"kanji": "埓",
+"type": "sentence",
+"tokens": [
+{
+"b": "埓",
+"r": "らち"
+},
+{
+"t": "が "
+},
+{
+"k": "明",
+"r": "あ"
+},
+{
+"t": "かない "
+},
+{
+"k": "話",
+"r": "はなし"
+}
+]
+},
+{
+"id": "g12-堊-1",
+"kanji": "堊",
+"type": "word",
+"tokens": [
+{
+"k": "白",
+"r": "はく"
+},
+{
+"b": "堊",
+"r": "あ"
+},
+{
+"t": "の "
+},
+{
+"k": "殿堂",
+"r": "でんどう"
+}
+]
+},
+{
+"id": "g12-埖-1",
+"kanji": "埖",
+"type": "sentence",
+"tokens": [
+{
+"b": "埖",
+"r": "ごみ"
+},
+{
+"t": "を "
+},
+{
+"k": "捨",
+"r": "す"
+},
+{
+"t": "てる"
+}
+]
+},
+{
+"id": "g12-堙-1",
+"kanji": "堙",
+"type": "word",
+"tokens": [
+{
+"k": "証拠",
+"r": "しょうこ"
+},
+{
+"t": "を "
+},
+{
+"b": "堙",
+"r": "いん"
+},
+{
+"k": "滅",
+"r": "めつ"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-堝-1",
+"kanji": "堝",
+"type": "word",
+"tokens": [
+{
+"k": "坩",
+"r": "かん"
+},
+{
+"b": "堝",
+"r": "か"
+},
+{
+"t": "で "
+},
+{
+"k": "金属",
+"r": "きんぞく"
+},
+{
+"t": "を "
+},
+{
+"k": "溶",
+"r": "と"
+},
+{
+"t": "かす"
+}
+]
+},
+{
+"id": "g12-塲-1",
+"kanji": "塲",
+"type": "word",
+"tokens": [
+{
+"k": "会",
+"r": "かい"
+},
+{
+"b": "塲",
+"r": "じょう"
+},
+{
+"t": "に "
+},
+{
+"k": "着",
+"r": "つ"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-堡-1",
+"kanji": "堡",
+"type": "word",
+"tokens": [
+{
+"k": "橋頭",
+"r": "きょうとう"
+},
+{
+"b": "堡",
+"r": "ほ"
+},
+{
+"t": "を "
+},
+{
+"k": "築",
+"r": "きず"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-塋-1",
+"kanji": "塋",
+"type": "word",
+"tokens": [
+{
+"k": "先祖",
+"r": "せんぞ"
+},
+{
+"t": "の "
+},
+{
+"b": "塋",
+"r": "えい"
+},
+{
+"k": "域",
+"r": "いき"
+}
+]
+},
+{
+"id": "g12-塒-1",
+"kanji": "塒",
+"type": "sentence",
+"tokens": [
+{
+"k": "鳥",
+"r": "とり"
+},
+{
+"t": "が "
+},
+{
+"b": "塒",
+"r": "ねぐら"
+},
+{
+"t": "に "
+},
+{
+"k": "帰",
+"r": "かえ"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-塹-1",
+"kanji": "塹",
+"type": "word",
+"tokens": [
+{
+"b": "塹",
+"r": "ざん"
+},
+{
+"k": "壕",
+"r": "ごう"
+},
+{
+"t": "を "
+},
+{
+"k": "掘",
+"r": "ほ"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-墅-1",
+"kanji": "墅",
+"type": "word",
+"tokens": [
+{
+"k": "別",
+"r": "べっ"
+},
+{
+"b": "墅",
+"r": "しょ"
+},
+{
+"t": "で "
+},
+{
+"k": "過",
+"r": "す"
+},
+{
+"t": "ごす"
+}
+]
+},
+{
+"id": "g12-墟-1",
+"kanji": "墟",
+"type": "word",
+"tokens": [
+{
+"k": "廃",
+"r": "はい"
+},
+{
+"b": "墟",
+"r": "きょ"
+},
+{
+"t": "と なった "
+},
+{
+"k": "町",
+"r": "まち"
+}
+]
+},
+{
+"id": "g12-墺-1",
+"kanji": "墺",
+"type": "word",
+"tokens": [
+{
+"k": "日",
+"r": "にち"
+},
+{
+"b": "墺",
+"r": "おう"
+},
+{
+"t": "の "
+},
+{
+"k": "交流",
+"r": "こうりゅう"
+}
+]
+},
+{
+"id": "g12-壞-1",
+"kanji": "壞",
+"type": "word",
+"tokens": [
+{
+"k": "建物",
+"r": "たてもの"
+},
+{
+"t": "が "
+},
+{
+"k": "倒",
+"r": "とう"
+},
+{
+"b": "壞",
+"r": "かい"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-墻-1",
+"kanji": "墻",
+"type": "word",
+"tokens": [
+{
+"b": "墻",
+"r": "しょう"
+},
+{
+"k": "壁",
+"r": "へき"
+},
+{
+"t": "を "
+},
+{
+"k": "巡",
+"r": "めぐ"
+},
+{
+"t": "らす"
+}
+]
+},
+{
+"id": "g12-墮-1",
+"kanji": "墮",
+"type": "word",
+"tokens": [
+{
+"b": "墮",
+"r": "だ"
+},
+{
+"k": "落",
+"r": "らく"
+},
+{
+"t": "した "
+},
+{
+"k": "生活",
+"r": "せいかつ"
+}
+]
+},
+{
+"id": "g12-壅-1",
+"kanji": "壅",
+"type": "sentence",
+"tokens": [
+{
+"k": "川",
+"r": "かわ"
+},
+{
+"t": "が "
+},
+{
+"b": "壅",
+"r": "ふさ"
+},
+{
+"t": "がる"
+}
+]
+},
+{
+"id": "g12-壓-1",
+"kanji": "壓",
+"type": "word",
+"tokens": [
+{
+"k": "血",
+"r": "けつ"
+},
+{
+"b": "壓",
+"r": "あつ"
+},
+{
+"t": "を "
+},
+{
+"k": "測",
+"r": "はか"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-壑-1",
+"kanji": "壑",
+"type": "word",
+"tokens": [
+{
+"k": "欲",
+"r": "よく"
+},
+{
+"b": "壑",
+"r": "がく"
+},
+{
+"t": "を "
+},
+{
+"k": "満",
+"r": "み"
+},
+{
+"t": "たす"
+}
+]
+},
+{
+"id": "g12-壙-1",
+"kanji": "壙",
+"type": "word",
+"tokens": [
+{
+"k": "墓",
+"r": "ぼ"
+},
+{
+"b": "壙",
+"r": "こう"
+},
+{
+"t": "を "
+},
+{
+"k": "掘",
+"r": "ほ"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-壘-1",
+"kanji": "壘",
+"type": "word",
+"tokens": [
+{
+"k": "一",
+"r": "いち"
+},
+{
+"b": "壘",
+"r": "るい"
+},
+{
+"t": "に "
+},
+{
+"k": "走",
+"r": "はし"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-壜-1",
+"kanji": "壜",
+"type": "sentence",
+"tokens": [
+{
+"b": "壜",
+"r": "びん"
+},
+{
+"t": "に "
+},
+{
+"k": "酒",
+"r": "さけ"
+},
+{
+"t": "を "
+},
+{
+"k": "詰",
+"r": "つ"
+},
+{
+"t": "める"
+}
+]
+},
+{
+"id": "g12-壤-1",
+"kanji": "壤",
+"type": "word",
+"tokens": [
+{
+"k": "土",
+"r": "ど"
+},
+{
+"b": "壤",
+"r": "じょう"
+},
+{
+"t": "が "
+},
+{
+"k": "肥",
+"r": "こ"
+},
+{
+"t": "える"
+}
+]
+},
+{
+"id": "g12-壟-1",
+"kanji": "壟",
+"type": "word",
+"tokens": [
+{
+"b": "壟",
+"r": "ろう"
+},
+{
+"k": "断",
+"r": "だん"
+},
+{
+"t": "を "
+},
+{
+"k": "許",
+"r": "ゆる"
+},
+{
+"t": "さない"
+}
+]
+},
+{
+"id": "g12-壯-1",
+"kanji": "壯",
+"type": "word",
+"tokens": [
+{
+"b": "壯",
+"r": "そう"
+},
+{
+"k": "大",
+"r": "だい"
+},
+{
+"t": "な "
+},
+{
+"k": "計画",
+"r": "けいかく"
+}
+]
+},
+{
+"id": "g12-壺-1",
+"kanji": "壺",
+"type": "word",
+"tokens": [
+{
+"k": "花",
+"r": "か"
+},
+{
+"b": "壺",
+"r": "き"
+},
+{
+"t": "を "
+},
+{
+"k": "届",
+"r": "とど"
+},
+{
+"t": "ける"
+}
+]
+},
+{
+"id": "g12-壹-1",
+"kanji": "壹",
+"type": "word",
+"tokens": [
+{
+"k": "金",
+"r": "きん"
+},
+{
+"t": " "
+},
+{
+"b": "壹",
+"r": "いち"
+},
+{
+"k": "万",
+"r": "まん"
+},
+{
+"k": "円",
+"r": "えん"
+},
+{
+"t": "と "
+},
+{
+"k": "書",
+"r": "か"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-壻-1",
+"kanji": "壻",
+"type": "word",
+"tokens": [
+{
+"k": "花",
+"r": "はな"
+},
+{
+"b": "壻",
+"r": "むこ"
+},
+{
+"t": "が "
+},
+{
+"k": "入場",
+"r": "にゅうじょう"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-壽-1",
+"kanji": "壽",
+"type": "word",
+"tokens": [
+{
+"b": "壽",
+"r": "じゅ"
+},
+{
+"k": "命",
+"r": "みょう"
+},
+{
+"t": "が "
+},
+{
+"k": "延",
+"r": "の"
+},
+{
+"t": "びる"
+}
+]
+},
+{
+"id": "g12-夂-1",
+"kanji": "夂",
+"type": "sentence",
+"tokens": [
+{
+"b": "夂",
+"r": "ふゆがしら"
+},
+{
+"t": "は "
+},
+{
+"k": "部首",
+"r": "ぶしゅ"
+},
+{
+"t": "の "
+},
+{
+"k": "一",
+"r": "ひと"
+},
+{
+"t": "つ"
+}
+]
+},
+{
+"id": "g12-夊-1",
+"kanji": "夊",
+"type": "sentence",
+"tokens": [
+{
+"b": "夊",
+"r": "すいにょう"
+},
+{
+"t": "は "
+},
+{
+"k": "部首",
+"r": "ぶしゅ"
+},
+{
+"t": "の "
+},
+{
+"k": "一",
+"r": "ひと"
+},
+{
+"t": "つ"
+}
+]
+},
+{
+"id": "g12-夐-1",
+"kanji": "夐",
+"type": "word",
+"tokens": [
+{
+"b": "夐",
+"r": "けい"
+},
+{
+"k": "然",
+"r": "ぜん"
+},
+{
+"t": "と して "
+},
+{
+"k": "遠",
+"r": "とお"
+},
+{
+"t": "い"
+}
+]
+},
+{
+"id": "g12-夛-1",
+"kanji": "夛",
+"type": "word",
+"tokens": [
+{
+"b": "夛",
+"r": "た"
+},
+{
+"k": "数",
+"r": "すう"
+},
+{
+"t": "の "
+},
+{
+"k": "人",
+"r": "ひと"
+}
+]
+},
+{
+"id": "g12-梦-1",
+"kanji": "梦",
+"type": "sentence",
+"tokens": [
+{
+"k": "楽",
+"r": "たの"
+},
+{
+"t": "しい "
+},
+{
+"b": "梦",
+"r": "ゆめ"
+},
+{
+"t": "を "
+},
+{
+"k": "見",
+"r": "み"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-夥-1",
+"kanji": "夥",
+"type": "sentence",
+"tokens": [
+{
+"b": "夥",
+"r": "おびただ"
+},
+{
+"t": "しい "
+},
+{
+"k": "数",
+"r": "かず"
+},
+{
+"t": "の "
+},
+{
+"k": "鳥",
+"r": "とり"
+}
+]
+},
+{
+"id": "g12-夬-1",
+"kanji": "夬",
+"type": "sentence",
+"tokens": [
+{
+"b": "夬",
+"r": "かい"
+},
+{
+"t": "の "
+},
+{
+"k": "字",
+"r": "じ"
+},
+{
+"t": "は "
+},
+{
+"k": "決",
+"r": "けつ"
+},
+{
+"t": "の "
+},
+{
+"k": "右",
+"r": "みぎ"
+},
+{
+"t": "がわ"
+}
+]
+},
+{
+"id": "g12-夭-1",
+"kanji": "夭",
+"type": "word",
+"tokens": [
+{
+"b": "夭",
+"r": "よう"
+},
+{
+"k": "折",
+"r": "せつ"
+},
+{
+"t": "した "
+},
+{
+"k": "天才",
+"r": "てんさい"
+}
+]
+},
+{
+"id": "g12-夲-1",
+"kanji": "夲",
+"type": "sentence",
+"tokens": [
+{
+"b": "夲",
+"r": "ほん"
+},
+{
+"t": "の "
+},
+{
+"k": "字",
+"r": "じ"
+},
+{
+"t": "は "
+},
+{
+"k": "本",
+"r": "ほん"
+},
+{
+"t": "の "
+},
+{
+"k": "異体",
+"r": "いたい"
+},
+{
+"t": "だ"
+}
+]
+},
+{
+"id": "g12-夸-1",
+"kanji": "夸",
+"type": "word",
+"tokens": [
+{
+"b": "夸",
+"r": "こ"
+},
+{
+"k": "張",
+"r": "ちょう"
+},
+{
+"t": "して "
+},
+{
+"k": "話",
+"r": "はな"
+},
+{
+"t": "す"
+}
+]
+},
+{
+"id": "g12-夾-1",
+"kanji": "夾",
+"type": "word",
+"tokens": [
+{
+"b": "夾",
+"r": "きょう"
+},
+{
+"k": "竹",
+"r": "ちく"
+},
+{
+"k": "桃",
+"r": "とう"
+},
+{
+"t": "が "
+},
+{
+"k": "咲",
+"r": "さ"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-竒-1",
+"kanji": "竒",
+"type": "word",
+"tokens": [
+{
+"b": "竒",
+"r": "き"
+},
+{
+"k": "妙",
+"r": "みょう"
+},
+{
+"t": "な "
+},
+{
+"k": "話",
+"r": "はなし"
+}
+]
+},
+{
+"id": "g12-奕-1",
+"kanji": "奕",
+"type": "word",
+"tokens": [
+{
+"k": "博",
+"r": "ばく"
+},
+{
+"b": "奕",
+"r": "えき"
+},
+{
+"t": "に ふける"
+}
+]
+},
+{
+"id": "g12-奐-1",
+"kanji": "奐",
+"type": "word",
+"tokens": [
+{
+"k": "美",
+"r": "び"
+},
+{
+"k": "輪",
+"r": "りん"
+},
+{
+"k": "美",
+"r": "び"
+},
+{
+"b": "奐",
+"r": "かん"
+},
+{
+"t": "の "
+},
+{
+"k": "建物",
+"r": "たてもの"
+}
+]
+},
+{
+"id": "g12-奎-1",
+"kanji": "奎",
+"type": "word",
+"tokens": [
+{
+"b": "奎",
+"r": "けい"
+},
+{
+"k": "運",
+"r": "うん"
+},
+{
+"t": "の "
+},
+{
+"k": "隆盛",
+"r": "りゅうせい"
+},
+{
+"t": "を "
+},
+{
+"k": "祈",
+"r": "いの"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-奚-1",
+"kanji": "奚",
+"type": "sentence",
+"tokens": [
+{
+"b": "奚",
+"r": "なん"
+},
+{
+"t": "ぞ "
+},
+{
+"k": "帰",
+"r": "かえ"
+},
+{
+"t": "らざる"
+}
+]
+},
+{
+"id": "g12-奘-1",
+"kanji": "奘",
+"type": "word",
+"tokens": [
+{
+"k": "玄",
+"r": "げん"
+},
+{
+"b": "奘",
+"r": "じょう"
+},
+{
+"k": "三",
+"r": "さん"
+},
+{
+"k": "蔵",
+"r": "ぞう"
+},
+{
+"t": "の "
+},
+{
+"k": "旅",
+"r": "たび"
+}
+]
+},
+{
+"id": "g12-奢-1",
+"kanji": "奢",
+"type": "sentence",
+"tokens": [
+{
+"k": "友",
+"r": "とも"
+},
+{
+"t": "に "
+},
+{
+"k": "昼食",
+"r": "ちゅうしょく"
+},
+{
+"t": "を "
+},
+{
+"b": "奢",
+"r": "おご"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-奠-1",
+"kanji": "奠",
+"type": "word",
+"tokens": [
+{
+"k": "香",
+"r": "こう"
+},
+{
+"b": "奠",
+"r": "でん"
+},
+{
+"t": "を "
+},
+{
+"k": "包",
+"r": "つつ"
+},
+{
+"t": "む"
+}
+]
+},
+{
+"id": "g12-奧-1",
+"kanji": "奧",
+"type": "sentence",
+"tokens": [
+{
+"k": "山",
+"r": "やま"
+},
+{
+"t": "の "
+},
+{
+"b": "奧",
+"r": "おく"
+},
+{
+"t": "へ "
+},
+{
+"k": "進",
+"r": "すす"
+},
+{
+"t": "む"
+}
+]
+},
+{
+"id": "g12-奬-1",
+"kanji": "奬",
+"type": "word",
+"tokens": [
+{
+"k": "推",
+"r": "すい"
+},
+{
+"b": "奬",
+"r": "しょう"
+},
+{
+"k": "図書",
+"r": "としょ"
+},
+{
+"t": "を "
+},
+{
+"k": "読",
+"r": "よ"
+},
+{
+"t": "む"
+}
+]
+},
+{
+"id": "g12-奩-1",
+"kanji": "奩",
+"type": "word",
+"tokens": [
+{
+"k": "香",
+"r": "こう"
+},
+{
+"b": "奩",
+"r": "れん"
+},
+{
+"t": "に "
+},
+{
+"k": "香",
+"r": "こう"
+},
+{
+"t": "を "
+},
+{
+"k": "納",
+"r": "おさ"
+},
+{
+"t": "める"
+}
+]
+},
+{
+"id": "g12-奸-1",
+"kanji": "奸",
+"type": "word",
+"tokens": [
+{
+"b": "奸",
+"r": "かん"
+},
+{
+"k": "計",
+"r": "けい"
+},
+{
+"t": "を "
+},
+{
+"k": "巡",
+"r": "めぐ"
+},
+{
+"t": "らす"
+}
+]
+},
+{
+"id": "g12-妁-1",
+"kanji": "妁",
+"type": "word",
+"tokens": [
+{
+"k": "媒",
+"r": "ばい"
+},
+{
+"b": "妁",
+"r": "しゃく"
+},
+{
+"t": "の "
+},
+{
+"k": "労",
+"r": "ろう"
+},
+{
+"t": "を とる"
+}
+]
+},
+{
+"id": "g12-妝-1",
+"kanji": "妝",
+"type": "word",
+"tokens": [
+{
+"k": "紅",
+"r": "こう"
+},
+{
+"b": "妝",
+"r": "しょう"
+},
+{
+"t": "の "
+},
+{
+"k": "美人",
+"r": "びじん"
+}
+]
+},
+{
+"id": "g12-佞-1",
+"kanji": "佞",
+"type": "word",
+"tokens": [
+{
+"b": "佞",
+"r": "ねい"
+},
+{
+"k": "臣",
+"r": "しん"
+},
+{
+"t": "を "
+},
+{
+"k": "退",
+"r": "しりぞ"
+},
+{
+"t": "ける"
+}
+]
+},
+{
+"id": "g12-侫-1",
+"kanji": "侫",
+"type": "word",
+"tokens": [
+{
+"k": "奸",
+"r": "かん"
+},
+{
+"b": "侫",
+"r": "ねい"
+},
+{
+"t": "の "
+},
+{
+"k": "輩",
+"r": "やから"
+}
+]
+},
+{
+"id": "g12-妣-1",
+"kanji": "妣",
+"type": "word",
+"tokens": [
+{
+"k": "先",
+"r": "せん"
+},
+{
+"b": "妣",
+"r": "ぴ"
+},
+{
+"t": "の "
+},
+{
+"k": "墓",
+"r": "はか"
+},
+{
+"t": "に "
+},
+{
+"k": "参",
+"r": "まい"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-姆-1",
+"kanji": "姆",
+"type": "word",
+"tokens": [
+{
+"k": "保",
+"r": "ほ"
+},
+{
+"b": "姆",
+"r": "ぼ"
+},
+{
+"t": "に "
+},
+{
+"k": "子",
+"r": "こ"
+},
+{
+"t": "を "
+},
+{
+"k": "預",
+"r": "あず"
+},
+{
+"t": "ける"
+}
+]
+},
+{
+"id": "g12-姨-1",
+"kanji": "姨",
+"type": "word",
+"tokens": [
+{
+"b": "姨",
+"r": "い"
+},
+{
+"k": "捨",
+"r": "すて"
+},
+{
+"k": "山",
+"r": "やま"
+},
+{
+"t": "の "
+},
+{
+"k": "伝説",
+"r": "でんせつ"
+}
+]
+},
+{
+"id": "g12-姜-1",
+"kanji": "姜",
+"type": "word",
+"tokens": [
+{
+"k": "生",
+"r": "しょう"
+},
+{
+"b": "姜",
+"r": "が"
+},
+{
+"t": "を すりおろす"
+}
+]
+},
+{
+"id": "g12-妍-1",
+"kanji": "妍",
+"type": "sentence",
+"tokens": [
+{
+"k": "百花",
+"r": "ひゃっか"
+},
+{
+"t": " "
+},
+{
+"b": "妍",
+"r": "けん"
+},
+{
+"t": "を "
+},
+{
+"k": "競",
+"r": "きそ"
+},
+{
+"t": "う"
+}
+]
+},
+{
+"id": "g12-姙-1",
+"kanji": "姙",
+"type": "word",
+"tokens": [
+{
+"b": "姙",
+"r": "にん"
+},
+{
+"k": "娠",
+"r": "しん"
+},
+{
+"t": "が わかる"
+}
+]
+},
+{
+"id": "g12-姚-1",
+"kanji": "姚",
+"type": "sentence",
+"tokens": [
+{
+"b": "姚",
+"r": "よう"
+},
+{
+"t": "の "
+},
+{
+"k": "字",
+"r": "じ"
+},
+{
+"t": "は "
+},
+{
+"k": "中国",
+"r": "ちゅうごく"
+},
+{
+"t": "の "
+},
+{
+"k": "姓",
+"r": "せい"
+},
+{
+"t": "に "
+},
+{
+"k": "多",
+"r": "おお"
+},
+{
+"t": "い"
+}
+]
+},
+{
+"id": "g12-娥-1",
+"kanji": "娥",
+"type": "word",
+"tokens": [
+{
+"k": "月",
+"r": "げっ"
+},
+{
+"b": "娥",
+"r": "が"
+},
+{
+"t": "の "
+},
+{
+"k": "伝説",
+"r": "でんせつ"
+}
+]
+},
+{
+"id": "g12-娑-1",
+"kanji": "娑",
+"type": "word",
+"tokens": [
+{
+"b": "娑",
+"r": "しゃ"
+},
+{
+"k": "婆",
+"r": "ば"
+},
+{
+"t": "の "
+},
+{
+"k": "空気",
+"r": "くうき"
+},
+{
+"t": "を "
+},
+{
+"k": "吸",
+"r": "す"
+},
+{
+"t": "う"
+}
+]
+},
+{
+"id": "g12-娜-1",
+"kanji": "娜",
+"type": "word",
+"tokens": [
+{
+"k": "婀",
+"r": "あ"
+},
+{
+"b": "娜",
+"r": "だ"
+},
+{
+"t": "っぽい "
+},
+{
+"k": "姿",
+"r": "すがた"
+}
+]
+},
+{
+"id": "g12-娚-1",
+"kanji": "娚",
+"type": "sentence",
+"tokens": [
+{
+"b": "娚",
+"r": "めおと"
+},
+{
+"t": "の "
+},
+{
+"k": "字",
+"r": "じ"
+},
+{
+"t": "は "
+},
+{
+"k": "男",
+"r": "おとこ"
+},
+{
+"t": "と "
+},
+{
+"k": "女",
+"r": "おんな"
+},
+{
+"t": "を "
+},
+{
+"k": "並",
+"r": "なら"
+},
+{
+"t": "べる"
+}
+]
+},
+{
+"id": "g12-婀-1",
+"kanji": "婀",
+"type": "word",
+"tokens": [
+{
+"b": "婀",
+"r": "あ"
+},
+{
+"k": "娜",
+"r": "だ"
+},
+{
+"t": "な "
+},
+{
+"k": "仕草",
+"r": "しぐさ"
+}
+]
+},
+{
+"id": "g12-婬-1",
+"kanji": "婬",
+"type": "word",
+"tokens": [
+{
+"b": "婬",
+"r": "いん"
+},
+{
+"k": "乱",
+"r": "らん"
+},
+{
+"t": "を "
+},
+{
+"k": "戒",
+"r": "いまし"
+},
+{
+"t": "める"
+}
+]
+},
+{
+"id": "g12-婉-1",
+"kanji": "婉",
+"type": "word",
+"tokens": [
+{
+"b": "婉",
+"r": "えん"
+},
+{
+"k": "曲",
+"r": "きょく"
+},
+{
+"t": "に "
+},
+{
+"k": "断",
+"r": "ことわ"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-娵-1",
+"kanji": "娵",
+"type": "sentence",
+"tokens": [
+{
+"b": "娵",
+"r": "よめ"
+},
+{
+"t": "を "
+},
+{
+"k": "迎",
+"r": "むか"
+},
+{
+"t": "える"
+}
+]
+},
+{
+"id": "g12-娶-1",
+"kanji": "娶",
+"type": "sentence",
+"tokens": [
+{
+"k": "妻",
+"r": "つま"
+},
+{
+"t": "を "
+},
+{
+"b": "娶",
+"r": "めと"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-婢-1",
+"kanji": "婢",
+"type": "word",
+"tokens": [
+{
+"k": "下",
+"r": "げ"
+},
+{
+"b": "婢",
+"r": "ひ"
+},
+{
+"t": "を "
+},
+{
+"k": "雇",
+"r": "やと"
+},
+{
+"t": "う"
+}
+]
+},
+{
+"id": "g12-婪-1",
+"kanji": "婪",
+"type": "word",
+"tokens": [
+{
+"k": "貪",
+"r": "どん"
+},
+{
+"b": "婪",
+"r": "らん"
+},
+{
+"t": "な "
+},
+{
+"k": "欲望",
+"r": "よくぼう"
+}
+]
+},
+{
+"id": "g12-媚-1",
+"kanji": "媚",
+"type": "sentence",
+"tokens": [
+{
+"k": "上司",
+"r": "じょうし"
+},
+{
+"t": "に "
+},
+{
+"b": "媚",
+"r": "こ"
+},
+{
+"t": "びる"
+}
+]
+},
+{
+"id": "g12-媼-1",
+"kanji": "媼",
+"type": "sentence",
+"tokens": [
+{
+"k": "翁",
+"r": "おきな"
+},
+{
+"t": "と "
+},
+{
+"b": "媼",
+"r": "おうな"
+}
+]
+},
+{
+"id": "g12-媾-1",
+"kanji": "媾",
+"type": "word",
+"tokens": [
+{
+"k": "敵国",
+"r": "てきこく"
+},
+{
+"t": "と "
+},
+{
+"b": "媾",
+"r": "こう"
+},
+{
+"k": "和",
+"r": "わ"
+},
+{
+"t": "する"
+}
+]
+},
+{
+"id": "g12-嫋-1",
+"kanji": "嫋",
+"type": "word",
+"tokens": [
+{
+"k": "余韻",
+"r": "よいん"
+},
+{
+"t": " "
+},
+{
+"b": "嫋",
+"r": "じょう"
+},
+{
+"k": "々",
+"r": "じょう"
+},
+{
+"t": "と して "
+},
+{
+"k": "響",
+"r": "ひび"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-嫂-1",
+"kanji": "嫂",
+"type": "sentence",
+"tokens": [
+{
+"k": "兄",
+"r": "あに"
+},
+{
+"t": "の "
+},
+{
+"k": "妻",
+"r": "つま"
+},
+{
+"t": "を "
+},
+{
+"b": "嫂",
+"r": "あによめ"
+},
+{
+"t": "と いう"
+}
+]
+},
+{
+"id": "g12-媽-1",
+"kanji": "媽",
+"type": "word",
+"tokens": [
+{
+"k": "阿",
+"r": "あ"
+},
+{
+"b": "媽",
+"r": "ま"
+},
+{
+"t": "の "
+},
+{
+"k": "伝説",
+"r": "でんせつ"
+}
+]
+},
+{
+"id": "g12-嫣-1",
+"kanji": "嫣",
+"type": "word",
+"tokens": [
+{
+"b": "嫣",
+"r": "えん"
+},
+{
+"k": "然",
+"r": "ぜん"
+},
+{
+"t": "と "
+},
+{
+"k": "微笑",
+"r": "ほほえ"
+},
+{
+"t": "む"
+}
+]
+},
+{
+"id": "g12-嫗-1",
+"kanji": "嫗",
+"type": "word",
+"tokens": [
+{
+"k": "老",
+"r": "ろう"
+},
+{
+"b": "嫗",
+"r": "おう"
+},
+{
+"t": "が "
+},
+{
+"k": "糸",
+"r": "いと"
+},
+{
+"t": "を "
+},
+{
+"k": "紡",
+"r": "つむ"
+},
+{
+"t": "ぐ"
+}
+]
+},
+{
+"id": "g12-嫦-1",
+"kanji": "嫦",
+"type": "word",
+"tokens": [
+{
+"b": "嫦",
+"r": "じょう"
+},
+{
+"k": "娥",
+"r": "が"
+},
+{
+"t": "が "
+},
+{
+"k": "月",
+"r": "つき"
+},
+{
+"t": "に "
+},
+{
+"k": "昇",
+"r": "のぼ"
+},
+{
+"t": "る"
+}
+]
+},
+{
+"id": "g12-嫩-1",
+"kanji": "嫩",
+"type": "word",
+"tokens": [
+{
+"b": "嫩",
+"r": "どん"
+},
+{
+"k": "葉",
+"r": "よう"
+},
+{
+"t": "が "
+},
+{
+"k": "芽吹",
+"r": "めぶ"
+},
+{
+"t": "く"
+}
+]
+},
+{
+"id": "g12-嫺-1",
+"kanji": "嫺",
+"type": "word",
+"tokens": [
+{
+"b": "嫺",
+"r": "かん"
+},
+{
+"k": "雅",
+"r": "が"
+},
+{
+"t": "な "
+},
+{
+"k": "振",
+"r": "ふ"
+},
+{
+"t": "る"
+},
+{
+"k": "舞",
+"r": "ま"
+},
+{
+"t": "い"
 }
 ]
 }
