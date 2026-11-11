@@ -19,12 +19,14 @@ known = set(''.join(G[str(g)] for g in range(1, int(grade) + 1)))
 target_set = list(G[grade])
 
 # JMdict: 表記 → 読みの集合
-words = collections.defaultdict(set)
+words = collections.defaultdict(set)        # 表記 → 読み（すべての表記）
+common = collections.defaultdict(set)       # 表記 → 読み（よく使われる表記だけ。別の字が入る検査に使う）
 for w in jm['words']:
     for k in w['kanji']:
         for r in w['kana']:
             if r['appliesToKanji'] == ['*'] or k['text'] in r['appliesToKanji']:
                 words[k['text']].add(r['text'])
+                if k['common'] and r['common']: common[k['text']].add(r['text'])
 
 def kun_of(c):
     out = set()
@@ -49,9 +51,12 @@ for ln, line in enumerate(open(os.path.join(ROOT, f'data/src/g{grade}.txt')), 1)
     seen.add(ch)
     if ch not in target_set: errors.append(f'{ln}行: {ch} は小{grade}の配当漢字でない')
     qlist = [q.strip() for q in qs.split(';') if q.strip()]
+    # 末尾の ※ は「同じ読みの別の熟語もあるが、文の意味で答えが決まることを目で確認した」しるし
     if len(qlist) < 3: warns.append(f'{ch}: 問題が{len(qlist)}問')
     words_of_ch = []
     for qi, q in enumerate(qlist):
+        reviewed = q.endswith('※')
+        q = q.rstrip('※').strip()
         toks, blanks = [], 0
         for m in TOK.finditer(q):
             if m.group(1) is not None:
@@ -62,7 +67,7 @@ for ln, line in enumerate(open(os.path.join(ROOT, f'data/src/g{grade}.txt')), 1)
                 toks.append({'b': c, 'r': r})
             elif m.group(3) is not None:
                 c, r = m.group(3), m.group(4)
-                if len(c) != 1 or c not in known: errors.append(f'{ch}: 「{q}」の [{c}] は小{grade}までに習わない字')
+                if any(x not in known for x in c): errors.append(f'{ch}: 「{q}」の [{c}] に小{grade}までに習わない字がある')
                 if not HIRA.match(r or ''): errors.append(f'{ch}: 「{q}」の [{c}] の読み「{r}」がひらがなでない')
                 toks.append({'k': c, 'r': r})
             else:
@@ -89,16 +94,30 @@ for ln, line in enumerate(open(os.path.join(ROOT, f'data/src/g{grade}.txt')), 1)
             for c2 in known:
                 if c2 == ch: continue
                 alt = surface.replace(ch, c2, 1)
-                if reading in words.get(alt, set()):
-                    errors.append(f'{ch}: 「{surface}（{reading}）」の空欄に {c2} を入れても「{alt}」になる')
+                if reading in common.get(alt, set()):
+                    if reviewed: warns.append(f'{ch}: 「{surface}」の空欄に {c2} で「{alt}」— 文の意味で決まる（確認済み）')
+                    else: errors.append(f'{ch}: 「{surface}（{reading}）」の空欄に {c2} を入れても「{alt}」になる（文: {sentence}）')
         else:
             br = toks[bi]['r']
             same = sorted(c2 for c2 in known if c2 != ch and br in kun_of(c2))
             if same:
                 warns.append(f'{ch}: 文「{sentence}」の読み「{br}」は {"".join(same)} にもある（文脈で決まるか確認）')
         out_q.append({'id': f'g{grade}-{ch}-{qi+1}', 'kanji': ch, 'type': 'word' if is_word else 'sentence', 'tokens': toks})
+    mtoks = []
+    for m in TOK.finditer(mean):
+        if m.group(3) is not None:
+            c, r = m.group(3), m.group(4)
+            if any(x not in known for x in c): errors.append(f'{ch}: 意味の [{c}] に小{grade}までに習わない字がある')
+            if not HIRA.match(r or ''): errors.append(f'{ch}: 意味の [{c}] の読み「{r}」がひらがなでない')
+            mtoks.append({'k': c, 'r': r})
+        elif m.group(1) is not None:
+            errors.append(f'{ch}: 意味に空欄 {{}} は使えない')
+        else:
+            if re.search(r'[\u4e00-\u9fff]', m.group(5)): errors.append(f'{ch}: 意味にふりがなのない漢字「{m.group(5)}」')
+            mtoks.append({'t': m.group(5)})
+    plain_mean = ''.join(t.get('k') or t.get('t') for t in mtoks)
     out_kanji[ch] = {'grade': int(grade), 'on': [] if on == '—' else on.split('・'), 'kun': [] if kun == '—' else kun.split('・'),
-                     'meaning': mean, 'words': words_of_ch}
+                     'meaning': plain_mean, 'meaningTokens': mtoks, 'words': words_of_ch}
 missing = [c for c in target_set if c not in seen]
 if missing: errors.append('配当漢字の抜け: ' + ''.join(missing))
 print(f'小{grade}: {len(out_kanji)}字 / {len(out_q)}問（熟語を含む文 {sum(q["type"]=="word" for q in out_q)}・そのほかの文 {sum(q["type"]=="sentence" for q in out_q)}）')

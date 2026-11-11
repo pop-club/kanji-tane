@@ -243,7 +243,8 @@
   function infoDl(ch) {
     var k = KANJI[ch];
     var yomi = [].concat(k.on, k.kun).filter(Boolean).join('・') || '—';
-    return '<dl><dt>よみ</dt><dd>' + esc(yomi) + '</dd><dt>いみ</dt><dd>' + esc(k.meaning) + '</dd>' +
+    var mean = k.meaningTokens ? '<span class="qline mline">' + renderQ({ tokens: k.meaningTokens }, 'answer') + '</span>' : esc(k.meaning);
+    return '<dl><dt>よみ</dt><dd>' + esc(yomi) + '</dd><dt>いみ</dt><dd>' + mean + '</dd>' +
       (k.words && k.words.length ? '<dt>ことば</dt><dd class="kj">' + esc(k.words.slice(0, 4).join('　')) + '</dd>' : '') + '</dl>';
   }
   function feedback(kind, verdict, detail, withInfo, misjudge) {
