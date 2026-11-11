@@ -10,6 +10,8 @@ import json, glob, os
 out = {}
 for f in sorted(glob.glob('data/questions/g*.json')):
     d = json.load(open(f)); out[str(d['grade'])] = d
+g = json.load(open('data/grade-kanji.json'))
+open('js/grades.js', 'w').write('// 学年別漢字配当表（文部科学省、2020年度施行）。data/grade-kanji.json から build.sh が作成\nwindow.POPKANJI_GRADES = ' + json.dumps(g['grades'], ensure_ascii=False) + ';\n')
 open('js/questions.js', 'w').write('// 問題データ（data/questions/*.json から build.sh が作成）\n// 熟語: JMdict (EDRDG, CC BY-SA 4.0) の共通語から選定 / 文: Pop-Kanji で作成\nwindow.POPKANJI_QUESTIONS = ' + json.dumps(out, ensure_ascii=False, separators=(',', ':')) + ';\n')
 PY
 page() { # $1 = 元ファイル, $2 = 出力

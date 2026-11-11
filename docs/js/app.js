@@ -23,6 +23,10 @@
     d.questions.forEach(function (q) { QUESTIONS[q.kanji].push(q); QBYID[q.id] = q; });
   });
   function gradeChars(g) { return QD[g] ? Object.keys(QD[g].kanji) : []; }
+  // 学年別漢字配当表（2020年度施行、js/grades.js）。習った字かどうかの判断に使う
+  var GRADE_OF = {};
+  var GL = window.POPKANJI_GRADES || {};
+  Object.keys(GL).forEach(function (g) { Array.from(GL[g]).forEach(function (c) { GRADE_OF[c] = +g; }); });
   function hasGrade(g) { return !!QD[g]; }
 
   /*
@@ -284,10 +288,18 @@
       feedback('recog', 'よみとれませんでした', 'まちがいには しません。こたえは この かんじです。', true, false);
       finishItem('recog');
     } else {
-      var seen = j.seenAs ? '「<span class="kj">' + esc(j.seenAs) + '</span>」に みえたよ。こたえは この かんじ。' : 'こたえは この かんじ。';
+      // 「〜に みえたよ」と見せるのは、その子が習った・習いそうな字（学年＋1まで）だけ。上位5つから選ぶ
+      var maxGrade = (KANJI[it.ch] ? KANJI[it.ch].grade : 1) + 1;
+      var shown = null;
+      for (var i = 0; i < Math.min(cands.length, 5); i++) {
+        var g = GRADE_OF[cands[i].char];
+        if (cands[i].char !== it.ch && g && g <= maxGrade) { shown = cands[i].char; break; }
+      }
+      var seen = shown ? '「<span class="kj">' + esc(shown) + '</span>」に みえたよ。こたえは この かんじ。' : 'ちがう かんじに みえたよ。こたえは この かんじ。';
       feedback('wrong', 'ざんねん', seen, true, true);
       finishItem('wrong', j.seenAs);
     }
+    it.top = cands.slice(0, 5).map(function (c) { return c.char; }).join('');
   };
   $('tSkip').onclick = function () {
     if (answered) return;
@@ -313,7 +325,7 @@
   function saveSession(items) {
     Store.addSession({ id: session.id, at: session.at, mode: session.mode, grade: session.grade,
       items: items.map(function (x) {
-        var o = { ch: x.ch, q: x.q.id, result: x.result, tries: x.tries, seenAs: x.seenAs };
+        var o = { ch: x.ch, q: x.q.id, result: x.result, tries: x.tries, seenAs: x.seenAs, top: x.top || null };
         if (x.result !== 'correct') o.strokes = x.strokes;   // まちがい・読み取れなかった字の筆跡（読み取り改善用、この端末だけ）
         return o;
       }) });
