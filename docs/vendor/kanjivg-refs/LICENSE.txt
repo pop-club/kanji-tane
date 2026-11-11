@@ -1,0 +1,17 @@
+kvg-refs.js（Pop-Kanji 認識用の手本データ）
+
+このデータは KanjiVG の筆画データから作成しました。
+  KanjiVG (c) Ulrich Apel
+  https://kanjivg.tagaini.net/
+  元データ: https://github.com/KanjiVG/kanjivg （コミット 610091c）
+
+KanjiVG は Creative Commons Attribution-ShareAlike 3.0 で提供されています。
+このデータ（kvg-refs.js）も同じ CC BY-SA 3.0 で提供します。
+  https://creativecommons.org/licenses/by-sa/3.0/
+  全文: COPYING-CC-BY-SA-3.0.txt
+
+変更点: 筆画を KanjiCanvas の特徴量に変換し、1字につき、元の形1つと形を少し崩した4つの手本を作成。
+作成ツール: tools/build_kvg_refs.js
+
+アプリ本体（このファイル以外）は、このデータとは別の著作物で、CC BY-SA の対象ではありません
+（CC BY-SA 3.0 第4条(b)：集合著作物の、翻案物以外の部分には適用されない）。

@@ -110,3 +110,8 @@ cd build && python3 -m http.server 8000
 | 似た字の答えとして判定（取り違えて正解にした件数） | 7 / 66 | 3 / 66（うち1件は本当に「玉」を書いた記録） |
 
 1字3つより5つのほうが平均で少し良い（正解54.3→55.3、不正解1.3→0.3）。認識時間は1字20ms前後。
+
+## 公開（GitHub Pages）
+
+`./build.sh` で `docs/` に公開用ファイルを書き出し、GitHub の Settings → Pages で
+「Deploy from a branch」→ `main` / `/docs` を選ぶと、https://pop-club.github.io/pop-kanji/ で開ける。
