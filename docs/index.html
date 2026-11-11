@@ -125,11 +125,15 @@ h2 { font-size: 1.15rem; }
 .testgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, min(64vh, 560px)); gap: 18px; align-items: start; }
 @media (orientation: portrait), (max-width: 820px) { .testgrid { grid-template-columns: minmax(0, 1fr); } }
 .qcard { min-height: 180px; justify-content: center; }
-.qtext { font-size: clamp(1.6rem, 4.2vw, 2.6rem); line-height: 2.1; font-family: var(--font-kanji); overflow-wrap: anywhere; }
-.qtext ruby { ruby-position: over; }
-.qtext rt { font-size: .42em; font-family: var(--font-ui); color: var(--muted); letter-spacing: .05em; }
-.blank { display: inline-block; width: 1.15em; height: 1.15em; border: 3px solid var(--accent); border-radius: 8px; vertical-align: -0.12em; background: var(--accent-soft); }
-.blank.filled { border-color: var(--ok); background: var(--ok-bg); color: var(--ok); text-align: center; line-height: 1.02; }
+/* ふりがな付きの文：まとまり(.qw)ごとに折り返し、字(.qc)は「よみ」の下に「字」を積む */
+.qline { display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: .45em; row-gap: .25em; }
+.qw { display: inline-flex; align-items: flex-end; }
+.qc { display: inline-flex; flex-direction: column; align-items: center; }
+.qr { font-size: .42em; line-height: 1.35; font-family: var(--font-ui); color: var(--muted); letter-spacing: .04em; white-space: nowrap; min-height: 1.35em; padding: 0 .05em; }
+.qk { line-height: 1.2; white-space: nowrap; }
+.qtext { font-size: clamp(1.6rem, 4.2vw, 2.6rem); font-family: var(--font-kanji); }
+.blank { display: inline-block; width: 1.1em; height: 1.1em; border: 3px solid var(--accent); border-radius: 8px; vertical-align: middle; background: var(--accent-soft); box-sizing: border-box; }
+.blank.filled { border-color: var(--ok); background: var(--ok-bg); color: var(--ok); text-align: center; line-height: .95; }
 .blank.filled.ng { border-color: var(--ng); background: var(--ng-bg); color: var(--ng); }
 .qhint { font-size: .9rem; color: var(--muted); }
 .writer { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
@@ -161,8 +165,8 @@ h2 { font-size: 1.15rem; }
 .rlist { display: flex; flex-direction: column; gap: 8px; }
 .ritem { display: grid; grid-template-columns: 3.2em minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 12px; background: var(--bg); }
 .ritem .k { font-family: var(--font-kanji); font-size: 2.2rem; line-height: 1; text-align: center; }
-.ritem .q { font-family: var(--font-kanji); font-size: 1.15rem; line-height: 1.9; min-width: 0; overflow-wrap: anywhere; }
-.ritem .q rt { font-size: .5em; font-family: var(--font-ui); color: var(--muted); }
+.ritem .q { font-family: var(--font-kanji); font-size: 1.25rem; min-width: 0; }
+.ritem .blank { border-width: 2px; border-radius: 5px; }
 .pill { font-size: .8rem; font-weight: 700; padding: 4px 10px; border-radius: 99px; white-space: nowrap; }
 .pill.correct { background: var(--ok-bg); color: var(--ok); }
 .pill.wrong { background: var(--ng-bg); color: var(--ng); }
@@ -195,11 +199,11 @@ h2 { font-size: 1.15rem; }
 .sh-head p { margin: 1mm 0 0; font-size: 9pt; color: #555; }
 .sh-meta { font-size: 9pt; color: #444; text-align: right; display: flex; flex-direction: column; gap: 2mm; }
 .sh-meta .name { border-bottom: 0.8px solid #888; min-width: 48mm; padding-top: 4mm; text-align: left; color: #888; }
-.sh-row { display: grid; grid-template-columns: 7mm 52mm 112mm; align-items: center; gap: 3mm; height: 22.5mm; }
+.sh-row { display: grid; grid-template-columns: 7mm 86mm 80mm; align-items: center; gap: 3mm; height: 22.5mm; }
 .sh-no { font-size: 9pt; color: #555; text-align: right; }
-.sh-q { font-family: var(--font-kanji); font-size: 15pt; line-height: 1.75; overflow: hidden; max-height: 21mm; }
-.sh-q rt { font-size: 7.5pt; font-family: var(--font-ui); color: #555; letter-spacing: .08em; }
-.sh-q .box { display: inline-block; width: 1.05em; height: 1.05em; border: 1px solid #222; vertical-align: -0.12em; text-align: center; line-height: 1; }
+.sh-q { font-family: var(--font-kanji); font-size: 13pt; overflow: hidden; max-height: 21mm; column-gap: .4em; row-gap: 0; }
+.sh-q .qr { font-size: 7pt; color: #555; }
+.sh-q .box { display: inline-block; width: 1.1em; height: 1.1em; border: 1px solid #222; vertical-align: middle; text-align: center; line-height: 1.05; box-sizing: border-box; }
 .sh-q .box.ans { color: #c62828; font-weight: 600; }
 .sh-grid { display: flex; }
 .sh-cell { width: 16mm; height: 16mm; border: 0.8px solid #444; margin-left: -0.8px; position: relative; display: grid; place-items: center; font-family: var(--font-kanji); font-size: 12mm; line-height: 1; color: #c9c9c9; }
@@ -288,7 +292,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
       <div class="col" style="display:flex;flex-direction:column;gap:14px;min-width:0">
         <div class="card qcard">
           <p class="sub" id="tLabel">しかくに はいる かんじを かこう</p>
-          <div class="qtext" id="tQ"></div>
+          <div class="qtext qline" id="tQ"></div>
           <div class="qhint" id="tHint" hidden></div>
         </div>
         <div id="tFb" hidden></div>

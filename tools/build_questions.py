@@ -70,31 +70,40 @@ for ln, line in enumerate(open(os.path.join(ROOT, f'data/src/g{grade}.txt')), 1)
                 if re.search(r'[一-鿿]', t): errors.append(f'{ch}: 「{q}」にふりがなのない漢字「{t}」')
                 toks.append({'t': t})
         if blanks != 1: errors.append(f'{ch}: 「{q}」の空欄が{blanks}個')
-        is_word = all('t' not in t for t in toks)
-        surface = ''.join(t.get('b') or t.get('k') or t.get('t') for t in toks)
-        reading = ''.join(t.get('r') or t.get('t') for t in toks)
+        # 空欄を含む漢字の並び（文の中の熟語）を取り出す
+        bi = next((i for i, t in enumerate(toks) if 'b' in t), 0)
+        lo = bi
+        while lo > 0 and 't' not in toks[lo - 1]: lo -= 1
+        hi = bi
+        while hi + 1 < len(toks) and 't' not in toks[hi + 1]: hi += 1
+        run = toks[lo:hi + 1]
+        is_word = len(run) >= 2
+        surface = ''.join(t.get('b') or t.get('k') for t in run)
+        reading = ''.join(t['r'] for t in run)
+        sentence = ''.join(t.get('b') or t.get('k') or t.get('t') for t in toks)
         if is_word:
             if reading not in words.get(surface, set()):
-                warns.append(f'{ch}: 熟語「{surface}（{reading}）」が JMdict にない')
+                warns.append(f'{ch}: 文「{sentence}」の熟語「{surface}（{reading}）」が JMdict にない')
             else:
                 words_of_ch.append(f'{surface}（{reading}）')
-            # 別の字を入れても同じ読みの語になるか
             for c2 in known:
                 if c2 == ch: continue
                 alt = surface.replace(ch, c2, 1)
                 if reading in words.get(alt, set()):
                     errors.append(f'{ch}: 「{surface}（{reading}）」の空欄に {c2} を入れても「{alt}」になる')
         else:
-            br = next(t['r'] for t in toks if 'b' in t)
+            br = toks[bi]['r']
             same = sorted(c2 for c2 in known if c2 != ch and br in kun_of(c2))
             if same:
-                warns.append(f'{ch}: 文「{surface}」の読み「{br}」は {"".join(same)} にもある（文脈で決まるか確認）')
+                warns.append(f'{ch}: 文「{sentence}」の読み「{br}」は {"".join(same)} にもある（文脈で決まるか確認）')
         out_q.append({'id': f'g{grade}-{ch}-{qi+1}', 'kanji': ch, 'type': 'word' if is_word else 'sentence', 'tokens': toks})
     out_kanji[ch] = {'grade': int(grade), 'on': [] if on == '—' else on.split('・'), 'kun': [] if kun == '—' else kun.split('・'),
                      'meaning': mean, 'words': words_of_ch}
 missing = [c for c in target_set if c not in seen]
 if missing: errors.append('配当漢字の抜け: ' + ''.join(missing))
-print(f'小{grade}: {len(out_kanji)}字 / {len(out_q)}問（熟語 {sum(q["type"]=="word" for q in out_q)}・文 {sum(q["type"]=="sentence" for q in out_q)}）')
+print(f'小{grade}: {len(out_kanji)}字 / {len(out_q)}問（熟語を含む文 {sum(q["type"]=="word" for q in out_q)}・そのほかの文 {sum(q["type"]=="sentence" for q in out_q)}）')
+nontext = [q['id'] for q in out_q if all('t' not in t for t in q['tokens'])]
+if nontext: errors.append('文になっていない問題: ' + ' '.join(nontext))
 for w in warns: print('確認:', w)
 for e in errors: print('エラー:', e)
 if errors: sys.exit(1)

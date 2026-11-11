@@ -25,14 +25,34 @@
   function gradeChars(g) { return QD[g] ? Object.keys(QD[g].kanji) : []; }
   function hasGrade(g) { return !!QD[g]; }
 
-  function renderQ(q, mode, extraClass) {
-    // mode: 'test' 空欄 / 'answer' 答えを入れる / 'wrong' 答えを赤で
-    return q.tokens.map(function (t) {
-      if (t.t !== undefined) return esc(t.t);
-      if (t.k !== undefined) return '<ruby>' + esc(t.k) + '<rt>' + esc(t.r) + '</rt></ruby>';
-      var inner = mode === 'test' ? '<span class="blank" aria-label="しかく"></span>'
-        : '<span class="blank filled' + (mode === 'wrong' ? ' ng' : '') + (extraClass || '') + '">' + esc(t.b) + '</span>';
-      return '<ruby>' + inner + '<rt>' + esc(t.r) + '</rt></ruby>';
+  /*
+   * ふりがなは <ruby> を使わず、「よみ」と「字」を縦に積んだ箱で表示する
+   * （端末によって <ruby> のふりがなが □ の枠に隠れるため）。
+   * 文は空白で区切ったまとまりごとに折り返す。
+   * mode: 'test' 空欄 / 'answer' 答えを緑で / 'wrong' 答えを赤で / 'sheet' プリントの空欄 / 'sheetans' プリントのこたえ
+   */
+  function renderQ(q, mode) {
+    var words = [[]];
+    q.tokens.forEach(function (t) {
+      if (t.t === undefined) { words[words.length - 1].push(t); return; }
+      var parts = t.t.split(/([ 　、]+)/);
+      parts.forEach(function (p) {
+        if (!p) return;
+        if (/^[ 　]+$/.test(p)) { if (words[words.length - 1].length) words.push([]); return; }
+        if (/^[ 　]*、[ 　]*$/.test(p)) { words[words.length - 1].push({ t: '、' }); words.push([]); return; }
+        words[words.length - 1].push({ t: p });
+      });
+    });
+    return words.filter(function (w) { return w.length; }).map(function (w) {
+      return '<span class="qw">' + w.map(function (t) {
+        if (t.t !== undefined) return '<span class="qc"><span class="qr" aria-hidden="true">&#8203;</span><span class="qk">' + esc(t.t) + '</span></span>';
+        var body;
+        if (t.k !== undefined) body = esc(t.k);
+        else if (mode === 'test' || mode === 'sheet') body = '<span class="' + (mode === 'sheet' ? 'box' : 'blank') + '" aria-label="しかく"></span>';
+        else if (mode === 'sheetans') body = '<span class="box ans">' + esc(t.b) + '</span>';
+        else body = '<span class="blank filled' + (mode === 'wrong' ? ' ng' : '') + '">' + esc(t.b) + '</span>';
+        return '<span class="qc"><span class="qr">' + esc(t.r) + '</span><span class="qk">' + body + '</span></span>';
+      }).join('') + '</span>';
     }).join('');
   }
   function plainQ(q) { return q.tokens.map(function (t) { return t.t !== undefined ? t.t : (t.k || t.b); }).join(''); }
@@ -318,7 +338,7 @@
     $('rNote').textContent = (wrong.length ? 'まちがえた ' + wrong.length + '字は にがてリストに はいりました。' : 'まちがいは ありませんでした。') +
       (recog ? ' よみとれなかった ' + recog + '字は まちがいに していません。' : '');
     $('rList').innerHTML = items.map(function (x) {
-      return '<div class="ritem"><span class="k">' + esc(x.ch) + '</span><span class="q">' + renderQ(x.q, x.result === 'correct' ? 'answer' : 'wrong') +
+      return '<div class="ritem"><span class="k">' + esc(x.ch) + '</span><span class="q qline">' + renderQ(x.q, x.result === 'correct' ? 'answer' : 'wrong') +
         '</span><span class="pill ' + x.result + '">' + PILL[x.result] + '</span></div>';
     }).join('');
     $('rPrint').disabled = !wrong.length;
@@ -395,13 +415,7 @@
     qs.sort(function (a, b) { return (wrongIds[b.id] ? 2 : 0) - (wrongIds[a.id] ? 2 : 0) || (a.type === 'word' ? -1 : 1) - (b.type === 'word' ? -1 : 1); });
     return qs.slice(0, per);
   }
-  function sheetQ(q, answer) {
-    return q.tokens.map(function (t) {
-      if (t.t !== undefined) return esc(t.t);
-      if (t.k !== undefined) return '<ruby>' + esc(t.k) + '<rt>' + esc(t.r) + '</rt></ruby>';
-      return '<ruby><span class="box' + (answer ? ' ans' : '') + '">' + (answer ? esc(t.b) : '') + '</span><rt>' + esc(t.r) + '</rt></ruby>';
-    }).join('');
-  }
+  function sheetQ(q, answer) { return renderQ(q, answer ? 'sheetans' : 'sheet'); }
   function renderPrint() {
     var per = +$('pPer').value, trace = $('pTrace').checked, withAns = $('pAnswer').checked;
     var rows = [];
@@ -419,8 +433,8 @@
         '<div class="sh-meta"><span>ひづけ　' + esc(today) + '</span>' + (answer ? '' : '<span class="name">なまえ</span>') + '</div></div>' +
         rowsOnPage.map(function (row, k) {
           var cells = '';
-          for (var c = 0; c < 7; c++) cells += '<span class="sh-cell">' + ((answer || trace) && c === 0 ? esc(row.ch) : '') + '</span>';
-          return '<div class="sh-row"><span class="sh-no">' + (startNo + k + 1) + '.</span><span class="sh-q">' + sheetQ(row.q, answer) + '</span><span class="sh-grid">' + cells + '</span></div>';
+          for (var c = 0; c < 5; c++) cells += '<span class="sh-cell">' + ((answer || trace) && c === 0 ? esc(row.ch) : '') + '</span>';
+          return '<div class="sh-row"><span class="sh-no">' + (startNo + k + 1) + '.</span><span class="sh-q qline">' + sheetQ(row.q, answer) + '</span><span class="sh-grid">' + cells + '</span></div>';
         }).join('') +
         '<div class="sh-foot"><span>Pop-Kanji ・ ' + esc(grades) + '</span><span>' + pageNo + ' / ' + total + '</span></div></div></div>';
     }
