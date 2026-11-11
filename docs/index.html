@@ -440,6 +440,11 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
         <li>アカウント登録はありません。Cookie も使いません。</li>
         <li>学習の記録は、この端末のブラウザ（IndexedDB）にだけ保存されます。</li>
       </ul>
+      <h2>バージョン</h2>
+      <p>いまの バージョン：<b id="aVer">2026.11.11-2040</b></p>
+      <p>サイトを 新しくしたのに 前のままのときは、このボタンを おしてください。学習の記録は 消えません。</p>
+      <button class="btn small" id="aUpdate" style="align-self:flex-start">あたらしい バージョンを よみこむ</button>
+      <p class="msg" id="aUpMsg" aria-live="polite"></p>
       <h2>いまの 対応範囲</h2>
       <p id="aRange"></p>
       <h2>判定のしかた</h2>
@@ -466,14 +471,14 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
   </footer>
 </div>
 
-<script src="vendor/kanjicanvas/kanji-canvas.js"></script>
-<script src="js/joyo.js"></script>
-<script src="js/recognizer.js"></script>
-<script src="js/store.js"></script>
-<script src="js/pad.js"></script>
-<script src="js/stroke-counts.js"></script>
-<script src="js/grades.js"></script>
-<script src="js/questions.js"></script>
-<script src="js/app.js"></script>
+<script src="vendor/kanjicanvas/kanji-canvas.js?v=2026.11.11-2040"></script>
+<script src="js/joyo.js?v=2026.11.11-2040"></script>
+<script src="js/recognizer.js?v=2026.11.11-2040"></script>
+<script src="js/store.js?v=2026.11.11-2040"></script>
+<script src="js/pad.js?v=2026.11.11-2040"></script>
+<script src="js/stroke-counts.js?v=2026.11.11-2040"></script>
+<script src="js/grades.js?v=2026.11.11-2040"></script>
+<script src="js/questions.js?v=2026.11.11-2040"></script>
+<script src="js/app.js?v=2026.11.11-2040"></script>
 </body>
 </html>

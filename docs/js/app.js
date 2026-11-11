@@ -100,7 +100,11 @@
 
   // ---------- 読み取りの準備 ----------
   var ready = false;
+  // build.sh が付けた ?v=（バージョン）を、あとから読む手本データにも付ける
+  var APP_VER = (function () { var c = document.currentScript; var m = c && /[?&]v=([^&]+)/.exec(c.src); return m ? m[1] : ''; })();
+  if (/[?&]t=\d+/.test(location.search) && history.replaceState) history.replaceState(null, '', location.pathname + location.hash);   // 読みこみなおし用の ?t= を消す
   function loadScript(src) {
+    if (APP_VER) src += '?v=' + APP_VER;
     return new Promise(function (res, rej) { var s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.body.appendChild(s); });
   }
   loadScript('vendor/kanjicanvas/ref-patterns.js').then(function () {
@@ -458,6 +462,16 @@
     else { var l = reviewList(); if (l.length) startTest('review', 0, l.slice(0, 10)); else go('home'); }
   };
   function uniq(a) { return a.filter(function (x, i) { return a.indexOf(x) === i; }); }
+
+  // ---------- 新しいバージョンの読みこみ ----------
+  // ブラウザに残っている古いページを取りなおしてから開きなおす（学習の記録 IndexedDB はそのまま）
+  $('aUpdate').onclick = function () {
+    var btn = this; btn.disabled = true; $('aUpMsg').textContent = 'よみこみちゅう…';
+    var url = location.pathname + '?t=' + Date.now();
+    fetch(location.pathname, { cache: 'reload' }).catch(function () {}).then(function () {
+      location.replace(url + '#home');
+    });
+  };
 
   // ---------- 苦手リスト ----------
   var weakGrade = 1, selected = null;
