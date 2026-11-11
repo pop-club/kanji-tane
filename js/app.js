@@ -221,14 +221,16 @@
   function updateAnswerBtn() {
     if (!pad || !session) return;
     var n = pad.strokes().length;
-    $('tAnswer').disabled = !ready || !n || answered;
-    $('tAnswer').textContent = ready ? 'こたえる' : 'じゅんびちゅう…';
-    $('tUndo').disabled = !n || answered; $('tClear').disabled = !n || answered;
+    var busy = answered && !practicing;
+    $('tAnswer').disabled = !ready || !n || busy;
+    $('tAnswer').textContent = !ready ? 'じゅんびちゅう…' : practicing ? 'かけた！' : 'こたえる';
+    $('tUndo').disabled = !n || busy; $('tClear').disabled = !n || busy;
   }
-  var answered = false, pending = null;
+  var answered = false, pending = null, practicing = false;
   function showItem() {
     var it = cur(), n = session.items.length, k = KANJI[it.ch];
-    answered = false; pending = null;
+    answered = false; pending = null; practicing = false;
+    pad.setGuide(null);
     $('tNum').textContent = (session.idx + 1) + ' / ' + n;
     $('tProg').style.width = (100 * session.idx / n) + '%';
     $('tLabel').textContent = session.mode === 'review' ? 'ふくしゅう：しかくに はいる かんじを かこう' : GRADE_NAME[k.grade] + '：しかくに はいる かんじを かこう';
@@ -243,7 +245,8 @@
   function infoDl(ch) {
     var k = KANJI[ch];
     var yomi = [].concat(k.on, k.kun).filter(Boolean).join('・') || '—';
-    var mean = k.meaningTokens ? '<span class="qline mline">' + renderQ({ tokens: k.meaningTokens }, 'answer') + '</span>' : esc(k.meaning);
+    var hasK = k.meaningTokens && k.meaningTokens.some(function (t) { return t.k !== undefined; });
+    var mean = hasK ? '<span class="qline mline">' + renderQ({ tokens: k.meaningTokens }, 'answer') + '</span>' : esc(k.meaning);
     return '<dl><dt>よみ</dt><dd>' + esc(yomi) + '</dd><dt>いみ</dt><dd>' + mean + '</dd>' +
       (k.words && k.words.length ? '<dt>ことば</dt><dd class="kj">' + esc(k.words.slice(0, 4).join('　')) + '</dd>' : '') + '</dl>';
   }
@@ -252,8 +255,10 @@
     var showAns = kind !== 'retry';   // 書き直しのときは答えを見せない
     var html = '<div class="fb ' + kind + '" role="status"><div class="head">' + (showAns ? '<span class="ans">' + esc(it.ch) + '</span>' : '') + '<div><div class="verdict">' + verdict + '</div>' +
       (detail ? '<div>' + detail + '</div>' : '') + '</div></div>' + (withInfo ? infoDl(it.ch) : '') +
+      (kind === 'wrong' || kind === 'recog' ? '<button class="btn small practice" id="tPractice">おてほんを みて もういちど かく</button><div class="pmsg" id="tPmsg" aria-live="polite"></div>' : '') +
       (misjudge ? '<button class="misjudge" id="tMis">ただしく かいたのに まちがいに なった</button>' : '') + '</div>';
     $('tFb').innerHTML = html; $('tFb').hidden = false;
+    if ($('tPractice')) $('tPractice').onclick = startPractice;
     if (misjudge) $('tMis').onclick = function () {
       pending = 'recog';
       $('tFb').firstChild.className = 'fb recog';
@@ -271,9 +276,27 @@
     $('tNext').focus();
     updateAnswerBtn();
   }
+  // まちがえた字の練習：お手本をうすく出して、なぞって書く。記録（まちがい）は変えない
+  function startPractice() {
+    practicing = true;
+    pad.setGuide(cur().ch);
+    pad.lock(false); pad.clear();
+    $('tControls').hidden = false;
+    $('tPmsg').textContent = 'うすい おてほんを なぞって かいてみよう';
+    $('tPractice').hidden = true;
+    updateAnswerBtn();
+  }
+  function practiceCheck() {
+    var it = cur();
+    var cands = R.recognize(pad.strokes(), { width: pad.size(), height: pad.size() }, 10);
+    var ok = R.judge(cands, it.ch).result === 'correct';
+    $('tPmsg').textContent = ok ? 'よく かけたね！ もういちど かいても いいよ' : 'おしい！ おてほんを よく みて かこう';
+    if (ok) { pad.clear(); }
+  }
   $('tUndo').onclick = function () { pad.undo(); };
   $('tClear').onclick = function () { pad.clear(); };
   $('tAnswer').onclick = function () {
+    if (practicing) { if (pad.strokes().length) practiceCheck(); return; }
     if (!ready || answered || !pad.strokes().length) return;
     var it = cur();
     var cands = R.recognize(pad.strokes(), { width: pad.size(), height: pad.size() }, 10);

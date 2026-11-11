@@ -117,7 +117,7 @@ for ln, line in enumerate(open(os.path.join(ROOT, f'data/src/g{grade}.txt')), 1)
             mtoks.append({'t': m.group(5)})
     plain_mean = ''.join(t.get('k') or t.get('t') for t in mtoks)
     out_kanji[ch] = {'grade': int(grade), 'on': [] if on == '—' else on.split('・'), 'kun': [] if kun == '—' else kun.split('・'),
-                     'meaning': plain_mean, 'meaningTokens': mtoks, 'words': words_of_ch}
+                     'meaning': plain_mean, 'meaningTokens': mtoks, 'words': list(dict.fromkeys(words_of_ch))}
 missing = [c for c in target_set if c not in seen]
 if missing: errors.append('配当漢字の抜け: ' + ''.join(missing))
 print(f'小{grade}: {len(out_kanji)}字 / {len(out_q)}問（熟語を含む文 {sum(q["type"]=="word" for q in out_q)}・そのほかの文 {sum(q["type"]=="sentence" for q in out_q)}）')

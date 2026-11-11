@@ -14,6 +14,7 @@
     pad.appendChild(cv);
     var ctx = cv.getContext('2d');
     var strokes = [], cur = null, activeId = null, penSeen = false, size = 0, locked = false;
+    var guide = null;   // うすく表示するお手本の字
 
     function resize() {
       var r = pad.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
@@ -40,6 +41,14 @@
       ctx.strokeStyle = cssVar('--grid'); ctx.lineWidth = 1.5; ctx.setLineDash([8, 8]);
       ctx.beginPath(); ctx.moveTo(size / 2, 10); ctx.lineTo(size / 2, size - 10); ctx.moveTo(10, size / 2); ctx.lineTo(size - 10, size / 2); ctx.stroke();
       ctx.restore();
+      if (guide) {
+        ctx.save();
+        ctx.fillStyle = cssVar('--guide');
+        ctx.font = Math.round(size * 0.8) + 'px ' + cssVar('--font-kanji');
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(guide, size / 2, size / 2 + size * 0.03);
+        ctx.restore();
+      }
       ctx.strokeStyle = cssVar('--stroke'); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
       ctx.lineWidth = Math.max(6, size / 40);
       strokes.forEach(line);
@@ -89,6 +98,7 @@
       clear: function () { strokes = []; cur = null; redraw(); },
       undo: function () { strokes.pop(); redraw(); },
       lock: function (v) { locked = !!v; pad.classList.toggle('locked', locked); },
+      setGuide: function (ch) { guide = ch || null; redraw(); },
       // 判定用：256 座標に変換した筆跡（記録用）
       strokes256: function () {
         return strokes.map(function (st) { return st.map(function (p) { return [Math.round(p[0] * 256 / size), Math.round(p[1] * 256 / size)]; }); });

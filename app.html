@@ -1,5 +1,6 @@
 <title>かんじのたね</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta name="google-site-verification" content="m89nn9A-U3s-qRIYAmwqCi1a57TgZ3Y5gHLazMKV-W0" />
 <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -21,6 +22,7 @@
   --sky-soft: #dcebfa;
   --grid: #c3d0de;
   --stroke: #1d2b3a;
+  --guide: #cfdbe7;        /* お手本のうすい字 */
   --ok: #188a5a;  --ok-bg: #dff4ea;
   --retry: #a35f00; --retry-bg: #fff0d4;
   --ng: #cc3838;  --ng-bg: #fde6e6;
@@ -32,7 +34,7 @@
   :root:not([data-theme="light"]) {
     --bg: #111821; --surface: #1a2430; --ink: #e9eff6; --muted: #9daabb; --line: #2d3a4a;
     --accent: #ff8a5c; --accent-ink: #1a1007; --accent-soft: #3d2418; --sky: #6aa8ec; --sky-soft: #1d3149;
-    --grid: #3a4c62; --stroke: #f1f5fa;
+    --grid: #3a4c62; --stroke: #f1f5fa; --guide: #33465c;
     --ok: #5fd39c; --ok-bg: #163428; --retry: #f2b24d; --retry-bg: #3a2b12; --ng: #ff8a8a; --ng-bg: #3d1c1c;
     color-scheme: dark;
   }
@@ -40,7 +42,7 @@
 :root[data-theme="dark"] {
   --bg: #111821; --surface: #1a2430; --ink: #e9eff6; --muted: #9daabb; --line: #2d3a4a;
   --accent: #ff8a5c; --accent-ink: #1a1007; --accent-soft: #3d2418; --sky: #6aa8ec; --sky-soft: #1d3149;
-  --grid: #3a4c62; --stroke: #f1f5fa;
+  --grid: #3a4c62; --stroke: #f1f5fa; --guide: #33465c;
   --ok: #5fd39c; --ok-bg: #163428; --retry: #f2b24d; --retry-bg: #3a2b12; --ng: #ff8a8a; --ng-bg: #3d1c1c;
   color-scheme: dark;
 }
@@ -159,6 +161,8 @@ h2 { font-size: 1.15rem; }
 .fb dd { margin: 0; overflow-wrap: anywhere; }
 .fb .mline { display: inline-flex; font-size: 1rem; column-gap: .3em; }
 .fb .mline .qr { font-size: .55em; }
+.fb .practice { align-self: flex-start; }
+.fb .pmsg { font-weight: 700; min-height: 1.4em; }
 .fb .misjudge { background: none; border: none; color: var(--muted); text-decoration: underline; font-size: .85rem; cursor: pointer; padding: 0; align-self: flex-start; min-height: 36px; }
 
 /* 結果 */
