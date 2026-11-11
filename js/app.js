@@ -9,8 +9,18 @@
   'use strict';
   var R = window.PopKanjiRecognizer, Store = window.PopKanjiStore;
   var QD = window.POPKANJI_QUESTIONS || {};
-  var GRADE_TOTAL = { 1: 80, 2: 160, 3: 200, 4: 202, 5: 193, 6: 191 };
-  var GRADE_NAME = { 1: '1ねんせい', 2: '2ねんせい', 3: '3ねんせい', 4: '4ねんせい', 5: '5ねんせい', 6: '6ねんせい' };
+  // 学年の番号: 1〜6 = 小学校、7〜10 = 中学の字を漢検の級で分けたもの（4級・3級・準2級・2級）
+  var GRADE_TOTAL = { 1: 80, 2: 160, 3: 200, 4: 202, 5: 193, 6: 191, 7: 313, 8: 284, 9: 328, 10: 185 };
+  var GRADE_NAME = { 1: '1ねんせい', 2: '2ねんせい', 3: '3ねんせい', 4: '4ねんせい', 5: '5ねんせい', 6: '6ねんせい',
+    7: '漢検4級', 8: '漢検3級', 9: '漢検準2級', 10: '漢検2級' };
+  var LEVEL_NOTE = { 7: '中学在学程度', 8: '中学卒業程度', 9: '高校在学程度', 10: '高校卒業程度' };   // 漢検協会の目安
+  var SHORT_NAME = { 1: '1ねん', 2: '2ねん', 3: '3ねん', 4: '4ねん', 5: '5ねん', 6: '6ねん', 7: '4級', 8: '3級', 9: '準2級', 10: '2級' };
+  // モード: しょうがくせい（小1〜小6）／漢検（中学の字）。この端末に覚えておく
+  var MODES = { sho: [1, 2, 3, 4, 5, 6], kanken: [7, 8, 9, 10] };
+  var mode = 'sho';
+  try { if (localStorage.getItem('kt-mode') === 'kanken') mode = 'kanken'; } catch (e) {}
+  function levels() { return MODES[mode]; }
+  function inMode(ch) { var k = KANJI[ch]; return !!k && levels().indexOf(k.grade) >= 0; }
   var DAY = 86400000, REVIEW_AFTER = 7 * DAY, MAX_RETRY = 3;
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
@@ -37,6 +47,8 @@
    * mode: 'test' 空欄 / 'answer' 答えを緑で / 'wrong' 答えを赤で / 'sheet' プリントの空欄 / 'sheetans' プリントのこたえ
    */
   function renderQ(q, mode) {
+    // 中学の字の問題では、小学校で習った字だけの言葉には ふりがなを付けない
+    var plainElem = !!(q.kanji && KANJI[q.kanji] && KANJI[q.kanji].grade >= 7);
     var words = [[]];
     q.tokens.forEach(function (t) {
       if (t.t === undefined) { words[words.length - 1].push(t); return; }
@@ -52,7 +64,11 @@
       return '<span class="qw">' + w.map(function (t) {
         if (t.t !== undefined) return '<span class="qc"><span class="qr" aria-hidden="true">&#8203;</span><span class="qk">' + esc(t.t) + '</span></span>';
         var body;
-        if (t.k !== undefined) body = esc(t.k);
+        if (t.k !== undefined) {
+          body = esc(t.k);
+          if (plainElem && Array.from(t.k).every(function (c) { return GRADE_OF[c] && GRADE_OF[c] <= 6; }))
+            return '<span class="qc"><span class="qr" aria-hidden="true">&#8203;</span><span class="qk">' + body + '</span></span>';
+        }
         else if (mode === 'test' || mode === 'sheet') body = '<span class="' + (mode === 'sheet' ? 'box' : 'blank') + '" aria-label="しかく"></span>';
         else if (mode === 'sheetans') body = '<span class="box ans">' + esc(t.b) + '</span>';
         else body = '<span class="blank filled' + (mode === 'wrong' ? ' ng' : '') + '">' + esc(t.b) + '</span>';
@@ -94,7 +110,7 @@
   }
   function reviewList() {
     var all = Store.all(), now = Date.now();
-    return Object.keys(all).filter(function (ch) { return KANJI[ch] && (all[ch].status === 'weak' || isDue(all[ch], now)); })
+    return Object.keys(all).filter(function (ch) { return inMode(ch) && (all[ch].status === 'weak' || isDue(all[ch], now)); })
       .sort(function (a, b) { return (all[a].lastAt || 0) - (all[b].lastAt || 0); });
   }
 
@@ -110,9 +126,12 @@
   loadScript('vendor/kanjicanvas/ref-patterns.js').then(function () {
     R.setCandidateSet(window.JOYO_KANJI);
     return loadScript('vendor/kanjivg-refs/kvg-refs.js').then(function () {
-      R.setReplaced('衛臨熟数歌社馬鳥鳴島進駅健散験慣敬');
+      // 元の手本の画数がちがう字は、KanjiVG の手本があれば元の手本を使わない（中学の字は、漢検モードで手本を読んでから効く）
+      R.setReplaced('衛臨熟数歌社馬鳥鳴島進駅健散験慣敬' + '幾御驚駆騒傍離肝貫敢騎鶏駐篤乏薦駄騰駒緻鶴罵箸璃');
       R.setKvgRefs(window.POPKANJI_KVG_REFS);
     }, function () {});
+  }).then(function () {
+    return mode === 'kanken' ? loadMidRefs() : null;
   }).then(function () {
     ready = true;
     $('loadstate').textContent = '';
@@ -120,6 +139,34 @@
   }, function () {
     $('loadstate').textContent = 'よみとりの データを よみこめませんでした。ページを よみこみなおしてください。';
   });
+  // 中学の字の手本（約4MB）は、漢検モードにしたときだけ読む
+  var midLoading = null;
+  function loadMidRefs() {
+    if (!midLoading) midLoading = loadScript('vendor/kanjivg-refs/kvg-refs-mid.js').then(function () {
+      R.setKvgRefs((window.POPKANJI_KVG_REFS || []).concat(window.POPKANJI_KVG_REFS_MID || []));
+    });
+    return midLoading;
+  }
+  function setMode(m) {
+    if (m === mode || session) return;
+    mode = m;
+    try { localStorage.setItem('kt-mode', m); } catch (e) {}
+    selected = null;
+    paintMode();
+    if (m === 'kanken' && ready && !window.POPKANJI_KVG_REFS_MID) {
+      ready = false;
+      $('loadstate').textContent = 'かんじの てほんを よみこみちゅう…';
+      loadMidRefs().then(function () { $('loadstate').textContent = ''; }, function () { $('loadstate').textContent = 'てほんを よみこめませんでした'; })
+        .then(function () { ready = true; updateAnswerBtn(); });
+    }
+    route();
+  }
+  function paintMode() {
+    Array.prototype.forEach.call(document.querySelectorAll('#modeSw button'), function (b) { b.setAttribute('aria-pressed', b.dataset.m === mode); });
+    document.body.classList.toggle('kanken', mode === 'kanken');
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('#modeSw button'), function (b) { b.onclick = function () { setMode(b.dataset.m); }; });
+  paintMode();
 
   // ---------- 画面の切り替え ----------
   var views = ['home', 'grade', 'test', 'result', 'weak', 'print', 'data', 'about'];
@@ -148,25 +195,26 @@
   // ---------- ホーム ----------
   function renderHome() {
     var rv = reviewList();
-    var weak = Object.keys(Store.all()).filter(function (ch) { return Store.get(ch).status === 'weak'; }).length;
+    var weak = Object.keys(Store.all()).filter(function (ch) { return inMode(ch) && Store.get(ch).status === 'weak'; }).length;
     $('hReview').textContent = rv.length;
     $('hWeak').textContent = weak;
     $('hReviewBtn').disabled = !rv.length;
     $('hReviewBtn').textContent = rv.length ? 'にがてを ふくしゅう する（' + Math.min(rv.length, 10) + 'もん）' : 'ふくしゅうする かんじは ありません';
     var html = '';
-    for (var g = 1; g <= 6; g++) {
+    levels().forEach(function (g) {
       if (!hasGrade(g)) {
-        html += '<div class="level soon"><span>' + g + 'ねん</span><span class="bar"></span><span class="n">じゅんびちゅう</span></div>';
-        continue;
+        html += '<div class="level soon"><span>' + SHORT_NAME[g] + '</span><span class="bar"></span><span class="n">じゅんびちゅう</span></div>';
+        return;
       }
       // 数字は「せいかいした字（おぼえた＋おぼえかけ）」。おぼえた は2回つづけて正解したときなので、1回めのテストでは 0 のまま
       var chars = gradeChars(g), c = statusCounts(chars), t = chars.length, done = c.mastered + c.candidate, tested = t - c.new;
-      html += '<div class="level"><span>' + g + 'ねん</span><span class="bar" role="img" aria-label="' + g + 'ねん おぼえた ' + c.mastered + '字、おぼえかけ ' + c.candidate + '字、にがて ' + c.weak + '字 / ' + t + '字">' +
+      html += '<div class="level"><span>' + SHORT_NAME[g] + '</span><span class="bar" role="img" aria-label="' + SHORT_NAME[g] + ' おぼえた ' + c.mastered + '字、おぼえかけ ' + c.candidate + '字、にがて ' + c.weak + '字 / ' + t + '字">' +
         '<i class="m" style="width:' + (100 * c.mastered / t) + '%"></i><i class="c" style="width:' + (100 * c.candidate / t) + '%"></i><i class="w" style="width:' + (100 * c.weak / t) + '%"></i>' +
         '</span><span class="n">' + done + ' / ' + t + '字</span>' +
         (tested ? '<small class="ld">おぼえた ' + c.mastered + '　おぼえかけ ' + c.candidate + '　にがて ' + c.weak + '</small>' : '') + '</div>';
-    }
+    });
     $('hLevels').innerHTML = html;
+    $('hLevelsTitle').textContent = mode === 'kanken' ? '級ごとの おぼえぐあい' : 'がくねんごとの おぼえぐあい';
   }
   $('hReviewBtn').onclick = function () { var l = reviewList(); if (l.length) startTest('review', 0, l.slice(0, 10)); };
 
@@ -174,15 +222,17 @@
   var pickGrade = 1, pickN = 10;
   function renderGrade() {
     var html = '';
-    for (var g = 1; g <= 6; g++) {
+    if (levels().indexOf(pickGrade) < 0) pickGrade = levels()[0];
+    $('gTitle').textContent = mode === 'kanken' ? 'どの 級に する？' : 'なんねんせいの かんじ？';
+    levels().forEach(function (g) {
       var ok = hasGrade(g);
       var sample = ok ? gradeChars(g).slice(0, 4).join('') : '';
       var c = ok ? statusCounts(gradeChars(g)) : null;
       html += '<button class="grade' + (ok && g === pickGrade ? ' on' : '') + '" data-g="' + g + '"' + (ok ? '' : ' disabled') + '>' +
-        '<b>' + GRADE_NAME[g] + '</b>' +
+        '<b>' + GRADE_NAME[g] + '</b>' + (LEVEL_NOTE[g] ? '<small>' + LEVEL_NOTE[g] + '</small>' : '') +
         (ok ? '<span class="sample">' + esc(sample) + '…</span><small>' + GRADE_TOTAL[g] + '字 ・ せいかい ' + (c.mastered + c.candidate) + '字（おぼえた ' + c.mastered + '）</small>'
             : '<small>' + GRADE_TOTAL[g] + '字 ・ じゅんびちゅう</small>') + '</button>';
-    }
+    });
     $('gList').innerHTML = html;
     Array.prototype.forEach.call($('gList').querySelectorAll('.grade'), function (b) {
       b.onclick = function () { pickGrade = +b.dataset.g; renderGrade(); };
@@ -287,7 +337,7 @@
     var k = KANJI[ch];
     var yomi = [].concat(k.on, k.kun).filter(Boolean).join('・') || '—';
     var hasK = k.meaningTokens && k.meaningTokens.some(function (t) { return t.k !== undefined; });
-    var mean = hasK ? '<span class="qline mline">' + renderQ({ tokens: k.meaningTokens }, 'answer') + '</span>' : esc(k.meaning);
+    var mean = hasK ? '<span class="qline mline">' + renderQ({ tokens: k.meaningTokens, kanji: ch }, 'answer') + '</span>' : esc(k.meaning);
     return '<dl><dt>よみ</dt><dd>' + esc(yomi) + '</dd><dt>いみ</dt><dd>' + mean + '</dd>' +
       (k.words && k.words.length ? '<dt>ことば</dt><dd class="kj">' + esc(k.words.slice(0, 4).join('　')) + '</dd>' : '') + '</dl>';
   }
@@ -486,11 +536,12 @@
       Object.keys(Store.all()).forEach(function (ch) { var k = kindOf(ch, now); if (k === 'weak' || k === 'due') selected[ch] = true; });
     }
     var tabs = '';
-    for (var g = 1; g <= 6; g++) {
-      if (!hasGrade(g)) continue;
+    if (levels().indexOf(weakGrade) < 0) weakGrade = levels()[0];
+    levels().forEach(function (g) {
+      if (!hasGrade(g)) return;
       var c = statusCounts(gradeChars(g));
-      tabs += '<button class="tab" role="tab" data-g="' + g + '" aria-selected="' + (g === weakGrade) + '">' + g + 'ねん（にがて ' + c.weak + '）</button>';
-    }
+      tabs += '<button class="tab" role="tab" data-g="' + g + '" aria-selected="' + (g === weakGrade) + '">' + SHORT_NAME[g] + '（にがて ' + c.weak + '）</button>';
+    });
     $('wTabs').innerHTML = tabs;
     Array.prototype.forEach.call($('wTabs').querySelectorAll('.tab'), function (b) { b.onclick = function () { weakGrade = +b.dataset.g; renderWeak(); }; });
     var chars = gradeChars(weakGrade), html = '';
@@ -605,9 +656,11 @@
 
   function renderAbout() {
     var ok = [], soon = [];
-    for (var g = 1; g <= 6; g++) (hasGrade(g) ? ok : soon).push(g + '年');
-    $('aRange').textContent = '問題があるのは ' + ok.join('・') + '（' + ok.map(function (x) { return GRADE_TOTAL[parseInt(x, 10)] + '字'; }).join('・') + '）です。' +
-      (soon.length ? soon.join('・') + ' は準備中です。' : '') + ' 手書きの読み取りは小1〜小6の1026字に対応しています。';
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].forEach(function (g) { (hasGrade(g) ? ok : soon).push(g); });
+    var nm = function (g) { return g <= 6 ? '小' + g : GRADE_NAME[g]; };
+    $('aRange').textContent = '問題があるのは ' + ok.map(function (g) { return nm(g) + '（' + GRADE_TOTAL[g] + '字）'; }).join('・') + ' です。' +
+      (soon.length ? soon.map(nm).join('・') + ' は準備中です。' : '') +
+      ' 手書きの読み取りは、小学校の1026字と、中学で習う1110字（漢検4級〜2級）に対応しています。中学の字の手本は、漢検モードにしたときだけ読みこみます。';
   }
 
   // ---------- はじめ ----------

@@ -15,8 +15,13 @@ grade = sys.argv[1]
 jm = json.load(open(sys.argv[2]))
 meta = json.load(open(sys.argv[3]))
 G = json.load(open(os.path.join(ROOT, 'data/grade-kanji.json')))['grades']
+G.update(json.load(open(os.path.join(ROOT, 'data/kanken-levels.json')))['kanji'])   # 7〜10 = 漢検4級・3級・準2級・2級（中学の字）
 known = set(''.join(G[str(g)] for g in range(1, int(grade) + 1)))
+# 漢検（中学の字）では、見せる字は常用漢字ならよい（小学校の字いがいは ふりがなを出す）
+if int(grade) >= 7:
+    known = set(c for c in open(os.path.join(ROOT, 'data/joyo-kanji.txt')).read() if ord(c) > 0x3000)
 target_set = list(G[grade])
+L = {'7': '漢検4級', '8': '漢検3級', '9': '漢検準2級', '10': '漢検2級'}.get(grade, f'小{grade}')
 
 # JMdict: 表記 → 読みの集合
 words = collections.defaultdict(set)        # 表記 → 読み（すべての表記）
@@ -49,7 +54,7 @@ for ln, line in enumerate(open(os.path.join(ROOT, f'data/src/g{grade}.txt')), 1)
     ch, on, kun, mean, qs = parts
     if ch in seen: errors.append(f'{ln}行: {ch} が重複')
     seen.add(ch)
-    if ch not in target_set: errors.append(f'{ln}行: {ch} は小{grade}の配当漢字でない')
+    if ch not in target_set: errors.append(f'{ln}行: {ch} は{L}の字でない')
     qlist = [q.strip() for q in qs.split(';') if q.strip()]
     # 末尾の ※ は「同じ読みの別の熟語もあるが、文の意味で答えが決まることを目で確認した」しるし
     if len(qlist) < 3: warns.append(f'{ch}: 問題が{len(qlist)}問')
@@ -67,7 +72,7 @@ for ln, line in enumerate(open(os.path.join(ROOT, f'data/src/g{grade}.txt')), 1)
                 toks.append({'b': c, 'r': r})
             elif m.group(3) is not None:
                 c, r = m.group(3), m.group(4)
-                if any(x not in known for x in c): errors.append(f'{ch}: 「{q}」の [{c}] に小{grade}までに習わない字がある')
+                if any(x not in known for x in c): errors.append(f'{ch}: 「{q}」の [{c}] に{L}までに習わない字がある')
                 if not HIRA.match(r or ''): errors.append(f'{ch}: 「{q}」の [{c}] の読み「{r}」がひらがなでない')
                 toks.append({'k': c, 'r': r})
             else:
@@ -107,7 +112,7 @@ for ln, line in enumerate(open(os.path.join(ROOT, f'data/src/g{grade}.txt')), 1)
     for m in TOK.finditer(mean):
         if m.group(3) is not None:
             c, r = m.group(3), m.group(4)
-            if any(x not in known for x in c): errors.append(f'{ch}: 意味の [{c}] に小{grade}までに習わない字がある')
+            if any(x not in known for x in c): errors.append(f'{ch}: 意味の [{c}] に{L}までに習わない字がある')
             if not HIRA.match(r or ''): errors.append(f'{ch}: 意味の [{c}] の読み「{r}」がひらがなでない')
             mtoks.append({'k': c, 'r': r})
         elif m.group(1) is not None:
@@ -120,7 +125,7 @@ for ln, line in enumerate(open(os.path.join(ROOT, f'data/src/g{grade}.txt')), 1)
                      'meaning': plain_mean, 'meaningTokens': mtoks, 'words': list(dict.fromkeys(words_of_ch))}
 missing = [c for c in target_set if c not in seen]
 if missing: errors.append('配当漢字の抜け: ' + ''.join(missing))
-print(f'小{grade}: {len(out_kanji)}字 / {len(out_q)}問（熟語を含む文 {sum(q["type"]=="word" for q in out_q)}・そのほかの文 {sum(q["type"]=="sentence" for q in out_q)}）')
+print(f'{L}: {len(out_kanji)}字 / {len(out_q)}問（熟語を含む文 {sum(q["type"]=="word" for q in out_q)}・そのほかの文 {sum(q["type"]=="sentence" for q in out_q)}）')
 nontext = [q['id'] for q in out_q if all('t' not in t for t in q['tokens'])]
 if nontext: errors.append('文になっていない問題: ' + ' '.join(nontext))
 for w in warns: print('確認:', w)
