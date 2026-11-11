@@ -64,7 +64,7 @@
       if (!(n0 < refLen + 2 && n0 > refLen - 3)) continue;
       // 登録した手本は正しい画数で書かれているので、同じ画数の入力とだけ比べる
       // （王4画の手本が玉5画を、大3画の手本が犬4画を引き寄せるのを防ぐ。tools/crossround.js の結果）
-      if (ref[3] === 'user' && userStrict && refLen !== n0) continue;
+      if ((ref[3] === 'user' || ref[3] === 'kvg') && userStrict && refLen !== n0) continue;
       var map = KC.getMap(ref[2], input, KC.initialDistance);
       map = KC.completeMap(ref[2], input, KC.wholeWholeDistance, map);
       var d = KC.computeWholeDistanceWeighted(ref[2], input, map);
@@ -141,21 +141,31 @@
    *  extras:   手書きで登録した手本（字ごとに複数可）
    *  replaced: 元の手本が壊れているため、登録した手本があれば元を使わない字
    */
-  var base = null, extras = [], candidateSet = null, useExtras = true;
+  var base = null, extras = [], kvgRefs = [], candidateSet = null, useExtras = true, useKvg = true;
   var replaced = {};
   function rebuild() {
     if (!base) base = KC.refPatterns;
-    var extraChars = {};
-    if (useExtras) extras.forEach(function (p) { extraChars[p[0]] = true; });
+    var covered = {};
+    if (useExtras) extras.forEach(function (p) { covered[p[0]] = true; });
+    if (useKvg) kvgRefs.forEach(function (p) { covered[p[0]] = true; });
+    var inSet = function (p) { return !candidateSet || candidateSet[p[0]]; };
     var list = base.filter(function (p) {
-      if (candidateSet && !candidateSet[p[0]]) return false;
-      if (useExtras && replaced[p[0]] && extraChars[p[0]]) return false;
+      if (!inSet(p)) return false;
+      if (replaced[p[0]] && covered[p[0]]) return false;
       return true;
     });
-    if (useExtras) list = list.concat(extras.filter(function (p) { return !candidateSet || candidateSet[p[0]]; }));
+    if (useKvg) list = list.concat(kvgRefs.filter(inSet));
+    if (useExtras) list = list.concat(extras.filter(inSet));
     KC.refPatterns = list;
     return list.length;
   }
+  // KanjiVG から作った手本（[字, 画数, 特徴量] の配列）
+  function setKvgRefs(list) {
+    kvgRefs = list.map(function (p) { return [p[0], p[1], p[2], 'kvg']; });
+    rebuild();
+    return kvgRefs.length;
+  }
+  function setUseKvg(v) { useKvg = !!v; rebuild(); }
   // 認識対象の文字を絞り込む（例：常用漢字のみ）。null で全パターンに戻す。
   function setCandidateSet(chars) {
     if (!base) base = KC.refPatterns;
@@ -178,7 +188,8 @@
     recognize: recognize, judge: judge, resample: resample, features: features,
     setCandidateSet: setCandidateSet, setStrokePenalty: setStrokePenalty, setUserWeight: setUserWeight, setUserStrict: setUserStrict,
     makePattern: makePattern, addPatterns: addPatterns, clearPatterns: clearPatterns,
-    setExtras: setExtras, setUseExtras: setUseExtras, setReplaced: setReplaced
+    setExtras: setExtras, setUseExtras: setUseExtras, setReplaced: setReplaced,
+    setKvgRefs: setKvgRefs, setUseKvg: setUseKvg
   };
   root.PopKanjiRecognizer = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

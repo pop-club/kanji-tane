@@ -167,7 +167,7 @@ footer a { color: var(--accent); }
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" id="tab-test" aria-selected="true">検証テスト（30字）</button>
     <button class="tab" role="tab" id="tab-free" aria-selected="false">自由に書く</button>
-    <button class="tab" role="tab" id="tab-reg" aria-selected="false">手本を登録</button>
+    <button class="tab" role="tab" id="tab-reg" aria-selected="false">手本を登録（任意）</button>
   </div>
 
   <div class="main">
@@ -248,7 +248,8 @@ footer a { color: var(--accent); }
           <dt>画面</dt><dd id="eScreen">—</dd>
         </dl>
         <label class="toggle"><input type="checkbox" id="palm" checked> ペンを使ったら指のタッチを無視する（手のひら対策）</label>
-        <label class="toggle"><input type="checkbox" id="useExtras" checked> 登録した手本を判定に使う</label>
+        <label class="toggle"><input type="checkbox" id="useKvg" checked> KanjiVGの手本を判定に使う（小1〜小6）</label>
+        <label class="toggle"><input type="checkbox" id="useExtras" checked> 手書きで登録した手本を判定に使う</label>
       </div>
 
       <div class="card">
@@ -265,7 +266,9 @@ footer a { color: var(--accent); }
   </div>
 
   <footer>
-    手書き認識: <a href="http://github.com/asdfjkl/kanjicanvas" target="_blank" rel="noopener">KanjiCanvas</a> © 2019-2024 Dominik Klein, © 2020 Seth Clydesdale (MIT License)。画数: kanji-data (MIT)。認識はすべてこの端末のブラウザ内で行います。
+    手書き認識: <a href="http://github.com/asdfjkl/kanjicanvas" target="_blank" rel="noopener">KanjiCanvas</a> © 2019-2024 Dominik Klein, © 2020 Seth Clydesdale (MIT License)。
+    認識用の手本（小1〜小6）: <a href="https://kanjivg.tagaini.net/" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel の筆画データから作成（<a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a>）。
+    画数: kanji-data (MIT)。認識はすべてこの端末のブラウザ内で行います。
   </footer>
 </div>
 
@@ -279,10 +282,11 @@ footer a { color: var(--accent); }
   'use strict';
   // 検証用30字：指示書の似た字ペア + 追加の似た字 + 参照データに問題がある「衛」
   var TEST = '土士末未右石待持晴清味日目王玉大犬千干牛午矢失休体力刀問間衛'.split('');
-  // 手本を登録してほしい字：実際の手書きで誤認識した字（2回分の記録より）+ 元の手本の画数が違う17字
+  // 認識しにくかった字：実際の手書きで誤認識した字（2回分の記録より）+ 元の手本の画数が違う17字
+  // 主な手本は KanjiVG から作った手本（vendor/kanjivg-refs）。手書きの登録は任意の補助
   var PRIORITY = '王玉右午日衛臨熟数歌社馬鳥鳴島進駅健散験慣敬'.split('');
-  // 元の手本が使えないほど壊れている字。登録した手本があれば元の手本を使わない
-  var REPLACED = '衛臨熟';
+  // 元の手本（KanjiCanvas）の画数が違う字。KanjiVG の手本か登録した手本があれば、元の手本を使わない
+  var REPLACED = '衛臨熟数歌社馬鳥鳴島進駅健散験慣敬';
   var BROKEN = '衛臨熟数歌社馬鳥鳴島進駅健散験慣敬';
   var GOAL = 3;
   var STORE = 'popkanji-step1-log', SSTORE = 'popkanji-step1-samples';
@@ -318,7 +322,7 @@ footer a { color: var(--accent); }
   }
 
   // ---------- 手本 ----------
-  var baseCount = 0;
+  var baseCount = 0, kvgCount = 0;
   function applyExtras() {
     var list = [];
     BUNDLED.concat(state.samples).forEach(function (s) {
@@ -330,8 +334,9 @@ footer a { color: var(--accent); }
   function renderStatus() {
     if (!state.loaded) return;
     var n = BUNDLED.length + state.samples.length;
-    $('status').innerHTML = '認識対象 <b>' + baseCount + '</b> 字（常用漢字）・登録した手本 <b>' + n + '</b> 件' +
-      ($('useExtras').checked ? '' : '（使っていません）');
+    $('status').innerHTML = '認識対象 <b>' + baseCount + '</b> 字（常用漢字）・KanjiVGの手本 <b>' + kvgCount + '</b> 件' +
+      ($('useKvg').checked ? '' : '（使っていません）') +
+      (n ? '・登録した手本 <b>' + n + '</b> 件' + ($('useExtras').checked ? '' : '（使っていません）') : '');
   }
   function countFor(ch) {
     var n = 0;
@@ -345,15 +350,24 @@ footer a { color: var(--accent); }
   var s = document.createElement('script');
   s.src = 'vendor/kanjicanvas/ref-patterns.js';
   s.onload = function () {
+    var s2 = document.createElement('script');
+    s2.src = 'vendor/kanjivg-refs/kvg-refs.js';
+    s2.onload = function () { start(true); };
+    s2.onerror = function () { start(false); };
+    document.body.appendChild(s2);
+  };
+  function start(kvgOk) {
     var ms = performance.now() - t0;
     baseCount = R.setCandidateSet(window.JOYO_KANJI);
+    if (kvgOk && window.POPKANJI_KVG_REFS) kvgCount = R.setKvgRefs(window.POPKANJI_KVG_REFS);
+    else $('useKvg').disabled = true;
     R.setReplaced(REPLACED);
     state.loaded = true;
     applyExtras();
     $('loading').remove();
-    $('eLoad').textContent = (ms / 1000).toFixed(1) + ' 秒（約6.7MB）';
+    $('eLoad').textContent = (ms / 1000).toFixed(1) + ' 秒（約10MB）';
     renderNet();
-  };
+  }
   s.onerror = function () { $('loading').textContent = '認識データを読み込めませんでした。ページを再読み込みしてください。'; };
   document.body.appendChild(s);
 
@@ -481,6 +495,7 @@ footer a { color: var(--accent); }
         top: cands.slice(0, 5).map(function (c) { return c.char + ':' + c.score.toFixed(1); }).join(' '),
         ms: Math.round(ms), input: inputTypes(), box: Math.round(size),
         extras: $('useExtras').checked ? BUNDLED.length + state.samples.length : 0,
+        kvg: $('useKvg').checked ? kvgCount : 0,
         strokes: strokes256(), at: new Date().toISOString()
       });
       save(); renderLog();
@@ -531,7 +546,7 @@ footer a { color: var(--accent); }
     if (k >= GOAL && state.mode === 'reg') {
       var nxt = PRIORITY.filter(function (c) { return countFor(c) < GOAL; })[0];
       if (nxt && PRIORITY.indexOf(ch) >= 0) { nextMsg = '「' + ch + '」はそろいました。次は「' + nxt + '」です。'; state.regChar = nxt; }
-      else if (!nxt) nextMsg = '登録してほしい字はすべてそろいました。ありがとうございます。';
+      else if (!nxt) nextMsg = '一覧の字はすべてそろいました。';
     }
     regMsg('correct', '登録しました（' + Math.min(k, 99) + ' / ' + GOAL + '）', was + nextMsg + (storageOk ? '' : ' ※この端末に保存できませんでした。ページを閉じる前にコピーしてください。'));
     renderReg(); renderPrompt(); renderExport();
@@ -584,7 +599,7 @@ footer a { color: var(--accent); }
       b.onclick = function () { pickChar(k); };
       chips.appendChild(b);
     });
-    $('regSummary').innerHTML = '登録してほしい ' + PRIORITY.length + ' 字のうち <b>' + done + '</b> 字がそろいました（1字につき ' + GOAL + ' つ）';
+    $('regSummary').innerHTML = '認識しにくかった ' + PRIORITY.length + ' 字のうち <b>' + done + '</b> 字に手本があります（1字につき ' + GOAL + ' つ）。主な手本は KanjiVG から作成済みなので、登録は任意です';
     $('regMeter').style.width = (100 * done / PRIORITY.length) + '%';
   }
   function pickChar(k) {
@@ -663,6 +678,7 @@ footer a { color: var(--accent); }
   $('tab-free').onclick = function () { setMode('free'); };
   $('tab-reg').onclick = function () { setMode('reg'); };
   $('useExtras').onchange = function () { R.setUseExtras(this.checked); renderStatus(); };
+  $('useKvg').onchange = function () { R.setUseKvg(this.checked); renderStatus(); };
 
   $('copy').onclick = function () {
     var box = $('exportBox');

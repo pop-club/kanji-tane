@@ -10,6 +10,7 @@ js/joyo.js                 常用漢字2136字（認識対象の絞り込み用�
 js/stroke-counts.js        常用漢字の標準画数（kanji-data, MIT）。手本登録の画数チェックに使う
 js/extra-samples.js        手書きで登録した手本（同梱分）。tools/import_samples.js で生成
 vendor/kanjicanvas/        KanjiCanvas 本体・参照パターン・ライセンス（MIT）
+vendor/kanjivg-refs/       KanjiVG から作った認識用の手本（小1〜小6 1026字×5）・ライセンス（CC BY-SA 3.0）
 data/grade-kanji.json      学年別漢字配当表（2020年度施行）小1〜小6 1026字
 data/joyo-kanji.txt        常用漢字一覧
 tools/eval.js              小1〜小6 全1026字の認識精度テスト（grade:1〜grade:6）
@@ -20,6 +21,9 @@ tools/penalty_test.js      画数差の上乗せ量の比較（手書き記録�
 tools/augment_test.js      手書きの手本を追加したときの効果と副作用
 tools/import_samples.js    検証ページの「記録と手本」を取り込み、同梱の手本を作り直す
 tools/crossround.js        本人の手書きを手本にした効果を、回をまたいで確かめる
+tools/build_kvg_refs.js    KanjiVG から認識用の手本を作る（vendor/kanjivg-refs/kvg-refs.js）
+tools/kvg_refs_eval.js     KanjiVG の手本を、実際の手書き記録で評価する
+tools/kvg_refs_test.js     KanjiVG の手本の作り方（字数・数）の比較
 data/user-samples/         検証ページから集めた実際の手書き記録
 results/                   テスト結果（JSON）
 ```
@@ -52,7 +56,8 @@ cd build && python3 -m http.server 8000
   参照パターンは作者が jTegaki で手書きしたもので、他のデータセット由来ではない。
 - **常用漢字リスト**: joyo-kanji (npm, MIT)
 - **学年別漢字配当表**: 文部科学省（2020年度施行版）。kanji-data (npm, MIT) の旧配当表に、群馬県資料の2020年改訂の移動字一覧を適用して作成し、各学年の字数（80/160/200/202/193/191、計1026）を照合済み。
-- **KanjiVG**（CC BY-SA 3.0）はテストデータの作成にのみ使用し、アプリには含めない。
+- **KanjiVG**（© Ulrich Apel, CC BY-SA 3.0）: 筆画データから認識用の手本 `vendor/kanjivg-refs/kvg-refs.js` を作成して同梱。
+  このファイルは CC BY-SA 3.0 で提供する（出典表示は画面下とファイル先頭）。アプリ本体は CC BY-SA の対象外（CC BY-SA 3.0 第4条(b)）。
 
 ## 参照パターンの不備（要修正）
 
@@ -89,3 +94,19 @@ cd build && python3 -m http.server 8000
 正しく書いた似た字の正解率は 93.1%→98.3% に上がった。
 
 2回とも誤認識した字：右→石、午→牛。新しく出た誤認識：日→田（横長に書いた日）。
+
+## KanjiVG から作った手本（2026-11-11 採用）
+
+手書きの手本は人によって癖が違うため、1人分の登録では一般化しにくい。そこで KanjiVG の筆画データから、
+1字につき「元の形1つ＋形を少し崩した4つ」の手本を、小1〜小6の1026字すべてに作った（5130件、約3.3MB）。
+手本は同じ画数の入力とだけ比べる。元の手本（KanjiCanvas）は、画数が違う17字だけ使わず、それ以外は残す
+（画をつなげて書いた字を拾うため）。
+
+実際の手書き記録（PC・マウス 2回 66件）での評価。合成データは KanjiVG 由来なので評価に使わない。
+
+| | 手本なし | KanjiVG手本あり（1字5つ、乱数3通りの平均） |
+|---|---|---|
+| 画数どおりに書いた59件 | 正解46・書き直し9・不正解4 | 正解55.3・書き直し3.3・不正解0.3 |
+| 似た字の答えとして判定（取り違えて正解にした件数） | 7 / 66 | 3 / 66（うち1件は本当に「玉」を書いた記録） |
+
+1字3つより5つのほうが平均で少し良い（正解54.3→55.3、不正解1.3→0.3）。認識時間は1字20ms前後。
