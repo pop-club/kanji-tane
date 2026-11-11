@@ -1,12 +1,12 @@
 /*
- * Pop-Kanji 学習データの保存（IndexedDB・この端末の中だけ）
+ * かんじのたね 学習データの保存（IndexedDB・この端末の中だけ）
  *  kanji:    字ごとの習熟度 { char, grade, status, correct, wrong, streak, recogErr, lastAt, reviewAt, history[] }
  *  sessions: テストの記録 { id, at, mode, grade, items[] }
  * IndexedDB が使えないときは、ページを開いている間だけメモリに保存する。
  */
 (function (root) {
   'use strict';
-  var DB = 'popkanji', VER = 1, db = null;
+  var DB = 'popkanji', VER = 1, db = null;   // 旧名 Pop-Kanji のまま（名前を変えると保存済みの記録が読めなくなるため）
   var kanji = {}, sessions = [];
   var persistent = false;
 
@@ -78,11 +78,11 @@
     sessions: function () { return sessions; },
     addSession: function (s) { sessions.push(s); return write('sessions', s); },
     exportData: function () {
-      return { app: 'Pop-Kanji', version: 1, exportedAt: new Date().toISOString(),
+      return { app: 'kanji-tane', version: 1, exportedAt: new Date().toISOString(),
         kanji: Object.keys(kanji).map(function (k) { return kanji[k]; }), sessions: sessions };
     },
     importData: function (data) {
-      if (!data || data.app !== 'Pop-Kanji' || !Array.isArray(data.kanji)) return Promise.reject(new Error('Pop-Kanji のデータではありません'));
+      if (!data || (data.app !== 'kanji-tane' && data.app !== 'Pop-Kanji') || !Array.isArray(data.kanji)) return Promise.reject(new Error('かんじのたね のデータではありません'));
       return Store.reset().then(function () {
         var jobs = [];
         data.kanji.forEach(function (k) { if (k && k.char) { kanji[k.char] = k; jobs.push(write('kanji', k)); } });

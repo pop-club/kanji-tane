@@ -1,4 +1,8 @@
-# Pop-Kanji — STEP 1 手書き認識 技術検証
+# かんじのたね（旧名 Pop-Kanji）
+
+小学生が手書きで答える漢字テスト。まちがえた字は「にがてリスト」に入り、練習プリントを印刷できる。通信なしで端末の中だけで動く。
+
+## STEP 1 手書き認識 技術検証
 
 ## 学習アプリ（STEP 2〜3、小1から）
 
@@ -132,4 +136,4 @@ cd build && python3 -m http.server 8000
 ## 公開（GitHub Pages）
 
 `./build.sh` で `docs/` に公開用ファイルを書き出し、GitHub の Settings → Pages で
-「Deploy from a branch」→ `main` / `/docs` を選ぶと、https://pop-club.github.io/pop-kanji/ で開ける。
+「Deploy from a branch」→ `main` / `/docs` を選ぶと、https://pop-club.github.io/kanji-tane/ で開ける。

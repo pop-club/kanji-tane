@@ -1,5 +1,5 @@
 /*
- * Pop-Kanji 学習アプリ
+ * かんじのたね 学習アプリ
  * 画面: #home #grade #test #result #weak #print #data #about
  * 習得のきまり（指示書 7章）:
  *   はじめて正解 → おぼえかけ / まちがい → にがて / 2回つづけて正解 → おぼえた（1週間後に再確認）
@@ -448,7 +448,7 @@
           for (var c = 0; c < 5; c++) cells += '<span class="sh-cell">' + ((answer || trace) && c === 0 ? esc(row.ch) : '') + '</span>';
           return '<div class="sh-row"><span class="sh-no">' + (startNo + k + 1) + '.</span><span class="sh-q qline">' + sheetQ(row.q, answer) + '</span><span class="sh-grid">' + cells + '</span></div>';
         }).join('') +
-        '<div class="sh-foot"><span>Pop-Kanji ・ ' + esc(grades) + '</span><span>' + pageNo + ' / ' + total + '</span></div></div></div>';
+        '<div class="sh-foot"><span>かんじのたね ・ ' + esc(grades) + '</span><span>' + pageNo + ' / ' + total + '</span></div></div></div>';
     }
     var html = '';
     pages.forEach(function (p, i) { html += sheet(p, i * ROWS, false); });
@@ -471,7 +471,7 @@
       var blob = new Blob([JSON.stringify(Store.exportData())], { type: 'application/json' });
       var a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'pop-kanji-' + new Date().toISOString().slice(0, 10) + '.json';
+      a.download = 'kanji-tane-' + new Date().toISOString().slice(0, 10) + '.json';
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
       $('dMsg').textContent = '書き出しました。';
@@ -482,9 +482,9 @@
     var rd = new FileReader();
     rd.onload = function () {
       var data;
-      try { data = JSON.parse(rd.result); } catch (e) { $('dMsg').textContent = 'ファイルを読めませんでした。Pop-Kanji で書き出したファイルを選んでください。'; return; }
+      try { data = JSON.parse(rd.result); } catch (e) { $('dMsg').textContent = 'ファイルを読めませんでした。かんじのたね で書き出したファイルを選んでください。'; return; }
       Store.importData(data).then(function () { selected = null; $('dMsg').textContent = '読み込みました。'; renderData(); },
-        function (e) { $('dMsg').textContent = e.message + '。Pop-Kanji で書き出したファイルを選んでください。'; });
+        function (e) { $('dMsg').textContent = e.message + '。かんじのたね で書き出したファイルを選んでください。'; });
     };
     rd.readAsText(f);
     this.value = '';

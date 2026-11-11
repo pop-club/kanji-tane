@@ -1,4 +1,4 @@
-<title>Pop-Kanji 認識テスト</title>
+<title>かんじのたね 読み取り検証</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* Layout: 横向き＝左に大きな正方形の書き取り枠、右に判定と記録。縦向き・スマホ＝縦に積む */
@@ -160,7 +160,7 @@ footer a { color: var(--accent); }
 
 <div class="app">
   <header>
-    <h1>Pop-Kanji 認識テスト<small>STEP 1 技術検証版</small></h1>
+    <h1>かんじのたね 読み取り検証<small>STEP 1 技術検証版</small></h1>
     <div class="status" id="status">参照データを読み込み中…</div>
   </header>
 
@@ -657,7 +657,7 @@ footer a { color: var(--accent); }
     var summary = { correct: 0, retry: 0, wrong: 0 };
     state.log.forEach(function (r) { summary[r.result]++; });
     $('exportBox').value = (n || m) ? JSON.stringify({
-      app: 'Pop-Kanji STEP1', ua: navigator.userAgent, screen: [screen.width, screen.height, window.devicePixelRatio],
+      app: 'kanji-tane STEP1', ua: navigator.userAgent, screen: [screen.width, screen.height, window.devicePixelRatio],
       summary: summary, log: state.log, samples: state.samples
     }) : '';
     $('copy').disabled = !(n || m);

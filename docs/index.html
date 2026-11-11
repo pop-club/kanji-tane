@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Pop-Kanji</title>
+<title>かんじのたね</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="手書きで答える小学生の漢字テスト。まちがえた字は練習プリントにして印刷できます。通信なしで端末の中だけで動きます。">
 <style>
@@ -60,7 +60,7 @@ a { color: var(--sky); }
 /* ヘッダー */
 .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; min-height: 52px; }
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
-.brand .mark { width: 40px; height: 40px; border-radius: 12px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-family: var(--font-kanji); font-size: 1.6rem; line-height: 1; }
+.brand .mark { width: 40px; height: 40px; border-radius: 12px; background: var(--ok); color: var(--surface); display: grid; place-items: center; flex: none; }
 .brand b { font-size: 1.3rem; letter-spacing: .02em; }
 .back { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; }
 .loadstate { font-size: .8rem; color: var(--muted); }
@@ -238,7 +238,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
 
 <div class="app">
   <header class="top">
-    <a class="brand" href="#home" aria-label="Pop-Kanji ホームへ"><span class="mark">字</span><b>Pop-Kanji</b></a>
+    <a class="brand" href="#home" aria-label="かんじのたね ホームへ"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26"><path d="M12 21V11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/><path d="M12 12C12 7 8.5 4.5 4 5c0 4.5 3 7.5 8 7z" fill="currentColor"/><path d="M12 10.5c0-4 3-6.5 8-6.5 0 4-3 6.8-8 6.5z" fill="currentColor" opacity=".8"/></svg></span><b>かんじのたね</b></a>
     <span class="loadstate" id="loadstate">よみとりの じゅんびちゅう…</span>
   </header>
 
@@ -381,7 +381,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
   <section id="v-about" class="view" hidden>
     <div class="card prose">
       <div class="row" style="justify-content:space-between"><h1>このアプリについて</h1><a class="back" href="#home" role="button" style="display:inline-flex;align-items:center;text-decoration:none;color:inherit">もどる</a></div>
-      <p>Pop-Kanji は、小学生が手書きで答える漢字テストです。まちがえた字は「にがてリスト」に入り、練習プリントを作って印刷できます。</p>
+      <p>かんじのたね は、小学生が手書きで答える漢字テストです。まちがえた字は「にがてリスト」に入り、練習プリントを作って印刷できます。</p>
       <h2>プライバシー</h2>
       <ul>
         <li>手書きの文字の読み取りは、すべてこの端末の中で行います。手書きの文字や学習の記録を、外部に送ることはありません。</li>
