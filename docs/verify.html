@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pop-Kanji 認識テスト</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: 横向き＝左に大きな正方形の書き取り枠、右に判定と記録。縦向き・スマホ＝縦に積む */
+:root {
+  --bg: #f6f8fb;
+  --surface: #ffffff;
+  --ink: #1f2a37;
+  --muted: #5b6878;
+  --line: #d9e0ea;
+  --accent: #2f6fed;      /* 操作ボタン */
+  --accent-ink: #ffffff;
+  --grid: #c9d3e1;        /* 書き取り枠の補助線 */
+  --stroke: #1f2a37;      /* 筆跡 */
+  --ok: #1f8a4c;
+  --ok-bg: #e4f5ea;
+  --retry: #a35f00;
+  --retry-bg: #fff1d6;
+  --ng: #c23434;
+  --ng-bg: #fde7e7;
+  --font-ui: "Hiragino Maru Gothic ProN", "Hiragino Sans", "BIZ UDPGothic", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+  --font-kanji: "Hiragino Mincho ProN", "Yu Mincho", "BIZ UDPMincho", "Noto Serif JP", serif;
+  --font-data: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121820; --surface: #1b232e; --ink: #e8edf4; --muted: #9aa8b8; --line: #2c3746;
+    --accent: #6b9bff; --accent-ink: #0d1520; --grid: #34465c; --stroke: #f2f5f9;
+    --ok: #5fd08f; --ok-bg: #173325; --retry: #f2b24d; --retry-bg: #3a2b12; --ng: #ff8080; --ng-bg: #3d1c1c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121820; --surface: #1b232e; --ink: #e8edf4; --muted: #9aa8b8; --line: #2c3746;
+  --accent: #6b9bff; --accent-ink: #0d1520; --grid: #34465c; --stroke: #f2f5f9;
+  --ok: #5fd08f; --ok-bg: #173325; --retry: #f2b24d; --retry-bg: #3a2b12; --ng: #ff8080; --ng-bg: #3d1c1c;
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+html, body { overscroll-behavior: none; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-ui); font-size: 15px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 12px 32px;
+  -webkit-text-size-adjust: 100%;
+}
+button { font: inherit; }
+.app { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+h1 { font-size: 1.35rem; margin: 0; letter-spacing: .02em; text-wrap: balance; }
+h1 small { font-size: .8rem; color: var(--muted); font-weight: 500; margin-left: 8px; }
+.status { font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.status b { color: var(--ink); font-weight: 600; }
+
+.tabs { display: flex; gap: 6px; }
+.tab { border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 8px 16px; border-radius: 999px; cursor: pointer; min-height: 44px; }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+.main { display: grid; grid-template-columns: minmax(0, min(68vh, 620px)) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 860px), (orientation: portrait) { .main { grid-template-columns: minmax(0, 1fr); } }
+
+.writer { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+.prompt { display: flex; align-items: center; gap: 14px; min-height: 64px; }
+.prompt .target { font-family: var(--font-kanji); font-size: 2.6rem; line-height: 1; width: 64px; height: 64px; display: grid; place-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+.prompt .text { min-width: 0; }
+.prompt .text b { font-size: 1.05rem; }
+.prompt .text div { color: var(--muted); font-size: .85rem; }
+
+.pad {
+  position: relative; width: 100%; aspect-ratio: 1; max-width: 100%;
+  background: var(--surface); border: 2px solid var(--line); border-radius: var(--r);
+  touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
+@media (max-width: 860px), (orientation: portrait) { .pad, .controls { width: min(100%, 56vh, 620px); justify-self: center; } .writer { align-items: center; } .prompt { align-self: stretch; } }
+.pad canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; border-radius: var(--r); touch-action: none; }
+.pad .hint { position: absolute; left: 0; right: 0; bottom: 10px; text-align: center; color: var(--muted); font-size: .85rem; pointer-events: none; }
+
+.controls { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 10px; width: 100%; }
+.btn { min-height: 56px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-size: 1rem; font-weight: 600; cursor: pointer; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn:focus-visible, .tab:focus-visible, .chip:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.panel { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card h2 { font-size: .8rem; letter-spacing: .08em; color: var(--muted); margin: 0; font-weight: 600; }
+
+.verdict { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; font-weight: 600; }
+.verdict .big { font-size: 1.3rem; }
+.verdict.correct { background: var(--ok-bg); color: var(--ok); }
+.verdict.retry { background: var(--retry-bg); color: var(--retry); }
+.verdict.wrong { background: var(--ng-bg); color: var(--ng); }
+.verdict.idle { background: var(--bg); color: var(--muted); font-weight: 500; }
+.verdict .detail { font-weight: 500; font-size: .85rem; color: var(--ink); }
+
+.cands { display: flex; flex-wrap: wrap; gap: 6px; }
+.cand { display: flex; flex-direction: column; align-items: center; min-width: 52px; padding: 6px 4px 4px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
+.cand .k { font-family: var(--font-kanji); font-size: 1.7rem; line-height: 1.1; }
+.cand .s { font-family: var(--font-data); font-size: .68rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cand.hit { border-color: var(--ok); background: var(--ok-bg); }
+.cand.first .k { font-weight: 700; }
+
+.next-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.next-row .btn { flex: 1 1 140px; min-height: 48px; }
+
+.chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 6px; }
+.chip { height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font-family: var(--font-kanji); font-size: 1.35rem; cursor: pointer; position: relative; }
+.chip.cur { outline: 2px solid var(--accent); outline-offset: 1px; }
+.chip.correct { background: var(--ok-bg); border-color: var(--ok); }
+.chip.retry { background: var(--retry-bg); border-color: var(--retry); }
+.chip.wrong { background: var(--ng-bg); border-color: var(--ng); }
+.chip .n { position: absolute; right: 3px; top: 1px; font-family: var(--font-data); font-size: .6rem; color: var(--muted); }
+
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; text-align: center; }
+.stats div { background: var(--bg); border-radius: 10px; padding: 8px 4px; }
+.stats b { display: block; font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+.stats span { font-size: .72rem; color: var(--muted); }
+
+dl.env { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 12px; margin: 0; font-size: .85rem; }
+dl.env dt { color: var(--muted); }
+dl.env dd { margin: 0; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.netok { color: var(--ok); font-weight: 600; }
+.netng { color: var(--ng); font-weight: 600; }
+
+textarea { width: 100%; min-height: 110px; font-family: var(--font-data); font-size: .72rem; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); padding: 8px; box-sizing: border-box; resize: vertical; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.row .btn { min-height: 44px; padding: 0 16px; font-size: .9rem; }
+.note { font-size: .8rem; color: var(--muted); margin: 0; }
+label.toggle { display: flex; align-items: center; gap: 8px; font-size: .85rem; min-height: 32px; }
+label.toggle input { width: 20px; height: 20px; }
+footer { font-size: .78rem; color: var(--muted); }
+footer a { color: var(--accent); }
+.loading { position: absolute; inset: 0; display: grid; place-items: center; background: var(--surface); border-radius: var(--r); color: var(--muted); z-index: 2; }
+</style>
+</head>
+<body>
+<style>
+.tabs { flex-wrap: wrap; }
+.chip .n { font-size: .58rem; }
+.chip.done { background: var(--ok-bg); border-color: var(--ok); }
+.chip.partial { background: var(--retry-bg); border-color: var(--retry); }
+.chip.broken::after { content: ""; position: absolute; left: 4px; top: 4px; width: 6px; height: 6px; border-radius: 50%; background: var(--ng); }
+.samples { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 8px; }
+.sample { position: relative; aspect-ratio: 1; max-width: 100%; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
+.sample canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.sample .del { position: absolute; right: 4px; top: 4px; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ng); font-weight: 700; cursor: pointer; line-height: 1; }
+.sample .del:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+.empty { font-size: .85rem; color: var(--muted); padding: 10px 0; }
+.pick { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.pick input { width: 64px; height: 44px; font-family: var(--font-kanji); font-size: 1.4rem; text-align: center; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); }
+.pick .btn { min-height: 44px; padding: 0 16px; font-size: .9rem; }
+.meter { height: 8px; border-radius: 99px; background: var(--bg); overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--ok); width: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .75rem; color: var(--muted); }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; border: 1px solid var(--line); }
+.legend .l-done::before { background: var(--ok-bg); border-color: var(--ok); }
+.legend .l-part::before { background: var(--retry-bg); border-color: var(--retry); }
+.legend .l-broken::before { background: var(--ng); border-color: var(--ng); border-radius: 50%; width: 6px; height: 6px; }
+</style>
+
+<div class="app">
+  <header>
+    <h1>Pop-Kanji 認識テスト<small>STEP 1 技術検証版</small></h1>
+    <div class="status" id="status">参照データを読み込み中…</div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-test" aria-selected="true">検証テスト（30字）</button>
+    <button class="tab" role="tab" id="tab-free" aria-selected="false">自由に書く</button>
+    <button class="tab" role="tab" id="tab-reg" aria-selected="false">手本を登録（任意）</button>
+  </div>
+
+  <div class="main">
+    <section class="writer">
+      <div class="prompt">
+        <div class="target" id="target">土</div>
+        <div class="text">
+          <b id="promptText">この字を書いてください</b>
+          <div id="promptSub">1 / 30 ・ 書き順は自由です</div>
+        </div>
+      </div>
+      <div class="pad" id="pad">
+        <canvas id="ink" aria-label="手書き入力欄"></canvas>
+        <div class="hint" id="hint">ここに指・ペンで書きます</div>
+        <div class="loading" id="loading">認識データを読み込み中…</div>
+      </div>
+      <div class="controls">
+        <button class="btn" id="undo">1画もどす</button>
+        <button class="btn" id="clear">ぜんぶけす</button>
+        <button class="btn primary" id="judge">はんてい</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="card" id="verdictCard">
+        <h2>判定</h2>
+        <div class="verdict idle" id="verdict"><span>書いたら「はんてい」を押してください</span></div>
+        <div class="cands" id="cands"></div>
+        <div class="next-row" id="nextRow" hidden>
+          <button class="btn" id="again">もう一度書く</button>
+          <button class="btn primary" id="next">次の字へ</button>
+        </div>
+      </div>
+
+      <div class="card" id="regCard" hidden>
+        <h2>手本の登録</h2>
+        <div class="verdict idle" id="regMsg"><span>画数どおりに、ていねいに書いて「手本に登録」を押してください</span></div>
+        <div id="regList"></div>
+        <p class="note" id="regBundled"></p>
+      </div>
+
+      <div class="card" id="regPickCard" hidden>
+        <h2>登録する字</h2>
+        <div class="meter" aria-hidden="true"><i id="regMeter"></i></div>
+        <div class="status" id="regSummary"></div>
+        <div class="chips" id="regChips"></div>
+        <div class="legend">
+          <span class="l-done">3つ登録済み</span><span class="l-part">登録途中</span><span class="l-broken">元の手本に不具合がある字</span>
+        </div>
+        <div class="pick">
+          <label for="pickChar" class="note">ほかの字:</label>
+          <input id="pickChar" maxlength="2" autocomplete="off" aria-label="登録する字を1字入力">
+          <button class="btn" id="pickBtn">この字にする</button>
+          <span class="note" id="pickMsg"></span>
+        </div>
+      </div>
+
+      <div class="card" id="progressCard">
+        <h2>検証の記録</h2>
+        <div class="stats">
+          <div><b id="sN">0</b><span>判定回数</span></div>
+          <div><b id="sOk">0</b><span>正解</span></div>
+          <div><b id="sRe">0</b><span>書き直し</span></div>
+          <div><b id="sNg">0</b><span>不正解</span></div>
+        </div>
+        <div class="chips" id="chips"></div>
+        <p class="note">字をタップするとその字に移動します。正しく書いたのに「不正解」になった字が、報告してほしい誤認識です。</p>
+      </div>
+
+      <div class="card">
+        <h2>この端末の動作</h2>
+        <dl class="env">
+          <dt>入力の種類</dt><dd id="eType">—</dd>
+          <dt>入力の細かさ</dt><dd id="eRate">—</dd>
+          <dt>認識にかかった時間</dt><dd id="eMs">—</dd>
+          <dt>データ読み込み</dt><dd id="eLoad">—</dd>
+          <dt>外部への通信</dt><dd id="eNet">確認中</dd>
+          <dt>画面</dt><dd id="eScreen">—</dd>
+        </dl>
+        <label class="toggle"><input type="checkbox" id="palm" checked> ペンを使ったら指のタッチを無視する（手のひら対策）</label>
+        <label class="toggle"><input type="checkbox" id="useKvg" checked> KanjiVGの手本を判定に使う（小1〜小6）</label>
+        <label class="toggle"><input type="checkbox" id="useExtras" checked> 手書きで登録した手本を判定に使う</label>
+      </div>
+
+      <div class="card">
+        <h2>結果を送る</h2>
+        <p class="note">判定の記録と登録した手本（筆跡の座標）をまとめてコピーできます。このチャットに貼り付けてください。データはこの端末の中にだけあり、自動では送信されません。</p>
+        <textarea id="exportBox" readonly aria-label="検証記録と手本"></textarea>
+        <div class="row">
+          <button class="btn" id="copy">記録と手本をコピー</button>
+          <button class="btn" id="reset">判定の記録を消す</button>
+          <span class="note" id="copyMsg"></span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    手書き認識: <a href="http://github.com/asdfjkl/kanjicanvas" target="_blank" rel="noopener">KanjiCanvas</a> © 2019-2024 Dominik Klein, © 2020 Seth Clydesdale (MIT License)。
+    認識用の手本（小1〜小6）: <a href="https://kanjivg.tagaini.net/" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel の筆画データから作成（<a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0</a>）。
+    画数: kanji-data (MIT)。認識はすべてこの端末のブラウザ内で行います。
+  </footer>
+</div>
+
+<script src="vendor/kanjicanvas/kanji-canvas.js"></script>
+<script src="js/joyo.js"></script>
+<script src="js/stroke-counts.js"></script>
+<script src="js/extra-samples.js"></script>
+<script src="js/recognizer.js"></script>
+<script>
+(function () {
+  'use strict';
+  // 検証用30字：指示書の似た字ペア + 追加の似た字 + 参照データに問題がある「衛」
+  var TEST = '土士末未右石待持晴清味日目王玉大犬千干牛午矢失休体力刀問間衛'.split('');
+  // 認識しにくかった字：実際の手書きで誤認識した字（2回分の記録より）+ 元の手本の画数が違う17字
+  // 主な手本は KanjiVG から作った手本（vendor/kanjivg-refs）。手書きの登録は任意の補助
+  var PRIORITY = '王玉右午日衛臨熟数歌社馬鳥鳴島進駅健散験慣敬'.split('');
+  // 元の手本（KanjiCanvas）の画数が違う字。KanjiVG の手本か登録した手本があれば、元の手本を使わない
+  var REPLACED = '衛臨熟数歌社馬鳥鳴島進駅健散験慣敬';
+  var BROKEN = '衛臨熟数歌社馬鳥鳴島進駅健散験慣敬';
+  var GOAL = 3;
+  var STORE = 'popkanji-step1-log', SSTORE = 'popkanji-step1-samples';
+  var STROKES = window.POPKANJI_STROKES || {};
+  var BUNDLED = window.POPKANJI_SAMPLES || [];
+  var R = window.PopKanjiRecognizer;
+  var $ = function (id) { return document.getElementById(id); };
+
+  var state = { mode: 'test', idx: 0, log: [], loaded: false, regChar: PRIORITY[0], samples: [] };
+  try { var saved = JSON.parse(localStorage.getItem(STORE) || 'null'); if (saved && saved.log) { state.log = saved.log; state.idx = saved.idx || 0; } } catch (e) {}
+  try { var ss = JSON.parse(localStorage.getItem(SSTORE) || 'null'); if (ss && ss.samples) state.samples = ss.samples; } catch (e) {}
+  function save() { try { localStorage.setItem(STORE, JSON.stringify({ log: state.log, idx: state.idx })); } catch (e) {} }
+  var storageOk = true;
+  function saveSamples() {
+    try { localStorage.setItem(SSTORE, JSON.stringify({ samples: state.samples })); storageOk = true; }
+    catch (e) { storageOk = false; }
+  }
+
+  // ---------- 外部通信の監視（このページが読み込んだリソースの送信先） ----------
+  var foreign = [];
+  function checkEntry(e) {
+    try { var u = new URL(e.name, location.href); if (u.origin !== location.origin && u.protocol.indexOf('http') === 0) foreign.push(u.host); } catch (x) {}
+  }
+  try {
+    performance.getEntriesByType('resource').forEach(checkEntry);
+    new PerformanceObserver(function (l) { l.getEntries().forEach(checkEntry); renderNet(); }).observe({ type: 'resource', buffered: true });
+  } catch (e) {}
+  function renderNet() {
+    var hosts = Array.from(new Set(foreign));
+    $('eNet').innerHTML = hosts.length
+      ? '<span class="netng">他サイトへの読み込みあり: ' + hosts.join(', ') + '</span>'
+      : '<span class="netok">0件</span>（同じサイトのファイルのみ）';
+  }
+
+  // ---------- 手本 ----------
+  var baseCount = 0, kvgCount = 0;
+  function applyExtras() {
+    var list = [];
+    BUNDLED.concat(state.samples).forEach(function (s) {
+      try { list.push(R.makePattern(s.char, s.strokes, { width: 256, height: 256 })); } catch (e) {}
+    });
+    R.setExtras(list);
+    renderStatus();
+  }
+  function renderStatus() {
+    if (!state.loaded) return;
+    var n = BUNDLED.length + state.samples.length;
+    $('status').innerHTML = '認識対象 <b>' + baseCount + '</b> 字（常用漢字）・KanjiVGの手本 <b>' + kvgCount + '</b> 件' +
+      ($('useKvg').checked ? '' : '（使っていません）') +
+      (n ? '・登録した手本 <b>' + n + '</b> 件' + ($('useExtras').checked ? '' : '（使っていません）') : '');
+  }
+  function countFor(ch) {
+    var n = 0;
+    state.samples.forEach(function (s) { if (s.char === ch) n++; });
+    BUNDLED.forEach(function (s) { if (s.char === ch) n++; });
+    return n;
+  }
+
+  // ---------- 参照データの読み込み ----------
+  var t0 = performance.now();
+  var s = document.createElement('script');
+  s.src = 'vendor/kanjicanvas/ref-patterns.js';
+  s.onload = function () {
+    var s2 = document.createElement('script');
+    s2.src = 'vendor/kanjivg-refs/kvg-refs.js';
+    s2.onload = function () { start(true); };
+    s2.onerror = function () { start(false); };
+    document.body.appendChild(s2);
+  };
+  function start(kvgOk) {
+    var ms = performance.now() - t0;
+    baseCount = R.setCandidateSet(window.JOYO_KANJI);
+    if (kvgOk && window.POPKANJI_KVG_REFS) kvgCount = R.setKvgRefs(window.POPKANJI_KVG_REFS);
+    else $('useKvg').disabled = true;
+    R.setReplaced(REPLACED);
+    state.loaded = true;
+    applyExtras();
+    $('loading').remove();
+    $('eLoad').textContent = (ms / 1000).toFixed(1) + ' 秒（約10MB）';
+    renderNet();
+  }
+  s.onerror = function () { $('loading').textContent = '認識データを読み込めませんでした。ページを再読み込みしてください。'; };
+  document.body.appendChild(s);
+
+  // ---------- 手書き入力（Pointer Events） ----------
+  var pad = $('pad'), cv = $('ink'), ctx = cv.getContext('2d');
+  var strokes = [], cur = null, activeId = null, penSeen = false, size = 0;
+  var typesSeen = {}, moveCount = 0, moveTime = 0, lastMoveT = 0;
+
+  function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+  function resize() {
+    var r = pad.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    var newSize = r.width;
+    if (size && newSize !== size) { // 画面回転時は筆跡を拡大縮小して保持
+      var k = newSize / size;
+      strokes = strokes.map(function (st) { return st.map(function (p) { return [p[0] * k, p[1] * k]; }); });
+    }
+    size = newSize;
+    cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    redraw();
+    $('eScreen').textContent = Math.round(window.innerWidth) + '×' + Math.round(window.innerHeight) + ' / 枠 ' + Math.round(size) + 'px / ' +
+      (window.innerWidth > window.innerHeight ? '横向き' : '縦向き') + ' / 倍率 ' + (window.devicePixelRatio || 1);
+  }
+  function drawGrid() {
+    ctx.save();
+    ctx.strokeStyle = cssVar('--grid'); ctx.lineWidth = 1; ctx.setLineDash([6, 6]);
+    ctx.beginPath(); ctx.moveTo(size / 2, 8); ctx.lineTo(size / 2, size - 8); ctx.moveTo(8, size / 2); ctx.lineTo(size - 8, size / 2); ctx.stroke();
+    ctx.restore();
+  }
+  function drawStroke(c, st) {
+    if (!st.length) return;
+    c.beginPath(); c.moveTo(st[0][0], st[0][1]);
+    if (st.length === 1) c.lineTo(st[0][0] + 0.1, st[0][1] + 0.1);
+    for (var i = 1; i < st.length; i++) c.lineTo(st[i][0], st[i][1]);
+    c.stroke();
+  }
+  function redraw() {
+    ctx.clearRect(0, 0, size, size);
+    drawGrid();
+    ctx.strokeStyle = cssVar('--stroke'); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.lineWidth = Math.max(5, size / 45);
+    strokes.forEach(function (st) { drawStroke(ctx, st); });
+    if (cur) drawStroke(ctx, cur);
+    $('hint').hidden = strokes.length > 0 || !!cur;
+    $('undo').disabled = !strokes.length; $('clear').disabled = !strokes.length;
+    if (state.mode === 'reg') renderPrompt();
+  }
+  function pt(e) { var r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+
+  cv.addEventListener('pointerdown', function (e) {
+    if (!state.loaded) return;
+    if (e.pointerType === 'pen') penSeen = true;
+    if (penSeen && $('palm').checked && e.pointerType === 'touch') return; // 手のひら対策
+    if (activeId !== null) return; // 2本目の指は無視
+    e.preventDefault();
+    activeId = e.pointerId;
+    try { cv.setPointerCapture(e.pointerId); } catch (x) {}
+    typesSeen[e.pointerType] = true;
+    $('eType').textContent = Object.keys(typesSeen).map(function (t) { return { pen: 'ペン', touch: '指', mouse: 'マウス' }[t] || t; }).join('・');
+    cur = [pt(e)];
+    lastMoveT = e.timeStamp;
+    redraw();
+  });
+  cv.addEventListener('pointermove', function (e) {
+    if (e.pointerId !== activeId || !cur) return;
+    e.preventDefault();
+    var evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+    if (!evs.length) evs = [e];
+    for (var i = 0; i < evs.length; i++) cur.push(pt(evs[i]));
+    moveCount += evs.length; moveTime += e.timeStamp - lastMoveT; lastMoveT = e.timeStamp;
+    redraw();
+  });
+  function endStroke(e) {
+    if (e.pointerId !== activeId) return;
+    activeId = null;
+    if (cur && cur.length) strokes.push(cur);
+    cur = null;
+    if (moveTime > 0) $('eRate').textContent = '約 ' + Math.round(moveCount / (moveTime / 1000)) + ' 点/秒';
+    redraw();
+  }
+  cv.addEventListener('pointerup', endStroke);
+  cv.addEventListener('pointercancel', endStroke);
+  ['contextmenu', 'selectstart', 'dblclick'].forEach(function (t) { pad.addEventListener(t, function (e) { e.preventDefault(); }); });
+  // iOS Safari のスクロール・拡大を確実に止める
+  pad.addEventListener('touchstart', function (e) { e.preventDefault(); }, { passive: false });
+  pad.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
+  document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+
+  $('undo').onclick = function () { strokes.pop(); redraw(); };
+  $('clear').onclick = function () { strokes = []; redraw(); };
+
+  function strokes256() {
+    return strokes.map(function (st) { return st.map(function (p) { return [Math.round(p[0] * 256 / size), Math.round(p[1] * 256 / size)]; }); });
+  }
+  function inputTypes() { return Object.keys(typesSeen).join('+'); }
+
+  // ---------- 判定 ----------
+  function currentTarget() { return state.mode === 'test' ? TEST[state.idx] : null; }
+  var LABEL = { correct: '正解', retry: 'もう一度書いてね', wrong: '不正解' };
+
+  $('judge').onclick = function () {
+    if (!state.loaded || !strokes.length) return;
+    if (state.mode === 'reg') { registerSample(); return; }
+    var t = performance.now();
+    var cands = R.recognize(strokes, { width: size, height: size }, 10);
+    var ms = performance.now() - t;
+    $('eMs').textContent = Math.round(ms) + ' ms（' + strokes.length + '画）';
+    var target = currentTarget();
+    var j = target ? R.judge(cands, target) : null;
+    renderCands(cands, target);
+    var v = $('verdict');
+    if (!target) {
+      v.className = 'verdict idle';
+      v.innerHTML = cands.length ? '<span>1位は <b style="font-family:var(--font-kanji);font-size:1.4rem">' + cands[0].char + '</b> です</span>'
+                                 : '<span>候補が見つかりませんでした。画数が多すぎるか少なすぎる可能性があります。</span>';
+    } else {
+      v.className = 'verdict ' + j.result;
+      var d = '';
+      if (j.result === 'correct') d = '1位で認識しました';
+      else if (j.result === 'retry') d = (j.rank < 0 ? '字として読み取れませんでした。' : '「' + j.seenAs + '」と迷いました。') + '不正解にはしません。';
+      else d = '「' + (j.seenAs || '?') + '」と認識しました' + (j.rank > 0 ? '（' + target + 'は' + (j.rank + 1) + '位）' : '（' + target + 'は10位以内になし）');
+      v.innerHTML = '<span class="big">' + LABEL[j.result] + '</span><span class="detail">' + d + '</span>';
+      state.log.push({
+        target: target, result: j.result, rank: j.rank, ratio: j.ratio ? +j.ratio.toFixed(3) : null,
+        top: cands.slice(0, 5).map(function (c) { return c.char + ':' + c.score.toFixed(1); }).join(' '),
+        ms: Math.round(ms), input: inputTypes(), box: Math.round(size),
+        extras: $('useExtras').checked ? BUNDLED.length + state.samples.length : 0,
+        kvg: $('useKvg').checked ? kvgCount : 0,
+        strokes: strokes256(), at: new Date().toISOString()
+      });
+      save(); renderLog();
+      $('nextRow').hidden = false;
+    }
+  };
+
+  function renderCands(cands, target) {
+    var box = $('cands'); box.innerHTML = '';
+    cands.forEach(function (c, i) {
+      var d = document.createElement('div');
+      d.className = 'cand' + (c.char === target ? ' hit' : '') + (i === 0 ? ' first' : '');
+      d.innerHTML = '<span class="k">' + c.char + '</span><span class="s">' + c.score.toFixed(1) + '</span>';
+      d.title = (i + 1) + '位 距離 ' + c.score.toFixed(2);
+      box.appendChild(d);
+    });
+  }
+
+  $('again').onclick = function () { strokes = []; redraw(); resetVerdict(); };
+  $('next').onclick = function () { state.idx = (state.idx + 1) % TEST.length; save(); strokes = []; redraw(); resetVerdict(); renderPrompt(); renderLog(); };
+  function resetVerdict() {
+    $('verdict').className = 'verdict idle';
+    $('verdict').innerHTML = '<span>書いたら「はんてい」を押してください</span>';
+    $('cands').innerHTML = ''; $('nextRow').hidden = true;
+  }
+
+  // ---------- 手本の登録 ----------
+  function regMsg(kind, big, detail) {
+    var m = $('regMsg');
+    m.className = 'verdict ' + kind;
+    m.innerHTML = big ? '<span class="big">' + big + '</span><span class="detail">' + detail + '</span>' : '<span>' + detail + '</span>';
+  }
+  function registerSample() {
+    var ch = state.regChar, std = STROKES[ch], n = strokes.length;
+    if (std && n !== std) {
+      regMsg('wrong', '画数が違います', '「' + ch + '」は' + std + '画です。いま' + n + '画でした。1画ずつ離して書き直してください。');
+      return;
+    }
+    var before = R.recognize(strokes, { width: size, height: size }, 3);
+    state.samples.push({ char: ch, strokes: strokes256(), input: inputTypes(), box: Math.round(size), at: new Date().toISOString(),
+      before: before.map(function (c) { return c.char; }).join('') });
+    saveSamples();
+    applyExtras();
+    strokes = []; redraw();
+    var k = countFor(ch);
+    var was = before.length ? '登録する前の認識は「' + before[0].char + '」でした。' : '';
+    var nextMsg = '';
+    if (k >= GOAL && state.mode === 'reg') {
+      var nxt = PRIORITY.filter(function (c) { return countFor(c) < GOAL; })[0];
+      if (nxt && PRIORITY.indexOf(ch) >= 0) { nextMsg = '「' + ch + '」はそろいました。次は「' + nxt + '」です。'; state.regChar = nxt; }
+      else if (!nxt) nextMsg = '一覧の字はすべてそろいました。';
+    }
+    regMsg('correct', '登録しました（' + Math.min(k, 99) + ' / ' + GOAL + '）', was + nextMsg + (storageOk ? '' : ' ※この端末に保存できませんでした。ページを閉じる前にコピーしてください。'));
+    renderReg(); renderPrompt(); renderExport();
+  }
+  function drawThumb(canvas, st) {
+    var px = 88 * (window.devicePixelRatio || 1);
+    canvas.width = px; canvas.height = px;
+    var c = canvas.getContext('2d'), k = px / 256;
+    c.strokeStyle = cssVar('--stroke'); c.lineCap = 'round'; c.lineJoin = 'round'; c.lineWidth = Math.max(2, px / 40);
+    st.forEach(function (s) { drawStroke(c, s.map(function (p) { return [p[0] * k, p[1] * k]; })); });
+  }
+  function renderReg() {
+    var ch = state.regChar;
+    var list = $('regList'); list.innerHTML = '';
+    var mine = [];
+    state.samples.forEach(function (s, i) { if (s.char === ch) mine.push(i); });
+    if (!mine.length) {
+      list.innerHTML = '<div class="empty">「' + ch + '」の手本はまだ登録されていません。</div>';
+    } else {
+      var grid = document.createElement('div'); grid.className = 'samples';
+      mine.forEach(function (i, n) {
+        var box = document.createElement('div'); box.className = 'sample';
+        var c = document.createElement('canvas'); box.appendChild(c);
+        var b = document.createElement('button'); b.className = 'del'; b.textContent = '×';
+        b.setAttribute('aria-label', '「' + ch + '」の手本' + (n + 1) + 'を削除');
+        b.onclick = function () {
+          state.samples.splice(i, 1); saveSamples(); applyExtras();
+          regMsg('idle', '', '「' + ch + '」の手本を1つ削除しました。');
+          renderReg(); renderPrompt(); renderExport();
+        };
+        box.appendChild(b); grid.appendChild(box);
+        drawThumb(c, state.samples[i].strokes);
+      });
+      list.appendChild(grid);
+    }
+    var bn = BUNDLED.filter(function (s) { return s.char === ch; }).length;
+    $('regBundled').textContent = bn ? 'このほかに、アプリに同梱済みの手本が ' + bn + ' 件あります。' : '';
+
+    var chips = $('regChips'); chips.innerHTML = '';
+    var done = 0;
+    var extra = state.samples.map(function (s) { return s.char; }).concat(BUNDLED.map(function (s) { return s.char; }))
+      .filter(function (c, i, a) { return PRIORITY.indexOf(c) < 0 && a.indexOf(c) === i; });
+    PRIORITY.concat(extra).forEach(function (k) {
+      var n = countFor(k);
+      if (PRIORITY.indexOf(k) >= 0 && n >= GOAL) done++;
+      var b = document.createElement('button');
+      b.className = 'chip' + (n >= GOAL ? ' done' : n ? ' partial' : '') + (BROKEN.indexOf(k) >= 0 ? ' broken' : '') + (k === ch ? ' cur' : '');
+      b.innerHTML = k + '<span class="n">' + n + '/' + GOAL + '</span>';
+      b.setAttribute('aria-label', k + ' 登録 ' + n + ' 件');
+      b.onclick = function () { pickChar(k); };
+      chips.appendChild(b);
+    });
+    $('regSummary').innerHTML = '認識しにくかった ' + PRIORITY.length + ' 字のうち <b>' + done + '</b> 字に手本があります（1字につき ' + GOAL + ' つ）。主な手本は KanjiVG から作成済みなので、登録は任意です';
+    $('regMeter').style.width = (100 * done / PRIORITY.length) + '%';
+  }
+  function pickChar(k) {
+    state.regChar = k; strokes = []; redraw();
+    regMsg('idle', '', '画数どおりに、ていねいに書いて「手本に登録」を押してください');
+    $('pickMsg').textContent = '';
+    renderReg(); renderPrompt();
+  }
+  $('pickBtn').onclick = function () {
+    var v = Array.from(($('pickChar').value || '').trim())[0];
+    if (!v || !STROKES[v]) { $('pickMsg').textContent = '常用漢字を1字入れてください。'; return; }
+    $('pickChar').value = '';
+    pickChar(v);
+  };
+  $('pickChar').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.isComposing) $('pickBtn').click(); });
+
+  // ---------- 表示 ----------
+  function renderPrompt() {
+    if (state.mode === 'test') {
+      $('target').textContent = TEST[state.idx]; $('target').hidden = false;
+      $('promptText').textContent = 'この字を書いてください';
+      $('promptSub').textContent = (state.idx + 1) + ' / ' + TEST.length + ' ・ 書き順は自由です';
+    } else if (state.mode === 'reg') {
+      var ch = state.regChar, std = STROKES[ch];
+      $('target').textContent = ch; $('target').hidden = false;
+      $('promptText').textContent = 'この字を手本として書いてください';
+      $('promptSub').textContent = (std ? '正しい画数 ' + std + '画 ・ いま ' + strokes.length + '画' : 'いま ' + strokes.length + '画') +
+        ' ・ 登録 ' + countFor(ch) + ' / ' + GOAL;
+    } else {
+      $('target').hidden = true;
+      $('promptText').textContent = '好きな漢字を書いてください';
+      $('promptSub').textContent = '常用漢字から候補を10個まで表示します（記録には残りません）';
+    }
+  }
+  function renderLog() {
+    var n = state.log.length, c = { correct: 0, retry: 0, wrong: 0 };
+    state.log.forEach(function (r) { c[r.result]++; });
+    $('sN').textContent = n; $('sOk').textContent = c.correct; $('sRe').textContent = c.retry; $('sNg').textContent = c.wrong;
+    var chips = $('chips'); chips.innerHTML = '';
+    TEST.forEach(function (k, i) {
+      var rs = state.log.filter(function (r) { return r.target === k; });
+      var last = rs.length ? rs[rs.length - 1].result : '';
+      var b = document.createElement('button');
+      b.className = 'chip ' + last + (state.mode === 'test' && i === state.idx ? ' cur' : '');
+      b.innerHTML = k + (rs.length ? '<span class="n">' + rs.length + '</span>' : '');
+      b.setAttribute('aria-label', k + (last ? ' ' + LABEL[last] : ' 未判定'));
+      b.onclick = function () { setMode('test'); state.idx = i; save(); strokes = []; redraw(); resetVerdict(); renderPrompt(); renderLog(); };
+      chips.appendChild(b);
+    });
+    $('reset').disabled = !n;
+    renderExport();
+  }
+  function renderExport() {
+    var n = state.log.length, m = state.samples.length;
+    var summary = { correct: 0, retry: 0, wrong: 0 };
+    state.log.forEach(function (r) { summary[r.result]++; });
+    $('exportBox').value = (n || m) ? JSON.stringify({
+      app: 'Pop-Kanji STEP1', ua: navigator.userAgent, screen: [screen.width, screen.height, window.devicePixelRatio],
+      summary: summary, log: state.log, samples: state.samples
+    }) : '';
+    $('copy').disabled = !(n || m);
+  }
+
+  function setMode(m) {
+    state.mode = m;
+    ['test', 'free', 'reg'].forEach(function (k) { $('tab-' + k).setAttribute('aria-selected', m === k); });
+    $('verdictCard').hidden = m === 'reg';
+    $('progressCard').hidden = m === 'reg';
+    $('regCard').hidden = m !== 'reg';
+    $('regPickCard').hidden = m !== 'reg';
+    $('judge').textContent = m === 'reg' ? '手本に登録' : 'はんてい';
+    strokes = []; redraw(); resetVerdict(); renderPrompt(); renderLog();
+    if (m === 'reg') { regMsg('idle', '', '画数どおりに、ていねいに書いて「手本に登録」を押してください'); renderReg(); }
+  }
+  $('tab-test').onclick = function () { setMode('test'); };
+  $('tab-free').onclick = function () { setMode('free'); };
+  $('tab-reg').onclick = function () { setMode('reg'); };
+  $('useExtras').onchange = function () { R.setUseExtras(this.checked); renderStatus(); };
+  $('useKvg').onchange = function () { R.setUseKvg(this.checked); renderStatus(); };
+
+  $('copy').onclick = function () {
+    var box = $('exportBox');
+    var done = function () { $('copyMsg').textContent = 'コピーしました。チャットに貼り付けてください。'; };
+    var fallback = function () { box.focus(); box.select(); $('copyMsg').textContent = '選択しました。長押しでコピーしてください。'; };
+    try { navigator.clipboard.writeText(box.value).then(done, fallback); } catch (e) { fallback(); }
+  };
+  var resetArmed = false;
+  $('reset').onclick = function () {
+    if (!resetArmed) { resetArmed = true; $('reset').textContent = '本当に消す'; setTimeout(function () { resetArmed = false; $('reset').textContent = '判定の記録を消す'; }, 4000); return; }
+    state.log = []; state.idx = 0; save(); resetArmed = false; $('reset').textContent = '判定の記録を消す'; renderPrompt(); renderLog(); resetVerdict();
+  };
+
+  new ResizeObserver(resize).observe(pad);
+  if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () { redraw(); if (state.mode === 'reg') renderReg(); });
+  renderPrompt(); renderLog(); resize();
+})();
+</script>
+</body>
+</html>

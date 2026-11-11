@@ -1,9 +1,27 @@
 # Pop-Kanji — STEP 1 手書き認識 技術検証
 
+## 学習アプリ（STEP 2〜3、小1から）
+
+- 画面: ホーム／学年えらび／テスト（手書き）／結果／にがてリスト／練習プリント／学習データ／このアプリについて
+- 問題: 読みがな付きの熟語・短い文の、1字を空欄にした形。小1は80字・240問（熟語144・文96）
+  - 熟語は JMdict（EDRDG, CC BY-SA 4.0）の共通語から選定、文は Pop-Kanji で作成（data/src/g1.txt）
+  - tools/build_questions.py で検査: 空欄の字・使う漢字の学年・JMdict の収録と読み・同じ読みで別の字が入らないか
+- 判定: 1位なら正解／迷ったら書き直し（3回まで、まちがいにしない）／それ以外はまちがい
+  「ただしく かいたのに まちがいに なった」で、まちがいとして記録しない
+- 習得: はじめて正解=おぼえかけ／まちがい=にがて／2回つづけて正解=おぼえた（7日後に再確認）／再確認でまちがい=にがて
+- 保存: IndexedDB（この端末だけ）。JSON で書き出し・読み込み
+- 練習プリント: A4・1ページ10問・7マス（1マスめにうすい手本）・こたえのページ付き。ブラウザの印刷を使う
+
 ## 構成（静的ファイルのみ・外部通信なし）
 
 ```
-index.html                 検証ページ本体（Canvas + Pointer Events）
+app.html                   学習アプリ本体（公開時は docs/index.html）
+js/app.js / store.js / pad.js  学習アプリの動き・保存・手書き入力
+js/questions.js            問題データ（build.sh が data/questions/*.json から作成）
+data/src/g1.txt            小1の問題の元データ（手で書く）
+data/questions/g1.json     検査済みの問題データ
+tools/build_questions.py   問題データの作成と検査
+index.html                 読み取り検証ページ（公開時は docs/verify.html）
 build.sh                   静的ホスティング用に build/index.html を書き出す
 js/recognizer.js           認識ラッパー（筆跡→候補10件＋距離、正誤判定）
 js/joyo.js                 常用漢字2136字（認識対象の絞り込み用）
