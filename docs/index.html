@@ -98,6 +98,7 @@ h2 { font-size: 1.15rem; }
 .today span { font-size: .82rem; color: var(--muted); }
 .big-actions { display: flex; flex-direction: column; gap: 10px; }
 .big-actions .btn { min-height: 64px; font-size: 1.15rem; }
+@media (max-width: 600px) { .big-actions .btn { font-size: 1rem; padding: 0 12px; } }
 .levels { display: grid; gap: 10px; }
 .level { display: grid; grid-template-columns: 3.6em minmax(0, 1fr) max-content; gap: 10px; align-items: center; font-size: .92rem; }
 .level > span { white-space: nowrap; }
@@ -106,6 +107,7 @@ h2 { font-size: 1.15rem; }
 .level .bar .m { background: var(--ok); }
 .level .bar .c { background: var(--sky); opacity: .55; }
 .level .bar .w { background: var(--ng); opacity: .7; }
+.level .ld { grid-column: 2 / -1; margin-top: -6px; font-size: .75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .level .n { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
 .level.soon { color: var(--muted); }
 .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .78rem; color: var(--muted); }
@@ -310,6 +312,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
         <h2>がくねんごとの おぼえぐあい</h2>
         <div class="levels" id="hLevels"></div>
         <div class="legend"><span class="lm">おぼえた</span><span class="lc">おぼえかけ</span><span class="lw">にがて</span></div>
+        <p class="sub" style="font-size:.78rem">すうじは せいかいした かんじの かず。2かい つづけて せいかいすると「おぼえた」に なるよ。</p>
       </div>
     </div>
   </section>

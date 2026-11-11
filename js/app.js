@@ -155,10 +155,12 @@
         html += '<div class="level soon"><span>' + g + 'ねん</span><span class="bar"></span><span class="n">じゅんびちゅう</span></div>';
         continue;
       }
-      var chars = gradeChars(g), c = statusCounts(chars), t = chars.length;
-      html += '<div class="level"><span>' + g + 'ねん</span><span class="bar" role="img" aria-label="' + g + 'ねん おぼえた ' + c.mastered + '字 / ' + t + '字">' +
+      // 数字は「せいかいした字（おぼえた＋おぼえかけ）」。おぼえた は2回つづけて正解したときなので、1回めのテストでは 0 のまま
+      var chars = gradeChars(g), c = statusCounts(chars), t = chars.length, done = c.mastered + c.candidate, tested = t - c.new;
+      html += '<div class="level"><span>' + g + 'ねん</span><span class="bar" role="img" aria-label="' + g + 'ねん おぼえた ' + c.mastered + '字、おぼえかけ ' + c.candidate + '字、にがて ' + c.weak + '字 / ' + t + '字">' +
         '<i class="m" style="width:' + (100 * c.mastered / t) + '%"></i><i class="c" style="width:' + (100 * c.candidate / t) + '%"></i><i class="w" style="width:' + (100 * c.weak / t) + '%"></i>' +
-        '</span><span class="n">' + c.mastered + ' / ' + t + '字</span></div>';
+        '</span><span class="n">' + done + ' / ' + t + '字</span>' +
+        (tested ? '<small class="ld">おぼえた ' + c.mastered + '　おぼえかけ ' + c.candidate + '　にがて ' + c.weak + '</small>' : '') + '</div>';
     }
     $('hLevels').innerHTML = html;
   }
@@ -174,7 +176,7 @@
       var c = ok ? statusCounts(gradeChars(g)) : null;
       html += '<button class="grade' + (ok && g === pickGrade ? ' on' : '') + '" data-g="' + g + '"' + (ok ? '' : ' disabled') + '>' +
         '<b>' + GRADE_NAME[g] + '</b>' +
-        (ok ? '<span class="sample">' + esc(sample) + '…</span><small>' + GRADE_TOTAL[g] + '字 ・ おぼえた ' + c.mastered + '字</small>'
+        (ok ? '<span class="sample">' + esc(sample) + '…</span><small>' + GRADE_TOTAL[g] + '字 ・ せいかい ' + (c.mastered + c.candidate) + '字（おぼえた ' + c.mastered + '）</small>'
             : '<small>' + GRADE_TOTAL[g] + '字 ・ じゅんびちゅう</small>') + '</button>';
     }
     $('gList').innerHTML = html;
