@@ -15,6 +15,7 @@
     var ctx = cv.getContext('2d');
     var strokes = [], cur = null, activeId = null, penSeen = false, size = 0, locked = false;
     var guide = null;   // うすく表示するお手本の字
+    var ink = null;     // 線の色を一時的に変える（練習で書けたとき 緑 など）
 
     function resize() {
       var r = pad.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
@@ -49,7 +50,7 @@
         ctx.fillText(guide, size / 2, size / 2 + size * 0.03);
         ctx.restore();
       }
-      ctx.strokeStyle = cssVar('--stroke'); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.strokeStyle = ink ? cssVar(ink) : cssVar('--stroke'); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
       ctx.lineWidth = Math.max(6, size / 40);
       strokes.forEach(line);
       if (cur) line(cur);
@@ -99,6 +100,7 @@
       undo: function () { strokes.pop(); redraw(); },
       lock: function (v) { locked = !!v; pad.classList.toggle('locked', locked); },
       setGuide: function (ch) { guide = ch || null; redraw(); },
+      setInk: function (v) { ink = v || null; redraw(); },
       // 判定用：256 座標に変換した筆跡（記録用）
       strokes256: function () {
         return strokes.map(function (st) { return st.map(function (p) { return [Math.round(p[0] * 256 / size), Math.round(p[1] * 256 / size)]; }); });

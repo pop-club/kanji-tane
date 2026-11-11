@@ -28,7 +28,7 @@
   --grid: #c3d0de;
   --stroke: #1d2b3a;
   --guide: #cfdbe7;        /* お手本のうすい字 */
-  --ok: #188a5a;  --ok-bg: #dff4ea;
+  --ok: #188a5a;  --ok-bg: #dff4ea; --ok-ink: #ffffff;
   --retry: #a35f00; --retry-bg: #fff0d4;
   --ng: #cc3838;  --ng-bg: #fde6e6;
   --font-ui: "Hiragino Maru Gothic ProN", "BIZ UDPGothic", "Hiragino Sans", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
@@ -40,7 +40,7 @@
     --bg: #111821; --surface: #1a2430; --ink: #e9eff6; --muted: #9daabb; --line: #2d3a4a;
     --accent: #ff8a5c; --accent-ink: #1a1007; --accent-soft: #3d2418; --sky: #6aa8ec; --sky-soft: #1d3149;
     --grid: #3a4c62; --stroke: #f1f5fa; --guide: #33465c;
-    --ok: #5fd39c; --ok-bg: #163428; --retry: #f2b24d; --retry-bg: #3a2b12; --ng: #ff8a8a; --ng-bg: #3d1c1c;
+    --ok: #5fd39c; --ok-bg: #163428; --ok-ink: #0d2419; --retry: #f2b24d; --retry-bg: #3a2b12; --ng: #ff8a8a; --ng-bg: #3d1c1c;
     color-scheme: dark;
   }
 }
@@ -48,7 +48,7 @@
   --bg: #111821; --surface: #1a2430; --ink: #e9eff6; --muted: #9daabb; --line: #2d3a4a;
   --accent: #ff8a5c; --accent-ink: #1a1007; --accent-soft: #3d2418; --sky: #6aa8ec; --sky-soft: #1d3149;
   --grid: #3a4c62; --stroke: #f1f5fa; --guide: #33465c;
-  --ok: #5fd39c; --ok-bg: #163428; --retry: #f2b24d; --retry-bg: #3a2b12; --ng: #ff8a8a; --ng-bg: #3d1c1c;
+  --ok: #5fd39c; --ok-bg: #163428; --ok-ink: #0d2419; --retry: #f2b24d; --retry-bg: #3a2b12; --ng: #ff8a8a; --ng-bg: #3d1c1c;
   color-scheme: dark;
 }
 [hidden] { display: none !important; }
@@ -212,7 +212,26 @@ h2 { font-size: 1.15rem; }
 .fb dd { margin: 0; overflow-wrap: anywhere; }
 .fb .mline { display: inline-flex; font-size: 1rem; column-gap: .3em; }
 .fb .mline .qr { font-size: .55em; }
-.fb .practice { align-self: flex-start; }
+.fb .practice { align-self: stretch; background: var(--ok); border-color: var(--ok); color: var(--ok-ink); font-size: clamp(.95rem, 4.4vw, 1.1rem); white-space: nowrap; padding: 0 12px; box-shadow: 0 4px 0 color-mix(in srgb, var(--ok) 60%, #000); }
+.fb .practice:active { transform: translateY(2px); box-shadow: 0 2px 0 color-mix(in srgb, var(--ok) 60%, #000); }
+.fb .pmsg.ok { color: var(--ok); font-size: 1.1rem; }
+.fb .pmsg.ng { color: var(--retry); }
+/* 練習で書けたとき：枠が緑に光り「できた！」がはずむ／おしいとき：黄色く ゆれる */
+.pad .stamp { position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .1em; background: color-mix(in srgb, var(--ok) 90%, transparent); color: var(--ok-ink); font-weight: 800; opacity: 0; }
+.pad .stamp .mark { font-size: clamp(5rem, 34vw, 11rem); line-height: 1; }
+.pad .stamp .word { font-size: clamp(1.5rem, 7vw, 2.4rem); }
+.pad.ok { border-color: var(--ok); box-shadow: 0 0 0 6px var(--ok-bg), 0 0 28px color-mix(in srgb, var(--ok) 45%, transparent); }
+.pad.ok .stamp { animation: stamp-pop 1.4s ease-out forwards; }
+.pad.ok .stamp .mark { animation: mark-pop 1.4s ease-out forwards; }
+.pad.ng { border-color: var(--retry); animation: pad-shake .45s ease-in-out; }
+/* 練習中は、答えの説明をたたんで 書く枠を大きく。「つぎへ」も画面下に固定しない */
+#tFb.practicing dl, #tFb.practicing .head > div > div:not(.verdict) { display: none; }
+body.practicing #tNextRow { position: static; }
+@media (max-width: 600px) { body.practicing .qcard { display: none; } body.practicing .fb .ans { font-size: 2.6rem; } body.practicing .fb .verdict { font-size: 1.05rem; } }
+@keyframes stamp-pop { 0% { opacity: 0; } 12% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes mark-pop { 0% { transform: scale(.3) rotate(-20deg); } 30% { transform: scale(1.15) rotate(5deg); } 45% { transform: scale(1) rotate(0); } 100% { transform: scale(1); } }
+@keyframes pad-shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(7px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(3px); } }
+@media (prefers-reduced-motion: reduce) { .pad.ok .stamp, .pad.ok .stamp .mark { animation: none; opacity: 1; transform: none; } .pad.ng { animation: none; } }
 .fb .pmsg { font-weight: 700; min-height: 1.4em; }
 .fb .misjudge { background: none; border: none; color: var(--muted); text-decoration: underline; font-size: .85rem; cursor: pointer; padding: 0; align-self: flex-start; min-height: 36px; }
 
@@ -364,7 +383,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
         <div id="tFb" hidden></div>
       </div>
       <div class="writer">
-        <div class="pad" id="tPad"><div class="padcount" id="tCount" hidden></div><div class="padhint" id="tPadHint" data-k="ここに [指:ゆび]や ペンで [書:か]こう">ここに ゆびや ペンで かこう</div></div>
+        <div class="pad" id="tPad"><div class="padcount" id="tCount" hidden></div><div class="stamp" id="tStamp" aria-hidden="true"></div><div class="padhint" id="tPadHint" data-k="ここに [指:ゆび]や ペンで [書:か]こう">ここに ゆびや ペンで かこう</div></div>
         <div class="controls" id="tControls">
           <button class="btn" id="tUndo" data-k="1[画:かく] [消:け]す">1かく けす</button>
           <button class="btn" id="tClear" data-k="[全部:ぜんぶ] [消:け]す">ぜんぶ けす</button>
@@ -457,7 +476,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
         <li>学習の記録は、この端末のブラウザ（IndexedDB）にだけ保存されます。</li>
       </ul>
       <h2>バージョン</h2>
-      <p>いまの バージョン：<b id="aVer">2026.11.11-2120</b></p>
+      <p>いまの バージョン：<b id="aVer">2026.11.11-2136</b></p>
       <p>サイトを 新しくしたのに 前のままのときは、このボタンを おしてください。学習の記録は 消えません。</p>
       <button class="btn small" id="aUpdate" style="align-self:flex-start">あたらしい バージョンを よみこむ</button>
       <p class="msg" id="aUpMsg" aria-live="polite"></p>
@@ -487,14 +506,14 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
   </footer>
 </div>
 
-<script src="vendor/kanjicanvas/kanji-canvas.js?v=2026.11.11-2120"></script>
-<script src="js/joyo.js?v=2026.11.11-2120"></script>
-<script src="js/recognizer.js?v=2026.11.11-2120"></script>
-<script src="js/store.js?v=2026.11.11-2120"></script>
-<script src="js/pad.js?v=2026.11.11-2120"></script>
-<script src="js/stroke-counts.js?v=2026.11.11-2120"></script>
-<script src="js/grades.js?v=2026.11.11-2120"></script>
-<script src="js/questions.js?v=2026.11.11-2120"></script>
-<script src="js/app.js?v=2026.11.11-2120"></script>
+<script src="vendor/kanjicanvas/kanji-canvas.js?v=2026.11.11-2136"></script>
+<script src="js/joyo.js?v=2026.11.11-2136"></script>
+<script src="js/recognizer.js?v=2026.11.11-2136"></script>
+<script src="js/store.js?v=2026.11.11-2136"></script>
+<script src="js/pad.js?v=2026.11.11-2136"></script>
+<script src="js/stroke-counts.js?v=2026.11.11-2136"></script>
+<script src="js/grades.js?v=2026.11.11-2136"></script>
+<script src="js/questions.js?v=2026.11.11-2136"></script>
+<script src="js/app.js?v=2026.11.11-2136"></script>
 </body>
 </html>

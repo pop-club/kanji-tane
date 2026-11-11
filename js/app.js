@@ -198,6 +198,7 @@
     views.forEach(function (v) { $('v-' + v).hidden = v !== name; });
     window.scrollTo(0, 0);
     document.body.classList.toggle('testing', name === 'test');
+    if (name !== 'test') document.body.classList.remove('practicing');
     if (name === 'test' && pad) setTimeout(function () { fitPad(); pad.redraw(); }, 0);
   }
   function route() {
@@ -327,8 +328,9 @@
   var answered = false, pending = null, practicing = false;
   function showItem() {
     var it = cur(), n = session.items.length, k = KANJI[it.ch];
-    answered = false; pending = null; practicing = false;
-    pad.setGuide(null);
+    answered = false; pending = null; practicing = false; practiceBusy = false;
+    pad.setGuide(null); pad.setInk(null); $('tPad').classList.remove('ok', 'ng');
+    $('tFb').classList.remove('practicing'); document.body.classList.remove('practicing');
     $('tNum').textContent = (session.idx + 1) + ' / ' + n;
     $('tProg').style.width = (100 * session.idx / n) + '%';
     $('tLabel').textContent = it.again ? K('もう[一度:いちど]：さっき [間違:まちが]えた [漢字:かんじ]だよ') :
@@ -375,7 +377,7 @@
     var showAns = kind !== 'retry';   // 書き直しのときは答えを見せない
     var html = '<div class="fb ' + kind + '" role="status"><div class="head">' + (showAns ? '<span class="ans">' + esc(it.ch) + '</span>' : '') + '<div><div class="verdict">' + verdict + '</div>' +
       (detail ? '<div>' + detail + '</div>' : '') + '</div></div>' + (withInfo ? infoDl(it.ch) : '') +
-      (kind === 'wrong' || kind === 'recog' ? '<button class="btn small practice" id="tPractice">' + K('お[手本:てほん]を [見:み]て もう[一度:いちど] [書:か]く') + '</button><div class="pmsg" id="tPmsg" aria-live="polite"></div>' : '') +
+      (kind === 'wrong' || kind === 'recog' ? '<button class="btn practice" id="tPractice">✏️ ' + K('お[手本:てほん]を [見:み]て [練習:れんしゅう]する') + '</button><div class="pmsg" id="tPmsg" aria-live="polite"></div>' : '') +
       (misjudge ? '<button class="misjudge" id="tMis">' + K('[正:ただ]しく [書:か]いたのに [間違:まちが]いに なった') + '</button>' : '') + '</div>';
     $('tFb').innerHTML = html; $('tFb').hidden = false;
     setTimeout(fitPad, 0);
@@ -399,22 +401,46 @@
     fitPad();
   }
   // まちがえた字の練習：お手本をうすく出して、なぞって書く。記録（まちがい）は変えない
+  var practiceOk = 0, practiceBusy = false;
   function startPractice() {
-    practicing = true;
+    practicing = true; practiceOk = 0; practiceBusy = false;
     pad.setGuide(cur().ch);
     pad.lock(false); pad.clear();
     $('tControls').hidden = false;
     $('tPmsg').textContent = K('うすい お[手本:てほん]を なぞって [書:か]いてみよう');
     $('tPractice').hidden = true;
+    $('tFb').classList.add('practicing'); document.body.classList.add('practicing');
     updateAnswerBtn();
     fitPad();
+    setTimeout(function () { try { $('tControls').scrollIntoView({ block: 'end', behavior: 'smooth' }); } catch (e) {} }, 50);
   }
+  // 書けたら：線が緑になり、枠が光って「できた！」が出る → 少しして消して、もう一度書ける
+  // おしいとき：枠が黄色く ゆれる
   function practiceCheck() {
-    var it = cur();
+    if (practiceBusy) return;
+    var it = cur(), padEl = $('tPad');
     var cands = R.recognize(pad.strokes(), { width: pad.size(), height: pad.size() }, 10);
     var ok = R.judge(cands, it.ch).result === 'correct';
-    $('tPmsg').textContent = ok ? K('よく [書:か]けたね！ もう[一度:いちど] [書:か]いても いいよ') : K('おしい！ お[手本:てほん]を よく [見:み]て [書:か]こう');
-    if (ok) { pad.clear(); }
+    padEl.classList.remove('ok', 'ng'); void padEl.offsetWidth;
+    if (ok) {
+      practiceOk++;
+      practiceBusy = true;
+      pad.setInk('--ok'); pad.lock(true);
+      padEl.classList.add('ok');
+      $('tStamp').innerHTML = '<span class="mark">◎</span><span class="word">' + esc(K('よく [書:か]けたね！')) + '</span>';
+      $('tPmsg').textContent = K('よく [書:か]けたね！') + '（' + practiceOk + K('[回:かい]）') + K(' もう[一度:いちど] [書:か]いてみよう');
+      $('tPmsg').className = 'pmsg ok';
+      setTimeout(function () {
+        if (!practicing) return;
+        padEl.classList.remove('ok'); pad.setInk(null); pad.lock(false); pad.clear(); practiceBusy = false; updateAnswerBtn();
+      }, 1400);
+    } else {
+      padEl.classList.add('ng');
+      $('tPmsg').textContent = K('おしい！ お[手本:てほん]を よく [見:み]て [書:か]こう');
+      $('tPmsg').className = 'pmsg ng';
+      setTimeout(function () { padEl.classList.remove('ng'); }, 600);
+    }
+    updateAnswerBtn();
   }
   $('tUndo').onclick = function () { pad.undo(); };
   $('tClear').onclick = function () { pad.clear(); };
