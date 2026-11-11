@@ -15,6 +15,8 @@
   var TMP_ID = '__popkanji_tmp__';
   var FEATURE_INTERVAL = 20;
   var RESAMPLE_STEP = 1.5; // 256座標系での点間隔（参照パターンの記録密度に合わせる）
+  var userWeight = 1;
+  var userStrict = true;
   var strokePenalty = 0.1; // 画数差1画あたりの上乗せ。tools/penalty_test.js の比較で決めた値
 
   function scaleTo256(strokes, box) {
@@ -60,12 +62,16 @@
       var ref = KC.refPatterns[j];
       var refLen = ref[1];
       if (!(n0 < refLen + 2 && n0 > refLen - 3)) continue;
+      // 登録した手本は正しい画数で書かれているので、同じ画数の入力とだけ比べる
+      // （王4画の手本が玉5画を、大3画の手本が犬4画を引き寄せるのを防ぐ。tools/crossround.js の結果）
+      if (ref[3] === 'user' && userStrict && refLen !== n0) continue;
       var map = KC.getMap(ref[2], input, KC.initialDistance);
       map = KC.completeMap(ref[2], input, KC.wholeWholeDistance, map);
       var d = KC.computeWholeDistanceWeighted(ref[2], input, map);
       d = d / Math.min(n0, ref[2].length);
       // 画数の差への上乗せ。1画少ない似た字（間→問など）に1位を取られるのを防ぐ
       d = d * (1 + strokePenalty * Math.abs(n0 - ref[2].length));
+      if (ref[3] === 'user') d = d * userWeight; // 登録した手本は少し遠めに見る（ほかの字を引き寄せすぎないため）
       res.push({ char: ref[0], score: d });
     }
     res.sort(function (a, b) { return a.score - b.score; });
@@ -104,7 +110,7 @@
   // 追加の手本（手書きで登録したもの）。[字, 画数, 特徴量] の配列
   function makePattern(ch, strokes, box) {
     var f = features(strokes, box);
-    return [ch, f.length, f];
+    return [ch, f.length, f, 'user'];
   }
 
   /*
@@ -165,10 +171,12 @@
   function setReplaced(chars) { replaced = {}; for (var i = 0; i < chars.length; i++) replaced[chars[i]] = true; rebuild(); }
 
   function setStrokePenalty(v) { strokePenalty = v; }
+  function setUserWeight(v) { userWeight = v; }
+  function setUserStrict(v) { userStrict = !!v; }
 
   var api = {
     recognize: recognize, judge: judge, resample: resample, features: features,
-    setCandidateSet: setCandidateSet, setStrokePenalty: setStrokePenalty,
+    setCandidateSet: setCandidateSet, setStrokePenalty: setStrokePenalty, setUserWeight: setUserWeight, setUserStrict: setUserStrict,
     makePattern: makePattern, addPatterns: addPatterns, clearPatterns: clearPatterns,
     setExtras: setExtras, setUseExtras: setUseExtras, setReplaced: setReplaced
   };
