@@ -10,13 +10,14 @@
   var R = window.PopKanjiRecognizer, Store = window.PopKanjiStore;
   var QD = window.POPKANJI_QUESTIONS || {};
   // 学年の番号: 1〜6 = 小学校、7〜10 = 中学の字を漢検の級で分けたもの（4級・3級・準2級・2級）
-  var GRADE_TOTAL = { 1: 80, 2: 160, 3: 200, 4: 202, 5: 193, 6: 191, 7: 313, 8: 284, 9: 328, 10: 185 };
+  var GRADE_TOTAL = { 1: 80, 2: 160, 3: 200, 4: 202, 5: 193, 6: 191, 7: 313, 8: 284, 9: 328, 10: 185, 11: 863, 12: 3360 };
   var GRADE_NAME = { 1: '[1年生:1ねんせい]', 2: '[2年生:2ねんせい]', 3: '[3年生:3ねんせい]', 4: '[4年生:4ねんせい]', 5: '[5年生:5ねんせい]', 6: '[6年生:6ねんせい]',
-    7: '漢検4級', 8: '漢検3級', 9: '漢検準2級', 10: '漢検2級' };
-  var LEVEL_NOTE = { 7: '中学在学程度', 8: '中学卒業程度', 9: '高校在学程度', 10: '高校卒業程度' };   // 漢検協会の目安
-  var SHORT_NAME = { 1: '[1年:1ねん]', 2: '[2年:2ねん]', 3: '[3年:3ねん]', 4: '[4年:4ねん]', 5: '[5年:5ねん]', 6: '[6年:6ねん]', 7: '4級', 8: '3級', 9: '準2級', 10: '2級' };
+    7: '漢検4級', 8: '漢検3級', 9: '漢検準2級', 10: '漢検2級', 11: '漢検準1級', 12: '漢検1級' };
+  // 漢検協会の目安。準1級・1級は字の一覧が公開されていないため、JIS第1・第2水準の常用外の字で代用（data/kanken-levels.json）
+  var LEVEL_NOTE = { 7: '中学在学程度', 8: '中学卒業程度', 9: '高校在学程度', 10: '高校卒業程度', 11: '大学・一般程度（JIS第1水準の字）', 12: '大学・一般程度（JIS第2水準の字）' };
+  var SHORT_NAME = { 1: '[1年:1ねん]', 2: '[2年:2ねん]', 3: '[3年:3ねん]', 4: '[4年:4ねん]', 5: '[5年:5ねん]', 6: '[6年:6ねん]', 7: '4級', 8: '3級', 9: '準2級', 10: '2級', 11: '準1級', 12: '1級' };
   // モード: しょうがくせい（小1〜小6）／漢検（中学の字）。この端末に覚えておく
-  var MODES = { sho: [1, 2, 3, 4, 5, 6], kanken: [7, 8, 9, 10] };
+  var MODES = { sho: [1, 2, 3, 4, 5, 6], kanken: [7, 8, 9, 10, 11, 12] };
   var mode = 'sho';
   try { if (localStorage.getItem('kt-mode') === 'kanken') mode = 'kanken'; } catch (e) {}
   function levels() { return MODES[mode]; }
@@ -170,6 +171,27 @@
     });
     return midLoading;
   }
+  // 準1級・1級の字の手本（約3MB・約8MB）は、その字をテストするときだけ読む
+  var extLoading = {}, extChars = '';
+  function loadExtRefs(lv) {
+    if (!extLoading[lv]) extLoading[lv] = loadMidRefs().then(function () { return loadScript('vendor/kanjivg-refs/kvg-refs-' + lv + '.js'); }).then(function () {
+      var add = window['POPKANJI_KVG_REFS_' + lv] || [];
+      add.forEach(function (p) { if (!STD_STROKES[p[0]]) STD_STROKES[p[0]] = p[1]; });   // 常用外の字の画数は KanjiVG の画数
+      extChars += GL[lv] || '';
+      R.setCandidateSet((window.JOYO_KANJI || '') + extChars);
+      var all = (window.POPKANJI_KVG_REFS || []).concat(window.POPKANJI_KVG_REFS_MID || []);
+      [11, 12].forEach(function (k) { all = all.concat(window['POPKANJI_KVG_REFS_' + k] || []); });
+      R.setKvgRefs(all);
+    });
+    return extLoading[lv];
+  }
+  function ensureRefs(chars) {
+    var need = {};
+    chars.forEach(function (ch) { var g = GRADE_OF[ch]; if (g >= 11) need[g] = true; });
+    var lvs = Object.keys(need).filter(function (k) { return !window['POPKANJI_KVG_REFS_' + k]; });
+    if (!lvs.length) return null;
+    return Promise.all(lvs.map(function (k) { return loadExtRefs(+k); }));
+  }
   function setMode(m) {
     if (m === mode || session) return;
     mode = m;
@@ -256,7 +278,7 @@
       var c = ok ? statusCounts(gradeChars(g)) : null;
       html += '<button class="grade' + (ok && g === pickGrade ? ' on' : '') + '" data-g="' + g + '"' + (ok ? '' : ' disabled') + '>' +
         '<b>' + K(GRADE_NAME[g]) + '</b>' + (LEVEL_NOTE[g] ? '<small>' + LEVEL_NOTE[g] + '</small>' : '') +
-        (ok ? '<span class="sample">' + esc(sample) + '…</span><small>' + GRADE_TOTAL[g] + '字 ・ ' + K('[正解:せいかい] ') + (c.mastered + c.candidate) + '字（' + K('[覚:おぼ]えた ') + c.mastered + '）</small>'
+        (ok ? '<span class="sample">' + esc(sample) + '…</span><small>' + GRADE_TOTAL[g] + '字' + (gradeChars(g).length < GRADE_TOTAL[g] ? '（' + K('[問題:もんだい]は ') + gradeChars(g).length + '字ぶん）' : '') + ' ・ ' + K('[正解:せいかい] ') + (c.mastered + c.candidate) + '字（' + K('[覚:おぼ]えた ') + c.mastered + '）</small>'
             : '<small>' + GRADE_TOTAL[g] + '字 ・ ' + K('[準備中:じゅんびちゅう]') + '</small>') + '</button>';
     });
     $('gList').innerHTML = html;
@@ -299,6 +321,14 @@
   }
   function startTest(mode, grade, chars) {
     if (!chars) chars = chooseForGrade(grade, pickN);
+    var wait = ensureRefs(chars);
+    if (wait) {
+      $('loadstate').textContent = K('[漢字:かんじ]の [手本:てほん]を [読:よ]み[込:こ]み[中:ちゅう]…（[初:はじ]めてのときは [少:すこ]し [時間:じかん]が かかります）');
+      $('gStart').disabled = true;
+      wait.then(function () { $('loadstate').textContent = ''; $('gStart').disabled = false; startTest(mode, grade, chars); },
+        function () { $('loadstate').textContent = K('[手本:てほん]を [読:よ]み[込:こ]めませんでした'); $('gStart').disabled = false; });
+      return;
+    }
     session = { id: 's' + Date.now(), at: Date.now(), mode: mode, grade: grade, idx: 0,
       items: chars.map(function (ch) { return { ch: ch, q: pickQuestion(ch), result: null, tries: 0 }; }) };
     if (!pad) pad = new window.PopKanjiPad($('tPad'), { onChange: function (n) {
@@ -711,11 +741,12 @@
 
   function renderAbout() {
     var ok = [], soon = [];
-    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].forEach(function (g) { (hasGrade(g) ? ok : soon).push(g); });
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].forEach(function (g) { (hasGrade(g) ? ok : soon).push(g); });
     var nm = function (g) { return g <= 6 ? '小' + g : GRADE_NAME[g]; };
     $('aRange').textContent = '問題があるのは ' + ok.map(function (g) { return nm(g) + '（' + GRADE_TOTAL[g] + '字）'; }).join('・') + ' です。' +
       (soon.length ? soon.map(nm).join('・') + ' は準備中です。' : '') +
-      ' 手書きの読み取りは、小学校の1026字と、中学で習う1110字（漢検4級〜2級）に対応しています。中学の字の手本は、漢検モードにしたときだけ読みこみます。';
+      ' 手書きの読み取りは、小学校の1026字、中学・高校の1110字（漢検4級〜2級）、JIS第1・第2水準の常用外の4223字（漢検準1級・1級の目安）に対応しています。中学からの字の手本は漢検モードにしたときに、準1級・1級の手本はその字をテストするときに読みこみます。' +
+      ' 漢検の準1級・1級は字の一覧が公開されていないため、協会の示す目安（JIS第1水準・第2水準）で分けています。実際の出題範囲とは一部ちがいます。';
   }
 
   // ---------- はじめ ----------

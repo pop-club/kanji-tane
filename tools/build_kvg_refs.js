@@ -11,10 +11,12 @@ const N = +nArg || 3;
 const out = outArg || path.join(__dirname, '../vendor/kanjivg-refs/kvg-refs.js');
 const { loadKVG, distort } = require('./kvg.js')(kvgDir, 2024);
 // SET=mid のときは中学の漢字（漢検4級〜2級、data/kanken-levels.json）。漢検モードのときだけ読む別ファイルにする
-const MID = process.env.SET === 'mid';
-const g = MID ? JSON.parse(fs.readFileSync(path.join(__dirname, '../data/kanken-levels.json'))).kanji
-  : JSON.parse(fs.readFileSync(path.join(__dirname, '../data/grade-kanji.json'))).grades;
-const chars = [...Object.values(g).join('')];
+// SET=11 / SET=12 は 準1級・1級（JIS第1・第2水準の常用外）。級をえらんだときだけ読む別ファイル
+const SET = process.env.SET || '';
+const MID = SET === 'mid', EXT = SET === '11' || SET === '12';
+const KL = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/kanken-levels.json'))).kanji;
+const chars = EXT ? [...KL[SET]] : MID ? [...['7', '8', '9', '10'].map((k) => KL[k]).join('')]
+  : [...Object.values(JSON.parse(fs.readFileSync(path.join(__dirname, '../data/grade-kanji.json'))).grades).join('')];
 const box = { width: 109, height: 109 }; // KanjiVG の座標系
 const pats = [];
 const MERGE = process.env.MERGE !== '0', MERGE_DIST = +(process.env.MERGE_DIST || 14), MAX_MERGE = 3;
@@ -41,5 +43,5 @@ fs.writeFileSync(out,
   ' * KanjiVG: https://kanjivg.tagaini.net/\n' +
   ' * このファイルは CC BY-SA 3.0 で提供します: https://creativecommons.org/licenses/by-sa/3.0/\n' +
   ' * 作成ツール: tools/build_kvg_refs.js\n */\n' +
-  (MID ? 'window.POPKANJI_KVG_REFS_MID = ' : 'window.POPKANJI_KVG_REFS = ') + JSON.stringify(pats) + ';\n');
+  (EXT ? 'window.POPKANJI_KVG_REFS_' + SET + ' = ' : MID ? 'window.POPKANJI_KVG_REFS_MID = ' : 'window.POPKANJI_KVG_REFS = ') + JSON.stringify(pats) + ';\n');
 console.log('手本', pats.length, '件（画をつなげた形', merged * 2, '件を含む）', fs.statSync(out).size, 'bytes →', out);

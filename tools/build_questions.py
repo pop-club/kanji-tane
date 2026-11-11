@@ -20,8 +20,9 @@ known = set(''.join(G[str(g)] for g in range(1, int(grade) + 1)))
 # 漢検（中学の字）では、見せる字は常用漢字ならよい（小学校の字いがいは ふりがなを出す）
 if int(grade) >= 7:
     known = set(c for c in open(os.path.join(ROOT, 'data/joyo-kanji.txt')).read() if ord(c) > 0x3000) | {'々'}
+    for g in range(11, int(grade) + 1): known |= set(G[str(g)])   # 準1級・1級は その級までの常用外の字も見せてよい
 target_set = list(G[grade])
-L = {'7': '漢検4級', '8': '漢検3級', '9': '漢検準2級', '10': '漢検2級'}.get(grade, f'小{grade}')
+L = {'7': '漢検4級', '8': '漢検3級', '9': '漢検準2級', '10': '漢検2級', '11': '漢検準1級', '12': '漢検1級'}.get(grade, f'小{grade}')
 
 # JMdict: 表記 → 読みの集合
 words = collections.defaultdict(set)        # 表記 → 読み（すべての表記）
@@ -124,7 +125,9 @@ for ln, line in enumerate(open(os.path.join(ROOT, f'data/src/g{grade}.txt')), 1)
     out_kanji[ch] = {'grade': int(grade), 'on': [] if on == '—' else on.split('・'), 'kun': [] if kun == '—' else kun.split('・'),
                      'meaning': plain_mean, 'meaningTokens': mtoks, 'words': list(dict.fromkeys(words_of_ch))}
 missing = [c for c in target_set if c not in seen]
-if missing: errors.append('配当漢字の抜け: ' + ''.join(missing))
+# --partial: 字が多い級（準1級・1級）は、できた字から順に公開する
+if missing and '--partial' in sys.argv: warns.append(f'まだ問題のない字: {len(missing)}字')
+elif missing: errors.append('配当漢字の抜け: ' + ''.join(missing))
 print(f'{L}: {len(out_kanji)}字 / {len(out_q)}問（熟語を含む文 {sum(q["type"]=="word" for q in out_q)}・そのほかの文 {sum(q["type"]=="sentence" for q in out_q)}）')
 nontext = [q['id'] for q in out_q if all('t' not in t for t in q['tokens'])]
 if nontext: errors.append('文になっていない問題: ' + ' '.join(nontext))
