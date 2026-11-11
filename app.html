@@ -269,6 +269,9 @@ h2 { font-size: 1.15rem; }
 /* データ・せつめい */
 .prose { max-width: 70ch; display: flex; flex-direction: column; gap: 10px; }
 .prose p, .prose li { margin: 0; }
+.qrbox { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.qrbox img { background: #fff; padding: 8px; border-radius: 12px; border: 1px solid var(--line); }
+.qrbox .sub { overflow-wrap: anywhere; }
 .prose ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 4px; }
 .msg { font-size: .9rem; min-height: 1.4em; }
 footer { font-size: .78rem; color: var(--muted); display: flex; gap: 6px 16px; flex-wrap: wrap; }
@@ -438,6 +441,8 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
     <div class="card prose">
       <div class="row" style="justify-content:space-between"><h1 data-k="このアプリについて">このアプリについて</h1><a class="back" href="#home" role="button" style="display:inline-flex;align-items:center;text-decoration:none;color:inherit" data-k="もどる">もどる</a></div>
       <p>かんじのたね は、小学生が手書きで答える漢字テストです。まちがえた字は「にがてリスト」に入り、練習プリントを作って印刷できます。</p>
+      <h2>このアプリを ひらく QR コード</h2>
+      <div class="qrbox"><img src="icons/qr.svg" alt="https://pop-club.github.io/kanji-tane/ を開く QR コード" width="180" height="180"><p class="sub">スマホや タブレットの カメラで 読み取ると、このアプリが 開きます。<br>https://pop-club.github.io/kanji-tane/</p></div>
       <h2>プライバシー</h2>
       <ul>
         <li>手書きの文字の読み取りは、すべてこの端末の中で行います。手書きの文字や学習の記録を、外部に送ることはありません。</li>

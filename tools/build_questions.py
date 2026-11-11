@@ -19,7 +19,7 @@ G.update(json.load(open(os.path.join(ROOT, 'data/kanken-levels.json')))['kanji']
 known = set(''.join(G[str(g)] for g in range(1, int(grade) + 1)))
 # 漢検（中学の字）では、見せる字は常用漢字ならよい（小学校の字いがいは ふりがなを出す）
 if int(grade) >= 7:
-    known = set(c for c in open(os.path.join(ROOT, 'data/joyo-kanji.txt')).read() if ord(c) > 0x3000)
+    known = set(c for c in open(os.path.join(ROOT, 'data/joyo-kanji.txt')).read() if ord(c) > 0x3000) | {'々'}
 target_set = list(G[grade])
 L = {'7': '漢検4級', '8': '漢検3級', '9': '漢検準2級', '10': '漢検2級'}.get(grade, f'小{grade}')
 
