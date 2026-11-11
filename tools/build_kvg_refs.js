@@ -14,11 +14,21 @@ const g = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/grade-kanji.j
 const chars = [...Object.values(g).join('')];
 const box = { width: 109, height: 109 }; // KanjiVG の座標系
 const pats = [];
+const MERGE = process.env.MERGE !== '0', MERGE_DIST = +(process.env.MERGE_DIST || 14), MAX_MERGE = 3;
+let merged = 0;
 for (const ch of chars) {
   const b = loadKVG(ch);
-  for (let i = 0; i < N; i++) {
-    const p = R.makePattern(ch, i === 0 ? b : distort(b, 1), box);
-    pats.push([ch, p[1], p[2].map((st) => st.map(([x, y]) => [Math.round(x), Math.round(y)]))]);
+  const add = (strokes) => { const p = R.makePattern(ch, strokes, box); pats.push([ch, p[1], p[2].map((st) => st.map(([x, y]) => [Math.round(x), Math.round(y)]))]); };
+  for (let i = 0; i < N; i++) add(i === 0 ? b : distort(b, 1));
+  // 画をつなげて書いた形（前の画の終わりと次の画の始まりが近いところ）。1か所ずつ、元の形と崩した形の2つ
+  if (MERGE) {
+    let m = 0;
+    for (let k = 0; k + 1 < b.length && m < MAX_MERGE; k++) {
+      const e = b[k][b[k].length - 1], s = b[k + 1][0];
+      if (Math.hypot(e[0] - s[0], e[1] - s[1]) > MERGE_DIST) continue;
+      const join = (st) => st.slice(0, k).concat([st[k].concat(st[k + 1])], st.slice(k + 2));
+      add(join(b)); add(join(distort(b, 1))); m++; merged++;
+    }
   }
 }
 fs.mkdirSync(path.dirname(out), { recursive: true });
@@ -29,4 +39,4 @@ fs.writeFileSync(out,
   ' * このファイルは CC BY-SA 3.0 で提供します: https://creativecommons.org/licenses/by-sa/3.0/\n' +
   ' * 作成ツール: tools/build_kvg_refs.js\n */\n' +
   'window.POPKANJI_KVG_REFS = ' + JSON.stringify(pats) + ';\n');
-console.log('手本', pats.length, '件', fs.statSync(out).size, 'bytes →', out);
+console.log('手本', pats.length, '件（画をつなげた形', merged * 2, '件を含む）', fs.statSync(out).size, 'bytes →', out);

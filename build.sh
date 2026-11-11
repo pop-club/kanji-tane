@@ -27,7 +27,7 @@ for out in build docs; do
   rm -rf "$out" && mkdir -p "$out/vendor"
   page app.html "$out/index.html"
   page index.html "$out/verify.html"
-  cp -r js "$out/"
+  cp -r js icons "$out/"
   cp -r vendor/kanjicanvas vendor/kanjivg-refs "$out/vendor/"
   touch "$out/.nojekyll"
 done

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <title>かんじのたね</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dff5e6"/>
+      <stop offset="1" stop-color="#bfe9cd"/>
+    </linearGradient>
+    <linearGradient id="seed" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6cf8f"/>
+      <stop offset="1" stop-color="#e9a95b"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- つち -->
+  <ellipse cx="256" cy="430" rx="170" ry="34" fill="#9fd8b1"/>
+  <!-- め（くき と はっぱ） -->
+  <path d="M256 236 C256 196 254 170 250 146" stroke="#2f9e5b" stroke-width="18" stroke-linecap="round" fill="none"/>
+  <path d="M250 156 C214 88 140 84 112 112 C120 166 196 190 250 156 Z" fill="#43b96f"/>
+  <path d="M252 150 C278 80 350 64 392 92 C390 150 316 186 252 150 Z" fill="#5ccc82"/>
+  <path d="M246 152 C210 130 170 120 140 118" stroke="#2f9e5b" stroke-width="6" stroke-linecap="round" fill="none" opacity=".55"/>
+  <path d="M258 146 C292 116 330 104 364 98" stroke="#2f9e5b" stroke-width="6" stroke-linecap="round" fill="none" opacity=".55"/>
+  <!-- たね -->
+  <path d="M256 222 C340 222 392 290 392 350 C392 410 330 440 256 440 C182 440 120 410 120 350 C120 290 172 222 256 222 Z" fill="url(#seed)"/>
+  <path d="M168 300 C180 268 204 248 232 238" stroke="#fff3dd" stroke-width="14" stroke-linecap="round" fill="none" opacity=".8"/>
+  <!-- かお -->
+  <ellipse cx="208" cy="344" rx="15" ry="19" fill="#3b2a1a"/>
+  <ellipse cx="304" cy="344" rx="15" ry="19" fill="#3b2a1a"/>
+  <circle cx="213" cy="337" r="5" fill="#fff"/>
+  <circle cx="309" cy="337" r="5" fill="#fff"/>
+  <ellipse cx="176" cy="378" rx="22" ry="13" fill="#f39a8c" opacity=".75"/>
+  <ellipse cx="336" cy="378" rx="22" ry="13" fill="#f39a8c" opacity=".75"/>
+  <path d="M236 378 C246 392 266 392 276 378" stroke="#3b2a1a" stroke-width="9" stroke-linecap="round" fill="none"/>
+</svg>

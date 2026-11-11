@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>かんじのたね</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="かんじのたね">
+<meta name="theme-color" content="#dff5e6">
 <meta name="description" content="手書きで答える小学生の漢字テスト。まちがえた字は練習プリントにして印刷できます。通信なしで端末の中だけで動きます。">
 <style>
 /* Layout: 1画面1つのしごと。テストは 横向き＝左に問題・右に大きな書き取り枠／縦向き＝上に問題・下に枠 */
@@ -60,7 +65,7 @@ a { color: var(--sky); }
 /* ヘッダー */
 .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; min-height: 52px; }
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
-.brand .mark { width: 40px; height: 40px; border-radius: 12px; background: var(--ok); color: var(--surface); display: grid; place-items: center; flex: none; }
+.brand .mark { width: 44px; height: 44px; border-radius: 12px; flex: none; display: block; }
 .brand b { font-size: 1.3rem; letter-spacing: .02em; }
 .back { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; }
 .loadstate { font-size: .8rem; color: var(--muted); }
@@ -238,7 +243,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
 
 <div class="app">
   <header class="top">
-    <a class="brand" href="#home" aria-label="かんじのたね ホームへ"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26"><path d="M12 21V11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/><path d="M12 12C12 7 8.5 4.5 4 5c0 4.5 3 7.5 8 7z" fill="currentColor"/><path d="M12 10.5c0-4 3-6.5 8-6.5 0 4-3 6.8-8 6.5z" fill="currentColor" opacity=".8"/></svg></span><b>かんじのたね</b></a>
+    <a class="brand" href="#home" aria-label="かんじのたね ホームへ"><img class="mark" src="icons/icon.svg" alt="" width="44" height="44"><b>かんじのたね</b></a>
     <span class="loadstate" id="loadstate">よみとりの じゅんびちゅう…</span>
   </header>
 
@@ -419,6 +424,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
 <script src="js/recognizer.js"></script>
 <script src="js/store.js"></script>
 <script src="js/pad.js"></script>
+<script src="js/stroke-counts.js"></script>
 <script src="js/grades.js"></script>
 <script src="js/questions.js"></script>
 <script src="js/app.js"></script>

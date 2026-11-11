@@ -24,6 +24,7 @@
   });
   function gradeChars(g) { return QD[g] ? Object.keys(QD[g].kanji) : []; }
   // 学年別漢字配当表（2020年度施行、js/grades.js）。習った字かどうかの判断に使う
+  var STD_STROKES = window.POPKANJI_STROKES || {};   // 標準の画数（js/stroke-counts.js）
   var GRADE_OF = {};
   var GL = window.POPKANJI_GRADES || {};
   Object.keys(GL).forEach(function (g) { Array.from(GL[g]).forEach(function (c) { GRADE_OF[c] = +g; }); });
@@ -277,9 +278,16 @@
     var cands = R.recognize(pad.strokes(), { width: pad.size(), height: pad.size() }, 10);
     var j = R.judge(cands, it.ch);
     it.tries++;
+    // 画数がちがうと読み取れないことが多い（例: 五の2画目と3画目をつなげる）。
+    // 1回めは画数のヒントを出して書き直し、2回めも画数がちがえば理由を伝えてまちがいにする。
+    var std = STD_STROKES[it.ch], n = pad.strokes().length, mismatch = !!std && n !== std;
     if (j.result === 'correct') {
       feedback('correct', 'せいかい！', '', true, false);
       finishItem('correct');
+    } else if (mismatch && !it.strokeHinted) {
+      it.strokeHinted = true;
+      feedback('retry', std + 'かくで かいてみよう', 'いまは ' + n + 'かく だったよ。1かくずつ はなして かこう。', false, false);
+      pad.clear();
     } else if (j.result === 'retry' && it.tries < MAX_RETRY) {
       feedback('retry', 'もういちど ていねいに かいてね', 'うまく よみとれなかったよ（' + it.tries + ' / ' + MAX_RETRY + '）', false, false);
       pad.clear();
@@ -295,7 +303,8 @@
         var g = GRADE_OF[cands[i].char];
         if (cands[i].char !== it.ch && g && g <= maxGrade) { shown = cands[i].char; break; }
       }
-      var seen = shown ? '「<span class="kj">' + esc(shown) + '</span>」に みえたよ。こたえは この かんじ。' : 'ちがう かんじに みえたよ。こたえは この かんじ。';
+      var seen = mismatch ? 'かくすうが ちがったよ（ただしくは ' + std + 'かく）。こたえは この かんじ。'
+        : shown ? '「<span class="kj">' + esc(shown) + '</span>」に みえたよ。こたえは この かんじ。' : 'ちがう かんじに みえたよ。こたえは この かんじ。';
       feedback('wrong', 'ざんねん', seen, true, true);
       finishItem('wrong', j.seenAs);
     }
