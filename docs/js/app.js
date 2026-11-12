@@ -417,7 +417,8 @@
       (misjudge ? '<button class="misjudge" id="tMis">' + K('[正:ただ]しく [書:か]いたのに [間違:まちが]いに なった') + '</button>' : '') + '</div>';
     $('tFb').innerHTML = html; $('tFb').hidden = false;
     setTimeout(fitPad, 0);
-    if ($('tPractice')) $('tPractice').onclick = startPractice;
+    // 間違えたときの練習は、練習モードと同じ画面（大きな書く枠）で1字だけ。終わったらテストに戻る
+    if ($('tPractice')) $('tPractice').onclick = function () { startDrill([cur().ch], { back: 'test' }); };
     if (misjudge) $('tMis').onclick = function () {
       pending = 'recog';
       $('tFb').firstChild.className = 'fb recog';
@@ -603,16 +604,18 @@
     };
   });
   $('dStart').onclick = function () { startDrill(chooseForGrade(dPickGrade, dPickN)); };
-  function startDrill(chars) {
+  function startDrill(chars, opt) {
     var wait = ensureRefs(chars);
     if (wait) {
       $('loadstate').textContent = K('[漢字:かんじ]の [手本:てほん]を [読:よ]み[込:こ]み[中:ちゅう]…');
       $('dStart').disabled = true;
-      wait.then(function () { $('loadstate').textContent = ''; $('dStart').disabled = false; startDrill(chars); },
+      wait.then(function () { $('loadstate').textContent = ''; $('dStart').disabled = false; startDrill(chars, opt); },
         function () { $('loadstate').textContent = K('[手本:てほん]を [読:よ]み[込:こ]めませんでした'); $('dStart').disabled = false; });
       return;
     }
-    drill = { items: chars.map(function (ch) { return { ch: ch, done: false, skipped: false, misses: 0 }; }), idx: 0, step: 0, count: 0, peek: false };
+    drill = { items: chars.map(function (ch) { return { ch: ch, done: false, skipped: false, misses: 0 }; }), idx: 0, step: 0, count: 0, peek: false, back: opt && opt.back };
+    $('dQuit').textContent = drill.back ? K('テストに [戻:もど]る') : K('やめる');
+    $('dSkip').hidden = !!drill.back;
     if (!dpad) dpad = new window.PopKanjiPad($('dPad'), { onChange: function (n) { dShowCount(n); dUpdateBtns(); } });
     go('drillrun');
     dShowChar();
@@ -741,9 +744,17 @@
   function dNextChar() {
     dBusy = false;
     if (drill.idx + 1 < drill.items.length) { drill.idx++; dShowChar(); return; }
+    if (drill.back) { backToTest(); return; }
     renderDrillDone(); go('drilldone');
   }
-  $('dQuit').onclick = function () { if (!drill) return; renderDrillDone(); go('drilldone'); };
+  $('dQuit').onclick = function () { if (!drill) return; if (drill.back) { backToTest(); return; } renderDrillDone(); go('drilldone'); };
+  function backToTest() {
+    drill = null; dBusy = false;
+    $('dQuit').textContent = K('やめる'); $('dSkip').hidden = false;
+    if ($('tPmsg')) { $('tPmsg').textContent = K('[練習:れんしゅう]したね！ [次:つぎ]へ [進:すす]もう'); $('tPmsg').className = 'pmsg ok'; }
+    go('test');
+    setTimeout(function () { try { $('tNext').focus({ preventScroll: true }); } catch (e) {} }, 50);
+  }
   function renderDrillDone() {
     var done = drill.items.filter(function (x) { return x.done; });
     $('ddNote').textContent = done.length ? done.length + K('[字:じ] [練習:れんしゅう]したよ。テストで [書:か]けたら「[覚:おぼ]えかけ」→「[覚:おぼ]えた」に なるよ。') : K('[練習:れんしゅう]した [字:じ]は ありません。');
