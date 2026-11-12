@@ -218,11 +218,11 @@
   paintMode();
 
   // ---------- 画面の切り替え ----------
-  var views = ['home', 'grade', 'test', 'result', 'weak', 'print', 'data', 'about'];
+  var views = ['home', 'grade', 'test', 'drill', 'drillrun', 'drilldone', 'result', 'weak', 'print', 'data', 'about'];
   function show(name) {
     views.forEach(function (v) { $('v-' + v).hidden = v !== name; });
     window.scrollTo(0, 0);
-    document.body.classList.toggle('testing', name === 'test');
+    document.body.classList.toggle('testing', name === 'test' || name === 'drillrun');
     if (name !== 'test') document.body.classList.remove('practicing');
     if (name === 'test' && pad) setTimeout(function () { fitPad(); pad.redraw(); }, 0);
   }
@@ -231,10 +231,12 @@
     if (views.indexOf(h) < 0) h = 'home';
     if (h === 'test' && !session) h = 'home';
     if (h === 'result' && !lastResult) h = 'home';
+    if ((h === 'drillrun' || h === 'drilldone') && !drill) h = 'drill';
     if (h === 'print' && !printChars.length) h = 'weak';
     paintText();   // 固定の文を先に。そのあと各画面の render が動く文を書く
     if (h === 'home') renderHome();
     if (h === 'grade') renderGrade();
+    if (h === 'drill') renderDrill();
     if (h === 'weak') renderWeak();
     if (h === 'print') renderPrint();
     if (h === 'data') renderData();
@@ -351,6 +353,7 @@
     el.className = 'padcount' + (std && n === std ? ' ok' : std && n > std ? ' over' : '');
   }
   function updateAnswerBtn() {
+    if (drill) dUpdateBtns();
     if (!pad || !session) return;
     var n = pad.strokes().length;
     var busy = answered && !practicing;
@@ -403,7 +406,7 @@
     var hasK = k.meaningTokens && k.meaningTokens.some(function (t) { return t.k !== undefined; });
     var mean = hasK ? '<span class="qline mline">' + renderQ({ tokens: k.meaningTokens, kanji: ch }, 'answer') + '</span>' : esc(k.meaning);
     return '<dl><dt>' + K('[読:よ]み') + '</dt><dd>' + esc(yomi) + '</dd><dt>' + K('[意味:いみ]') + '</dt><dd>' + mean + '</dd>' +
-      (k.words && k.words.length ? '<dt>' + K('[言葉:ことば]') + '</dt><dd class="kj">' + esc(k.words.slice(0, 4).join('　')) + '</dd>' : '') + '</dl>';
+      (k.words && k.words.length ? '<dt class="dw">' + K('[言葉:ことば]') + '</dt><dd class="kj dw">' + esc(k.words.slice(0, 4).join('　')) + '</dd>' : '') + '</dl>';
   }
   function feedback(kind, verdict, detail, withInfo, misjudge) {
     var it = cur();
@@ -568,6 +571,187 @@
     session = null;
     renderResult();
     go('result');
+  }
+
+  // ---------- 漢字の練習 ----------
+  // 1字ずつ「なぞる（2回）→ 見て書く → 見ないで書く」。記録（おぼえぐあい）は変えない。覚えたかどうかはテストで決める
+  var DSTEPS = [
+    { key: 'trace', label: 'なぞる', times: 2 },
+    { key: 'copy', label: '[見:み]て [書:か]く', times: 1 },
+    { key: 'recall', label: '[見:み]ないで [書:か]く', times: 1 }
+  ];
+  var drill = null, dpad = null, dBusy = false, dPickGrade = null, dPickN = 5;
+  function renderDrill() {
+    if (dPickGrade === null || levels().indexOf(dPickGrade) < 0) dPickGrade = levels().indexOf(pickGrade) >= 0 ? pickGrade : levels()[0];
+    $('dTitle').textContent = mode === 'kanken' ? K('どの [級:きゅう]を [練習:れんしゅう]する？') : K('[何年生:なんねんせい]の [漢字:かんじ]を [練習:れんしゅう]する？');
+    var html = '';
+    levels().forEach(function (g) {
+      var ok = hasGrade(g);
+      html += '<button class="grade' + (ok && g === dPickGrade ? ' on' : '') + '" data-g="' + g + '"' + (ok ? '' : ' disabled') + '><b>' + K(GRADE_NAME[g]) + '</b>' +
+        (ok ? '<span class="sample">' + esc(gradeChars(g).slice(0, 4).join('')) + '…</span>' : '<small>' + K('[準備中:じゅんびちゅう]') + '</small>') + '</button>';
+    });
+    $('dList').innerHTML = html;
+    Array.prototype.forEach.call($('dList').querySelectorAll('.grade'), function (b) {
+      b.onclick = function () { dPickGrade = +b.dataset.g; renderDrill(); };
+    });
+    $('dStart').disabled = !hasGrade(dPickGrade);
+  }
+  Array.prototype.forEach.call($('dCount').querySelectorAll('button'), function (b) {
+    b.onclick = function () {
+      dPickN = +b.dataset.n;
+      Array.prototype.forEach.call($('dCount').querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', x === b); });
+    };
+  });
+  $('dStart').onclick = function () { startDrill(chooseForGrade(dPickGrade, dPickN)); };
+  function startDrill(chars) {
+    var wait = ensureRefs(chars);
+    if (wait) {
+      $('loadstate').textContent = K('[漢字:かんじ]の [手本:てほん]を [読:よ]み[込:こ]み[中:ちゅう]…');
+      $('dStart').disabled = true;
+      wait.then(function () { $('loadstate').textContent = ''; $('dStart').disabled = false; startDrill(chars); },
+        function () { $('loadstate').textContent = K('[手本:てほん]を [読:よ]み[込:こ]めませんでした'); $('dStart').disabled = false; });
+      return;
+    }
+    drill = { items: chars.map(function (ch) { return { ch: ch, done: false, skipped: false, misses: 0 }; }), idx: 0, step: 0, count: 0, peek: false };
+    if (!dpad) dpad = new window.PopKanjiPad($('dPad'), { onChange: function (n) { dShowCount(n); dUpdateBtns(); } });
+    go('drillrun');
+    dShowChar();
+  }
+  function dCur() { return drill.items[drill.idx]; }
+  function dShowCount(n) {
+    var el = $('dCountN'), std = drill && STD_STROKES[dCur().ch];
+    el.hidden = !n && !std;
+    el.textContent = std ? n + ' / ' + std + K('[画:かく]') : n + K('[画:かく]');
+    el.className = 'padcount' + (std && n === std ? ' ok' : std && n > std ? ' over' : '');
+  }
+  function dUpdateBtns() {
+    if (!dpad || !drill) return;
+    var n = dpad.strokes().length;
+    $('dCheck').disabled = !ready || !n || dBusy;
+    $('dCheck').textContent = ready ? K('[書:か]けた！') : K('[準備中:じゅんびちゅう]…');
+    $('dUndo').disabled = !n || dBusy; $('dClear').disabled = !n || dBusy;
+  }
+  // 書き順：KanjiVG から作った手本（1つ目はそのままの形）の筆画を、順に描いて見せる
+  var kvgFirst = null;
+  function orderStrokes(ch) {
+    var lists = ['POPKANJI_KVG_REFS', 'POPKANJI_KVG_REFS_MID', 'POPKANJI_KVG_REFS_11', 'POPKANJI_KVG_REFS_12'];
+    if (!kvgFirst) kvgFirst = {};
+    if (kvgFirst[ch] !== undefined) return kvgFirst[ch];
+    var found = null;
+    lists.forEach(function (n) { if (found) return; var l = window[n] || []; for (var i = 0; i < l.length; i++) if (l[i][0] === ch) { found = l[i][2]; break; } });
+    kvgFirst[ch] = found;
+    return found;
+  }
+  function orderSvg(ch, animate) {
+    var st = orderStrokes(ch);
+    if (!st || st.length !== STD_STROKES[ch] && STD_STROKES[ch]) return '<div class="bigch" aria-label="' + esc(ch) + '">' + esc(ch) + '</div>';
+    var xs = [], ys = [];
+    st.forEach(function (s) { s.forEach(function (p) { xs.push(p[0]); ys.push(p[1]); }); });
+    var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+    var w = Math.max(x1 - x0, y1 - y0, 1), pad = w * 0.14, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    var sc = 200 / (w + 2 * pad), tx = function (x) { return (100 + (x - cx) * sc).toFixed(1); }, ty = function (y) { return (100 + (y - cy) * sc).toFixed(1); };
+    // 点と点のあいだを なめらかにつなぐ
+    var paths = st.map(function (s) {
+      if (s.length === 1) return 'M' + tx(s[0][0]) + ' ' + ty(s[0][1]) + 'l0.1 0.1';
+      var d = 'M' + tx(s[0][0]) + ' ' + ty(s[0][1]);
+      for (var i = 1; i < s.length - 1; i++) d += ' Q' + tx(s[i][0]) + ' ' + ty(s[i][1]) + ' ' + tx((s[i][0] + s[i + 1][0]) / 2) + ' ' + ty((s[i][1] + s[i + 1][1]) / 2);
+      d += ' L' + tx(s[s.length - 1][0]) + ' ' + ty(s[s.length - 1][1]);
+      return d;
+    });
+    var dur = 0.55, html = '<svg class="order" viewBox="0 0 200 200" role="img" aria-label="' + esc(ch) + K(' の [書:か]き[順:じゅん]') + '">';
+    paths.forEach(function (d) { html += '<path class="ghost" d="' + d + '"/>'; });
+    paths.forEach(function (d, i) {
+      html += '<path d="' + d + '" pathLength="1"' + (animate ? ' style="stroke-dasharray:1;stroke-dashoffset:1;animation:dwrite ' + dur + 's ' + (i * (dur + 0.15)).toFixed(2) + 's linear forwards"' : '') + '/>';
+    });
+    var placed = [];
+    st.forEach(function (s, i) {
+      var p = s[0], x = +tx(p[0]) - 10, y = +ty(p[1]) - 6;
+      // 番号どうしが重ならないように少しずらす
+      for (var t = 0; t < 6 && placed.some(function (q) { return Math.abs(q[0] - x) < 13 && Math.abs(q[1] - y) < 14; }); t++) x -= 12;
+      placed.push([x, y]);
+      html += '<text x="' + Math.max(2, Math.min(186, x)).toFixed(0) + '" y="' + Math.max(14, Math.min(196, y)).toFixed(0) + '"' + (animate ? ' style="opacity:0;animation:dnum .01s ' + (i * (dur + 0.15)).toFixed(2) + 's forwards"' : '') + '>' + (i + 1) + '</text>';
+    });
+    return html + '</svg>';
+  }
+  function dShowChar() {
+    var it = dCur(), n = drill.items.length;
+    drill.step = 0; drill.count = 0; drill.peek = false; dBusy = false;
+    $('dNum').textContent = (drill.idx + 1) + ' / ' + n;
+    $('dProg').style.width = (100 * drill.idx / n) + '%';
+    dShowStep();
+  }
+  function dShowStep() {
+    var it = dCur(), k = KANJI[it.ch], step = DSTEPS[drill.step];
+    $('dSteps').innerHTML = DSTEPS.map(function (s, i) {
+      return '<li class="' + (i < drill.step ? 'done' : i === drill.step ? 'now' : '') + '">' + (i + 1) + '. ' + K(s.label) + (s.times > 1 && i === drill.step ? '（' + (drill.count + 1) + '/' + s.times + '）' : '') + '</li>';
+    }).join('');
+    var hide = step.key === 'recall' && !drill.peek;
+    $('dModel').innerHTML = hide ? '<div class="hidden-ch" aria-label="' + K('かくれて いるよ') + '">？</div>' :
+      orderSvg(it.ch, drill.step === 0 && drill.count === 0) + '<div class="bigch" aria-hidden="true">' + esc(it.ch) + '</div>';
+    if (!hide) $('dModel').insertAdjacentHTML('beforeend', '<button class="btn replay" id="dReplay">▶ ' + K('[書:か]き[順:じゅん]') + '</button>');
+    if ($('dReplay')) $('dReplay').onclick = function () { var svg = $('dModel').querySelector('.order'); if (svg) svg.outerHTML = orderSvg(it.ch, true); };
+    // 読み・画数・言葉。見ないで書くときは、問題の文（空欄つき）で思い出す
+    var yomi = [].concat(k.on, k.kun).filter(Boolean).join('・') || '—';
+    var info = '<dl><dt>' + K('[読:よ]み') + '</dt><dd>' + esc(yomi) + '</dd><dt>' + K('[画数:かくすう]') + '</dt><dd>' + (STD_STROKES[it.ch] || '—') + K('[画:かく]') + '</dd>' +
+      (hide ? '' : (k.words && k.words.length ? '<dt class="dw">' + K('[言葉:ことば]') + '</dt><dd class="kj dw">' + esc(k.words.slice(0, 3).join('　')) + '</dd>' : '')) + '</dl>';
+    if (hide && QUESTIONS[it.ch]) { var q = QUESTIONS[it.ch][0]; info += '<p class="sub" style="margin:.6em 0 .2em">' + K('[四角:しかく]に [入:はい]る [漢字:かんじ]を [書:か]こう') + '</p><div class="qtext qline">' + renderQ(q, 'test') + '</div>'; }
+    $('dInfo').innerHTML = info;
+    $('dMsg').textContent = step.key === 'trace' ? K('うすい [字:じ]を なぞって [書:か]こう。[書:か]き[順:じゅん]に [気:き]を つけてね') :
+      step.key === 'copy' ? K('[左:ひだり]の お[手本:てほん]を [見:み]ながら [書:か]こう') : K('お[手本:てほん]を [見:み]ないで [書:か]けるかな？');
+    $('dMsg').className = 'dmsg';
+    dpad.setGuide(step.key === 'trace' ? it.ch : null); dpad.setInk(null); dpad.lock(false); dpad.clear();
+    $('dPad').classList.remove('ok', 'ng');
+    dShowCount(0); dUpdateBtns();
+  }
+  $('dUndo').onclick = function () { dpad.undo(); };
+  $('dClear').onclick = function () { dpad.clear(); };
+  $('dCheck').onclick = function () {
+    if (dBusy || !ready || !dpad.strokes().length) return;
+    var it = dCur(), step = DSTEPS[drill.step], padEl = $('dPad');
+    var cands = R.recognize(dpad.strokes(), { width: dpad.size(), height: dpad.size() }, 10);
+    var ok = R.judge(cands, it.ch).result === 'correct';
+    var std = STD_STROKES[it.ch], n = dpad.strokes().length;
+    padEl.classList.remove('ok', 'ng'); void padEl.offsetWidth;
+    if (ok) {
+      dBusy = true; dpad.setInk('--ok'); dpad.lock(true); padEl.classList.add('ok');
+      $('dStamp').innerHTML = '<span class="mark">◎</span><span class="word">' + esc(K('よく [書:か]けたね！')) + '</span>';
+      $('dMsg').textContent = K('よく [書:か]けたね！'); $('dMsg').className = 'dmsg ok';
+      dUpdateBtns();
+      setTimeout(function () {
+        if (!drill) return;
+        padEl.classList.remove('ok');
+        drill.count++;
+        if (drill.count >= step.times) { drill.step++; drill.count = 0; drill.peek = false; }
+        if (drill.step >= DSTEPS.length) { it.done = true; dNextChar(); return; }
+        dBusy = false; dShowStep();
+      }, 1200);
+    } else {
+      it.misses++;
+      padEl.classList.add('ng');
+      setTimeout(function () { padEl.classList.remove('ng'); }, 600);
+      var msg = std && n !== std ? std + K('[画:かく]で [書:か]いてみよう（[今:いま]は ') + n + K('[画:かく]）') : K('おしい！ もう[一度:いちど] [書:か]いてみよう');
+      // 見ないで書くとき、2回うまくいかなかったら お手本を見せる（見たあとも、見ないで書けるまで続ける）
+      if (step.key === 'recall' && !drill.peek && it.misses >= 2) { drill.peek = true; dShowStep(); msg = K('お[手本:てほん]を [見:み]て、もう[一度:いちど] [書:か]いてみよう'); }
+      else dpad.clear();
+      $('dMsg').textContent = msg; $('dMsg').className = 'dmsg ng';
+      dUpdateBtns();
+    }
+  };
+  $('dSkip').onclick = function () { if (!drill || dBusy) return; dCur().skipped = true; dNextChar(); };
+  function dNextChar() {
+    dBusy = false;
+    if (drill.idx + 1 < drill.items.length) { drill.idx++; dShowChar(); return; }
+    renderDrillDone(); go('drilldone');
+  }
+  $('dQuit').onclick = function () { if (!drill) return; renderDrillDone(); go('drilldone'); };
+  function renderDrillDone() {
+    var done = drill.items.filter(function (x) { return x.done; });
+    $('ddNote').textContent = done.length ? done.length + K('[字:じ] [練習:れんしゅう]したよ。テストで [書:か]けたら「[覚:おぼ]えかけ」→「[覚:おぼ]えた」に なるよ。') : K('[練習:れんしゅう]した [字:じ]は ありません。');
+    $('ddList').innerHTML = drill.items.map(function (x) {
+      return '<div class="it"><b>' + esc(x.ch) + '</b><small>' + (x.done ? K('[書:か]けた') : x.skipped ? K('とばした') : K('まだ')) + '</small></div>';
+    }).join('');
+    $('ddTest').disabled = !done.length;
+    $('ddTest').onclick = function () { var chars = done.map(function (x) { return x.ch; }); drill = null; startTest('review', 0, shuffle(chars)); };
   }
 
   // ---------- 結果 ----------

@@ -225,9 +225,44 @@ body.practicing #tNextRow { position: static; }
 @media (max-width: 600px) { body.practicing .qcard { display: none; } body.practicing .fb .ans { font-size: 2.6rem; } body.practicing .fb .verdict { font-size: 1.05rem; } }
 @keyframes stamp-pop { 0% { opacity: 0; } 12% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
 @keyframes mark-pop { 0% { transform: scale(.3) rotate(-20deg); } 30% { transform: scale(1.15) rotate(5deg); } 45% { transform: scale(1) rotate(0); } 100% { transform: scale(1); } }
+@keyframes dwrite { to { stroke-dashoffset: 0; } }
+@keyframes dnum { to { opacity: 1; } }
 @keyframes pad-shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(7px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(3px); } }
 @media (prefers-reduced-motion: reduce) { .pad.ok .stamp, .pad.ok .stamp .mark { animation: none; opacity: 1; transform: none; } .pad.ng { animation: none; } }
 .fb .pmsg { font-weight: 700; min-height: 1.4em; }
+/* 漢字の練習 */
+.big-actions a.btn.practice { text-decoration: none; background: var(--ok); border-color: var(--ok); color: var(--ok-ink); box-shadow: 0 4px 0 color-mix(in srgb, var(--ok) 60%, #000); }
+.big-actions a.btn.practice:active { transform: translateY(2px); box-shadow: 0 2px 0 color-mix(in srgb, var(--ok) 60%, #000); }
+.dcard { gap: 10px; }
+.dsteps { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; flex-wrap: wrap; }
+.dsteps li { padding: 4px 12px; border-radius: 99px; background: var(--bg); color: var(--muted); font-weight: 700; font-size: .9rem; border: 1px solid var(--line); }
+.dsteps li.now { background: var(--sky); color: #fff; border-color: var(--sky); }
+.dsteps li.done { background: var(--ok-bg); color: var(--ok); border-color: transparent; }
+.dmodel { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+.dmodel .order { width: min(46vw, 210px); aspect-ratio: 1; background: var(--surface); border: 2px solid var(--line); border-radius: var(--r); }
+.dmodel .order path { fill: none; stroke: var(--stroke); stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
+.dmodel .order path.ghost { stroke: var(--guide); }
+.dmodel .order text { font-size: 15px; font-weight: 700; fill: var(--accent); }
+.dmodel .bigch { font-family: var(--font-kanji); font-size: clamp(5rem, 22vw, 9rem); line-height: 1; }
+.dmodel .hidden-ch { width: min(46vw, 210px); aspect-ratio: 1; border: 2px dashed var(--line); border-radius: var(--r); display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--muted); }
+.dmodel .replay { font-size: .9rem; }
+.dinfo dl { margin: 0; }
+.dinfo .qline { font-size: 1.25rem; }
+.dmsg { font-weight: 700; min-height: 1.4em; text-align: center; }
+.dmsg.ok { color: var(--ok); } .dmsg.ng { color: var(--retry); }
+.ddlist { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0 14px; }
+.ddlist .it { min-width: 84px; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--r); text-align: center; background: var(--surface); }
+.ddlist .it b { display: block; font-family: var(--font-kanji); font-size: 2.6rem; line-height: 1.1; }
+.ddlist .it small { color: var(--muted); }
+@media (orientation: portrait), (max-width: 820px) {
+  .dmodel { flex-wrap: nowrap; justify-content: flex-start; }
+  .dmodel .order, .dmodel .hidden-ch { width: min(34vw, 150px); flex: none; }
+  .dmodel .bigch { display: none; }
+  .dinfo dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: .95rem; }
+  .dinfo dd { margin: 0; }
+  .dinfo .dw { display: none; }
+  .dsteps li { font-size: .8rem; padding: 3px 9px; }
+}
 .fb .misjudge { background: none; border: none; color: var(--muted); text-decoration: underline; font-size: .85rem; cursor: pointer; padding: 0; align-self: flex-start; min-height: 36px; }
 
 /* 結果 */
@@ -330,6 +365,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
         </div>
         <div class="big-actions">
           <a class="btn primary" href="#grade" data-k="テストを [始:はじ]める">テストを はじめる</a>
+          <a class="btn practice" href="#drill" data-k="✏️ [漢字:かんじ]の [練習:れんしゅう]">✏️ かんじの れんしゅう</a>
           <button class="btn sky" id="hReviewBtn">にがてを ふくしゅう する</button>
           <a class="btn" href="#weak" data-k="[苦手:にがて]リスト・[練習:れんしゅう]プリント">にがてリスト・れんしゅうプリント</a>
         </div>
@@ -384,6 +420,64 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
         </div>
         <div class="row" id="tNextRow" hidden><button class="btn primary" id="tNext" data-k="[次:つぎ]へ">つぎへ</button></div>
         <button class="skip" id="tSkip" data-k="[分:わ]からない">わからない</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 練習：字をえらぶ -->
+  <section id="v-drill" class="view" hidden>
+    <div class="card">
+      <div class="row" style="justify-content:space-between"><h1 id="dTitle">なんねんせいの かんじを れんしゅうする？</h1><a class="back" href="#home" role="button" style="display:inline-flex;align-items:center;text-decoration:none;color:inherit" data-k="もどる">もどる</a></div>
+      <div class="grades" id="dList"></div>
+      <h2 data-k="[何字:なんじ] やる？">なんじ やる？</h2>
+      <div class="count" id="dCount">
+        <button data-n="3" aria-pressed="false" data-k="3[字:じ]">3じ</button>
+        <button data-n="5" aria-pressed="true" data-k="5[字:じ]">5じ</button>
+        <button data-n="10" aria-pressed="false" data-k="10[字:じ]">10じ</button>
+      </div>
+      <p class="sub" data-k="1[字:じ]ずつ「なぞる → [見:み]て [書:か]く → [見:み]ないで [書:か]く」の [順:じゅん]に [練習:れんしゅう]します。まだ [覚:おぼ]えて いない [漢字:かんじ]と [苦手:にがて]の [漢字:かんじ]から [出:で]ます。[練習:れんしゅう]は おぼえぐあいに [数:かぞ]えません（[覚:おぼ]えたかどうかは テストで [決:き]めます）。">1じずつ「なぞる → みて かく → みないで かく」の じゅんに れんしゅうします。</p>
+      <button class="btn primary" id="dStart" disabled data-k="[始:はじ]める">はじめる</button>
+    </div>
+  </section>
+
+  <!-- 練習：書く -->
+  <section id="v-drillrun" class="view" hidden>
+    <div class="testbar">
+      <button class="back" id="dQuit" data-k="やめる">やめる</button>
+      <div class="prog"><i id="dProg"></i></div>
+      <span class="num" id="dNum">1 / 5</span>
+    </div>
+    <div class="testgrid">
+      <div class="col" style="display:flex;flex-direction:column;gap:14px;min-width:0">
+        <div class="card dcard">
+          <ol class="dsteps" id="dSteps"></ol>
+          <div class="dmodel" id="dModel"></div>
+          <div class="dinfo" id="dInfo"></div>
+        </div>
+      </div>
+      <div class="writer">
+        <div class="pad" id="dPad"><div class="padcount" id="dCountN" hidden></div><div class="stamp" id="dStamp" aria-hidden="true"></div></div>
+        <div class="dmsg" id="dMsg" aria-live="polite"></div>
+        <div class="controls">
+          <button class="btn" id="dUndo" data-k="1[画:かく] [消:け]す">1かく けす</button>
+          <button class="btn" id="dClear" data-k="[全部:ぜんぶ] [消:け]す">ぜんぶ けす</button>
+          <button class="btn primary" id="dCheck" data-k="[書:か]けた！">かけた！</button>
+        </div>
+        <button class="skip" id="dSkip" data-k="この [字:じ]は とばす">この じは とばす</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 練習：おわり -->
+  <section id="v-drilldone" class="view" hidden>
+    <div class="card">
+      <h1 data-k="[練習:れんしゅう] おしまい！">れんしゅう おしまい！</h1>
+      <p class="sub" id="ddNote"></p>
+      <div class="ddlist" id="ddList"></div>
+      <div class="row">
+        <button class="btn primary" id="ddTest" data-k="この [字:じ]で テストする">この じで テストする</button>
+        <a class="btn" href="#drill" data-k="ほかの [字:じ]を [練習:れんしゅう]">ほかの じを れんしゅう</a>
+        <a class="btn" href="#home" data-k="ホームへ">ホームへ</a>
       </div>
     </div>
   </section>
