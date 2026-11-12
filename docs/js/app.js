@@ -150,6 +150,9 @@
   loadScript('vendor/kanjicanvas/ref-patterns.js').then(function () {
     R.setCandidateSet(window.JOYO_KANJI);
     return loadScript('vendor/kanjivg-refs/kvg-refs.js').then(function () {
+      // よくある書き方の手本（五の2画目が長い形など）。読めなくても動作は変わらない
+      return loadScript('vendor/kanjivg-refs/kvg-refs-variants.js').catch(function () {});
+    }).then(function () {
       // 元の手本の画数がちがう字は、KanjiVG の手本があれば元の手本を使わない（中学の字は、漢検モードで手本を読んでから効く）
       R.setReplaced('衛臨熟数歌社馬鳥鳴島進駅健散験慣敬' + '幾御驚駆騒傍離肝貫敢騎鶏駐篤乏薦駄騰駒緻鶴罵箸璃');
       R.setKvgRefs(window.POPKANJI_KVG_REFS);

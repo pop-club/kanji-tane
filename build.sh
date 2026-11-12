@@ -32,6 +32,8 @@ for out in build docs; do
   page index.html "$out/verify.html"
   cp -r js icons "$out/"
   cp -r vendor/kanjicanvas vendor/kanjivg-refs "$out/vendor/"
+  # 手本の小数を1けたに丸めて 6.7MB → 2.2MB にする（認識の結果は変わらない: tools/minify_check.js）
+  python3 tools/minify_refs.py vendor/kanjicanvas/ref-patterns.js "$out/vendor/kanjicanvas/ref-patterns.js"
   touch "$out/.nojekyll"
   # Google Search Console の確認用ファイル（リポジトリ直下に置いたもの）も公開する
   for f in google*.html; do [ -f "$f" ] && cp "$f" "$out/"; done
