@@ -248,6 +248,8 @@ body.practicing #tNextRow { position: static; }
 .dmodel .replay { font-size: .9rem; }
 .dinfo dl { margin: 0; }
 .dinfo .qline { font-size: 1.25rem; }
+.btn.dskip { width: 100%; background: var(--sky-soft); border: 2px solid var(--sky); color: var(--sky); font-weight: 700; }
+.btn.dskip:active { transform: translateY(1px); }
 .dmsg { font-weight: 700; min-height: 1.4em; text-align: center; }
 .dmsg.ok { color: var(--ok); } .dmsg.ng { color: var(--retry); }
 .ddlist { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0 14px; }
@@ -463,7 +465,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
           <button class="btn" id="dClear" data-k="[全部:ぜんぶ] [消:け]す">ぜんぶ けす</button>
           <button class="btn primary" id="dCheck" data-k="[書:か]けた！">かけた！</button>
         </div>
-        <button class="skip" id="dSkip" data-k="この [字:じ]は とばす">この じは とばす</button>
+        <button class="btn dskip" id="dSkip" data-k="⏭ この [字:じ]は とばして [次:つぎ]へ">⏭ この じは とばして つぎへ</button>
       </div>
     </div>
   </section>

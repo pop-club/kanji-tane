@@ -253,6 +253,8 @@ body.practicing #tNextRow { position: static; }
 .dmodel .replay { font-size: .9rem; }
 .dinfo dl { margin: 0; }
 .dinfo .qline { font-size: 1.25rem; }
+.btn.dskip { width: 100%; background: var(--sky-soft); border: 2px solid var(--sky); color: var(--sky); font-weight: 700; }
+.btn.dskip:active { transform: translateY(1px); }
 .dmsg { font-weight: 700; min-height: 1.4em; text-align: center; }
 .dmsg.ok { color: var(--ok); } .dmsg.ng { color: var(--retry); }
 .ddlist { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0 14px; }
@@ -470,7 +472,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
           <button class="btn" id="dClear" data-k="[全部:ぜんぶ] [消:け]す">ぜんぶ けす</button>
           <button class="btn primary" id="dCheck" data-k="[書:か]けた！">かけた！</button>
         </div>
-        <button class="skip" id="dSkip" data-k="この [字:じ]は とばす">この じは とばす</button>
+        <button class="btn dskip" id="dSkip" data-k="⏭ この [字:じ]は とばして [次:つぎ]へ">⏭ この じは とばして つぎへ</button>
       </div>
     </div>
   </section>
@@ -570,7 +572,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
         <li>学習の記録は、この端末のブラウザ（IndexedDB）にだけ保存されます。</li>
       </ul>
       <h2>バージョン</h2>
-      <p>いまの バージョン：<b id="aVer">2026.11.12-2009</b></p>
+      <p>いまの バージョン：<b id="aVer">2026.11.12-2024</b></p>
       <p>サイトを 新しくしたのに 前のままのときは、このボタンを おしてください。学習の記録は 消えません。</p>
       <button class="btn small" id="aUpdate" style="align-self:flex-start">あたらしい バージョンを よみこむ</button>
       <p class="msg" id="aUpMsg" aria-live="polite"></p>
@@ -600,14 +602,14 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
   </footer>
 </div>
 
-<script src="vendor/kanjicanvas/kanji-canvas.js?v=2026.11.12-2009"></script>
-<script src="js/joyo.js?v=2026.11.12-2009"></script>
-<script src="js/recognizer.js?v=2026.11.12-2009"></script>
-<script src="js/store.js?v=2026.11.12-2009"></script>
-<script src="js/pad.js?v=2026.11.12-2009"></script>
-<script src="js/stroke-counts.js?v=2026.11.12-2009"></script>
-<script src="js/grades.js?v=2026.11.12-2009"></script>
-<script src="js/questions.js?v=2026.11.12-2009"></script>
-<script src="js/app.js?v=2026.11.12-2009"></script>
+<script src="vendor/kanjicanvas/kanji-canvas.js?v=2026.11.12-2024"></script>
+<script src="js/joyo.js?v=2026.11.12-2024"></script>
+<script src="js/recognizer.js?v=2026.11.12-2024"></script>
+<script src="js/store.js?v=2026.11.12-2024"></script>
+<script src="js/pad.js?v=2026.11.12-2024"></script>
+<script src="js/stroke-counts.js?v=2026.11.12-2024"></script>
+<script src="js/grades.js?v=2026.11.12-2024"></script>
+<script src="js/questions.js?v=2026.11.12-2024"></script>
+<script src="js/app.js?v=2026.11.12-2024"></script>
 </body>
 </html>
