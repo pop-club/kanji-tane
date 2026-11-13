@@ -97,6 +97,7 @@
       strokes: function () { return strokes; },
       size: function () { return size; },
       clear: function () { strokes = []; cur = null; redraw(); },
+      setStrokes: function (list) { strokes = (list || []).map(function (st) { return st.map(function (q) { return q.slice(); }); }); cur = null; redraw(); },
       undo: function () { strokes.pop(); redraw(); },
       lock: function (v) { locked = !!v; pad.classList.toggle('locked', locked); },
       setGuide: function (ch) { guide = ch || null; redraw(); },
