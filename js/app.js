@@ -107,6 +107,7 @@
           if (plainElem && Array.from(t.k).every(function (c) { return GRADE_OF[c] && GRADE_OF[c] <= 6; }))
             return '<span class="qc"><span class="qr" aria-hidden="true">&#8203;</span><span class="qk">' + body + '</span></span>';
         }
+        else if (mode === 'read') return '<span class="qc"><span class="qr" aria-hidden="true">&#8203;</span><span class="qk"><span class="blank filled read">' + esc(t.b) + '</span></span></span>';
         else if (mode === 'test' || mode === 'sheet') body = '<span class="' + (mode === 'sheet' ? 'box' : 'blank') + '" aria-label="しかく"></span>';
         else if (mode === 'sheetans') body = '<span class="box ans">' + esc(t.b) + '</span>';
         else body = '<span class="blank filled' + (mode === 'wrong' ? ' ng' : '') + '">' + esc(t.b) + '</span>';
@@ -233,7 +234,7 @@
   paintMode();
 
   // ---------- 画面の切り替え ----------
-  var views = ['home', 'grade', 'test', 'drill', 'drillrun', 'drilldone', 'result', 'weak', 'print', 'data', 'about'];
+  var views = ['home', 'grade', 'test', 'drill', 'drillrun', 'drilldone', 'quiz', 'quizrun', 'quizdone', 'result', 'weak', 'print', 'data', 'about'];
   function show(name) {
     views.forEach(function (v) { $('v-' + v).hidden = v !== name; });
     window.scrollTo(0, 0);
@@ -247,11 +248,13 @@
     if (h === 'test' && !session) h = 'home';
     if (h === 'result' && !lastResult) h = 'home';
     if ((h === 'drillrun' || h === 'drilldone') && !drill) h = 'drill';
+    if ((h === 'quizrun' || h === 'quizdone') && !quiz) h = 'quiz';
     if (h === 'print' && !printChars.length) h = 'weak';
     paintText();   // 固定の文を先に。そのあと各画面の render が動く文を書く
     if (h === 'home') renderHome();
     if (h === 'grade') renderGrade();
     if (h === 'drill') renderDrill();
+    if (h === 'quiz') renderQuizPick();
     if (h === 'weak') renderWeak();
     if (h === 'print') renderPrint();
     if (h === 'data') renderData();
@@ -259,6 +262,142 @@
     show(h);
   }
   function go(h) { if (location.hash === '#' + h) route(); else location.hash = h; }
+
+  // ---------- たねキャラの成長 ----------
+  // 覚えぐあいに合わせて、アイコンのたねが 芽 → 葉 → つぼみ → 花 → 実 と育つ。
+  // 絵は icons/icon.svg と同じ形・同じ色。stage 0〜6
+  var PLANT_NAME = ['たね', '[芽:め]', '[双葉:ふたば]', '[茎:くき]', 'つぼみ', '[花:はな]', '[実:み]'];
+  // 最後の姿は級ごとにちがう（花で完成する級と、実で完成する級）
+  function plantName(st, g) { return st === 6 ? (plantOf(g).end === 'fruit' ? '[実:み]' : 'まんかい') : PLANT_NAME[st]; }
+  function plantStage(done, total, mastered) {
+    if (total && mastered >= total) return 6;
+    var p = total ? done / total : 0;
+    return !done ? 0 : p < 0.1 ? 1 : p < 0.25 ? 2 : p < 0.5 ? 3 : p < 0.75 ? 4 : 5;
+  }
+  // つぎの すがたまで あと何字か
+  function plantNext(done, total, mastered) {
+    var st = plantStage(done, total, mastered);
+    if (st >= 6) return 0;
+    if (st === 5) return Math.max(0, total - mastered);
+    var need = [1, 0.1, 0.25, 0.5, 0.75, 1][st];
+    return Math.max(1, Math.ceil((need <= 1 && st ? need * total : 1) - done));
+  }
+  // 級・学年ごとに咲く花がちがう（育てた花がたまっていく感じにする）
+  var PLANTS = {
+    1:  { nm: 'さくら',      sh: 'round',  fl: '#f9b8cd', ce: '#ffd66e', lf: '#43b96f', l2: '#5ccc82', end: 'flower', fs: 'cherry', fn: 'さくらんぼ', fr: '#ef6f6f' },
+    2:  { nm: 'ひまわり',    sh: 'thin',   fl: '#ffd05c', ce: '#8a5a2b', lf: '#3faa63', l2: '#63c98a', end: 'fruit', fs: 'orange', fn: 'みかん', fr: '#f8a33c' },
+    3:  { nm: 'コスモス',    sh: 'point',  fl: '#e59ad8', ce: '#ffd66e', lf: '#4fbd7a', l2: '#76d79a', end: 'flower', fs: 'grape', fn: 'ぶどう', fr: '#9b6fd0' },
+    4:  { nm: 'チューリップ', sh: 'bell',   fl: '#f07d7d', ce: '#ffd66e', lf: '#36a95f', l2: '#5ccc82', end: 'fruit', fs: 'berry', fn: 'いちご', fr: '#e8536a' },
+    5:  { nm: 'あじさい',    sh: 'cluster',fl: '#8fb7f2', ce: '#cfe0ff', lf: '#2f9e5b', l2: '#52c37c', end: 'flower', fs: 'grape', fn: 'ブルーベリー', fr: '#6f8fef' },
+    6:  { nm: 'うめ',        sh: 'round',  fl: '#fff2f6', ce: '#f6a8c0', lf: '#3faa63', l2: '#69cf8e', end: 'fruit', fs: 'peach', fn: 'もも', fr: '#f9a7b8' },
+    65: { nm: 'きく',        sh: 'thin',   fl: '#fff0b8', ce: '#ffb347', lf: '#3b9e60', l2: '#64c98a', end: 'flower', fs: 'apple', fn: 'りんご', fr: '#e24b4b' },
+    7:  { nm: 'あさがお',    sh: 'round',  fl: '#8aa8f0', ce: '#ffffff', lf: '#3aa862', l2: '#63c98a', end: 'fruit', fs: 'lemon', fn: 'レモン', fr: '#f6d44b' },
+    8:  { nm: 'すいせん',    sh: 'point',  fl: '#fff6cf', ce: '#ffb347', lf: '#45b06c', l2: '#6fd296', end: 'fruit', fs: 'persimmon', fn: 'かき', fr: '#ef8a3a' },
+    9:  { nm: 'ばら',        sh: 'bell',   fl: '#e8577a', ce: '#ffd66e', lf: '#2f9e5b', l2: '#52c37c', end: 'flower', fs: 'apple', fn: 'あおりんご', fr: '#7fc24b' },
+    10: { nm: 'はす',        sh: 'point',  fl: '#f7c0d6', ce: '#ffe08a', lf: '#3faa63', l2: '#6fd296', end: 'fruit', fs: 'peach', fn: 'びわ', fr: '#f3c66a' },
+    11: { nm: 'ふじ',        sh: 'cluster',fl: '#c3a6ef', ce: '#e5d8ff', lf: '#3b9e60', l2: '#63c98a', end: 'flower', fs: 'berry', fn: 'きいちご', fr: '#f28fb0' },
+    12: { nm: 'きんもくせい', sh: 'thin',   fl: '#ffb45c', ce: '#fff0c8', lf: '#2f9e5b', l2: '#52c37c', end: 'fruit', fs: 'orange', fn: 'きんかん', fr: '#ff9a3c' }
+  };
+  function plantOf(g) { return PLANTS[+g] || PLANTS[1]; }
+  try { window.__plantSvg = function (st, l, g) { return plantSvg(st, l, g); }; } catch (e) {}
+  function flowerSvg(cx, cy, P, scale) {
+    var k = scale || 1, s = '', i, a;
+    function pet(deg, inner) { return '<g transform="rotate(' + deg.toFixed(1) + ' ' + cx + ' ' + cy + ')">' + inner + '</g>'; }
+    if (P.sh === 'thin') {
+      for (i = 0; i < 12; i++) s += pet(i * 30, '<ellipse cx="' + cx + '" cy="' + (cy - 20 * k) + '" rx="' + (5 * k) + '" ry="' + (14 * k) + '" fill="' + P.fl + '"/>');
+      s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (11 * k) + '" fill="' + P.ce + '"/>';
+    } else if (P.sh === 'point') {
+      for (i = 0; i < 8; i++) s += pet(i * 45, '<path d="M' + cx + ' ' + cy + ' C' + (cx - 9 * k) + ' ' + (cy - 14 * k) + ' ' + (cx - 7 * k) + ' ' + (cy - 26 * k) + ' ' + cx + ' ' + (cy - 32 * k) + ' C' + (cx + 7 * k) + ' ' + (cy - 26 * k) + ' ' + (cx + 9 * k) + ' ' + (cy - 14 * k) + ' ' + cx + ' ' + cy + ' Z" fill="' + P.fl + '"/>');
+      s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (8 * k) + '" fill="' + P.ce + '"/>';
+    } else if (P.sh === 'bell') {
+      s += '<path d="M' + (cx - 17 * k) + ' ' + (cy - 10 * k) + ' C' + (cx - 17 * k) + ' ' + (cy + 16 * k) + ' ' + (cx + 17 * k) + ' ' + (cy + 16 * k) + ' ' + (cx + 17 * k) + ' ' + (cy - 10 * k) + ' C' + (cx + 10 * k) + ' ' + (cy - 30 * k) + ' ' + (cx - 10 * k) + ' ' + (cy - 30 * k) + ' ' + (cx - 17 * k) + ' ' + (cy - 10 * k) + ' Z" fill="' + P.fl + '"/>';
+      s += '<path d="M' + (cx - 6 * k) + ' ' + (cy - 26 * k) + ' C' + (cx - 12 * k) + ' ' + (cy - 4 * k) + ' ' + (cx + 12 * k) + ' ' + (cy - 4 * k) + ' ' + (cx + 6 * k) + ' ' + (cy - 26 * k) + ' Z" fill="' + P.ce + '" opacity=".85"/>';
+    } else if (P.sh === 'cluster') {
+      var pts = [[0, -18], [-15, -8], [15, -8], [-9, 9], [9, 9], [0, -1]];
+      for (i = 0; i < pts.length; i++) s += '<circle cx="' + (cx + pts[i][0] * k) + '" cy="' + (cy + pts[i][1] * k) + '" r="' + (9 * k) + '" fill="' + (i === pts.length - 1 ? P.ce : P.fl) + '"/>';
+    } else {
+      for (i = 0; i < 5; i++) {
+        a = -Math.PI / 2 + i * Math.PI * 2 / 5;
+        s += '<ellipse cx="' + (cx + 20 * k * Math.cos(a)).toFixed(1) + '" cy="' + (cy + 20 * k * Math.sin(a)).toFixed(1) + '" rx="' + (13 * k) + '" ry="' + (13 * k) + '" fill="' + P.fl + '" stroke="#e9dccb" stroke-width="' + (P.fl.charAt(1) === 'f' && P.fl.charAt(3) === 'f' ? 1.5 : 0) + '"/>';
+      }
+      s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (10 * k) + '" fill="' + P.ce + '"/>';
+    }
+    return s;
+  }
+  // 実（級ごとにちがう くだものキャラ）
+  function fruitSvg(cx, cy, P) {
+    var f = P.fs || 'apple', s = '', fx = cx, fy = cy, i;
+    function stem(x, y) { return '<path d="M' + x + ' ' + y + ' C' + (x + 4) + ' ' + (y - 7) + ' ' + (x + 12) + ' ' + (y - 9) + ' ' + (x + 17) + ' ' + (y - 8) + '" stroke="#2f9e5b" stroke-width="5" fill="none" stroke-linecap="round"/>'; }
+    if (f === 'cherry') {
+      s += '<path d="M138 70 C140 80 136 86 134 90 M138 70 C144 80 152 84 157 88" stroke="#2f9e5b" stroke-width="4" fill="none" stroke-linecap="round"/>';
+      s += '<circle cx="134" cy="97" r="11" fill="' + P.fr + '"/><circle cx="158" cy="95" r="11" fill="' + P.fr + '"/>';
+      fx = 158; fy = 95;
+    } else if (f === 'grape') {
+      var pts = [[0, -13], [-11, -5], [11, -5], [-6, 6], [6, 6], [0, 16]];
+      for (i = 0; i < pts.length; i++) s += '<circle cx="' + (cx + pts[i][0]) + '" cy="' + (cy + pts[i][1]) + '" r="8" fill="' + P.fr + '"/>';
+      s += stem(cx, cy - 20);
+      fy = cy + 6;
+    } else if (f === 'berry') {
+      s += '<path d="M' + (cx - 14) + ' ' + (cy - 8) + ' C' + (cx - 14) + ' ' + (cy + 10) + ' ' + (cx - 5) + ' ' + (cy + 18) + ' ' + cx + ' ' + (cy + 18) + ' C' + (cx + 5) + ' ' + (cy + 18) + ' ' + (cx + 14) + ' ' + (cy + 10) + ' ' + (cx + 14) + ' ' + (cy - 8) + ' C' + (cx + 8) + ' ' + (cy - 15) + ' ' + (cx - 8) + ' ' + (cy - 15) + ' ' + (cx - 14) + ' ' + (cy - 8) + ' Z" fill="' + P.fr + '"/>';
+      s += '<path d="M' + (cx - 13) + ' ' + (cy - 9) + ' C' + (cx - 6) + ' ' + (cy - 16) + ' ' + (cx + 6) + ' ' + (cy - 16) + ' ' + (cx + 13) + ' ' + (cy - 9) + ' C' + (cx + 6) + ' ' + (cy - 6) + ' ' + (cx - 6) + ' ' + (cy - 6) + ' ' + (cx - 13) + ' ' + (cy - 9) + ' Z" fill="#43b96f"/>';
+      fy = cy + 3;
+    } else if (f === 'lemon') {
+      s += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="16" ry="12" fill="' + P.fr + '"/>';
+      s += '<path d="M' + (cx + 15) + ' ' + cy + ' l7 -2 -7 -3" fill="' + P.fr + '"/>' + stem(cx - 6, cy - 12);
+    } else if (f === 'peach') {
+      s += '<path d="M' + cx + ' ' + (cy - 12) + ' C' + (cx + 16) + ' ' + (cy - 20) + ' ' + (cx + 18) + ' ' + (cy + 8) + ' ' + cx + ' ' + (cy + 16) + ' C' + (cx - 18) + ' ' + (cy + 8) + ' ' + (cx - 16) + ' ' + (cy - 20) + ' ' + cx + ' ' + (cy - 12) + ' Z" fill="' + P.fr + '"/>';
+      s += '<path d="M' + cx + ' ' + (cy - 11) + ' L' + cx + ' ' + (cy + 10) + '" stroke="#e58aa0" stroke-width="2" opacity=".6"/>' + stem(cx, cy - 14);
+      fy = cy + 2;
+    } else if (f === 'persimmon') {
+      s += '<ellipse cx="' + cx + '" cy="' + (cy + 2) + '" rx="16" ry="13" fill="' + P.fr + '"/>';
+      s += '<path d="M' + (cx - 12) + ' ' + (cy - 9) + ' L' + cx + ' ' + (cy - 14) + ' L' + (cx + 12) + ' ' + (cy - 9) + ' L' + cx + ' ' + (cy - 4) + ' Z" fill="#43b96f"/>';
+      fy = cy + 4;
+    } else {
+      s += '<path d="M' + cx + ' ' + (cy - 10) + ' C' + (cx + 17) + ' ' + (cy - 18) + ' ' + (cx + 17) + ' ' + (cy + 10) + ' ' + cx + ' ' + (cy + 15) + ' C' + (cx - 17) + ' ' + (cy + 10) + ' ' + (cx - 17) + ' ' + (cy - 18) + ' ' + cx + ' ' + (cy - 10) + ' Z" fill="' + P.fr + '"/>';
+      s += stem(cx, cy - 12);
+      fy = cy + 2;
+    }
+    // かお
+    s += '<ellipse cx="' + (fx - 4.5) + '" cy="' + fy + '" rx="1.9" ry="2.3" fill="#3b2a1a"/><ellipse cx="' + (fx + 4.5) + '" cy="' + fy + '" rx="1.9" ry="2.3" fill="#3b2a1a"/>';
+    s += '<path d="M' + (fx - 3) + ' ' + (fy + 5) + ' C' + (fx - 1) + ' ' + (fy + 7.5) + ' ' + (fx + 1) + ' ' + (fy + 7.5) + ' ' + (fx + 3) + ' ' + (fy + 5) + '" stroke="#3b2a1a" stroke-width="1.6" fill="none" stroke-linecap="round"/>';
+    return s;
+  }
+  function gotIcon(g) {
+    var P = plantOf(g);
+    if (P.end === 'fruit') return '<svg class="fruit" viewBox="120 60 52 52" role="img" aria-label="' + esc(SHORT_NAME[g] + ' ' + P.fn) + '">' + fruitSvg(146, 88, P) + '</svg>';
+    return '<svg class="fruit" viewBox="68 12 58 58" role="img" aria-label="' + esc(SHORT_NAME[g] + ' ' + P.nm) + '">' + flowerSvg(97, 41, P, 1) + '</svg>';
+  }
+  function gotName(g) { var P = plantOf(g); return P.end === 'fruit' ? P.fn : P.nm; }
+  function plantSvg(stage, label, g) {
+    var P = plantOf(g == null ? 1 : g);
+    var s = '<svg class="plant" viewBox="0 0 200 210" role="img" aria-label="' + esc(label || '') + '">';
+    s += '<ellipse cx="100" cy="186" rx="66" ry="13" fill="#9fd8b1"/>';   // つち
+    if (stage >= 1) {   // くき
+      var top = [0, 120, 96, 62, 52, 46, 44][stage];
+      s += '<path d="M100 132 C100 ' + (top + 28) + ' 99 ' + (top + 12) + ' 97 ' + top + '" stroke="#2f9e5b" stroke-width="7" stroke-linecap="round" fill="none"/>';
+    }
+    if (stage === 1) s += '<path d="M97 124 C80 100 56 100 46 112 C52 134 82 140 97 124 Z" fill="' + P.lf + '"/>';
+    if (stage >= 2) {
+      s += '<path d="M97 104 C76 72 42 70 29 83 C33 109 70 121 97 104 Z" fill="' + P.lf + '"/>';
+      s += '<path d="M99 100 C112 66 146 58 166 71 C165 98 130 117 99 100 Z" fill="' + P.l2 + '"/>';
+    }
+    if (stage >= 3) s += '<path d="M98 72 C84 52 58 48 47 57 C50 77 78 86 98 72 Z" fill="' + P.lf + '"/>';
+    if (stage === 4) s += '<ellipse cx="97" cy="42" rx="15" ry="20" fill="' + P.fl + '" stroke="#e9dccb" stroke-width="' + (P.fl.charAt(1) === 'f' && P.fl.charAt(3) === 'f' ? 1.5 : 0) + '"/><path d="M97 24 C104 30 104 38 97 44" stroke="' + P.ce + '" stroke-width="5" fill="none" stroke-linecap="round"/>';
+    if (stage === 5) s += flowerSvg(97, 42, P, 0.85);
+    if (stage >= 6) {
+      if (P.end === 'fruit') s += '<g transform="translate(97 46) scale(1.45) translate(-146 -88)">' + fruitSvg(146, 88, P) + '</g>';
+      else s += flowerSvg(97, 40, P, 1.25) + flowerSvg(45, 74, P, 0.5) + flowerSvg(151, 64, P, 0.5);
+    }
+    // たね（かお）
+    s += '<path d="M100 120 C133 120 153 147 153 170 C153 193 129 205 100 205 C71 205 47 193 47 170 C47 147 67 120 100 120 Z" fill="#eeb06a"/>';
+    s += '<path d="M65 151 C70 139 79 131 90 127" stroke="#fff3dd" stroke-width="6" stroke-linecap="round" fill="none" opacity=".8"/>';
+    s += '<ellipse cx="81" cy="168" rx="6" ry="7.5" fill="#3b2a1a"/><ellipse cx="119" cy="168" rx="6" ry="7.5" fill="#3b2a1a"/>';
+    s += '<circle cx="83" cy="165" r="2" fill="#fff"/><circle cx="121" cy="165" r="2" fill="#fff"/>';
+    s += '<ellipse cx="68" cy="181" rx="9" ry="5" fill="#f39a8c" opacity=".75"/><ellipse cx="132" cy="181" rx="9" ry="5" fill="#f39a8c" opacity=".75"/>';
+    s += stage >= 6 ? '<path d="M89 180 C95 190 105 190 111 180" stroke="#3b2a1a" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M89 180 C95 190 105 190 111 180" stroke="#3b2a1a" stroke-width="4" stroke-linecap="round" fill="none"/>'
+      : '<path d="M91 180 C95 186 105 186 109 180" stroke="#3b2a1a" stroke-width="4" stroke-linecap="round" fill="none"/>';
+    return s + '</svg>';
+  }
 
   // ---------- ホーム ----------
   function renderHome() {
@@ -268,20 +407,35 @@
     $('hWeak').textContent = weak;
     $('hReviewBtn').disabled = !rv.length;
     $('hReviewBtn').textContent = rv.length ? K('[苦手:にがて]を [復習:ふくしゅう] する（') + Math.min(rv.length, 10) + K('[問:もん]）') : K('[復習:ふくしゅう]する [漢字:かんじ]は ありません');
-    var html = '';
+    var html = '', big = null;
     levels().forEach(function (g) {
       if (!hasGrade(g)) {
-        html += '<div class="level soon"><span>' + K(SHORT_NAME[g]) + '</span><span class="bar"></span><span class="n">' + K('[準備中:じゅんびちゅう]') + '</span></div>';
+        html += '<div class="level soon"><span></span><span>' + K(SHORT_NAME[g]) + '</span><span class="bar"></span><span class="n">' + K('[準備中:じゅんびちゅう]') + '</span></div>';
         return;
       }
       // 数字は「せいかいした字（おぼえた＋おぼえかけ）」。おぼえた は2回つづけて正解したときなので、1回めのテストでは 0 のまま
       var chars = gradeChars(g), c = statusCounts(chars), t = chars.length, done = c.mastered + c.candidate, tested = t - c.new;
-      html += '<div class="level"><span>' + K(SHORT_NAME[g]) + '</span><span class="bar" role="img" aria-label="' + K(SHORT_NAME[g]) + ' ' + K('[覚:おぼ]えた ') + c.mastered + '字、' + K('[覚:おぼ]えかけ ') + c.candidate + '字、' + K('[苦手:にがて] ') + c.weak + '字 / ' + t + '字">' +
+      html += '<div class="level">' + plantSvg(plantStage(done, t, c.mastered), '', g) + '<span>' + K(SHORT_NAME[g]) + '</span><span class="bar" role="img" aria-label="' + K(SHORT_NAME[g]) + ' ' + K('[覚:おぼ]えた ') + c.mastered + '字、' + K('[覚:おぼ]えかけ ') + c.candidate + '字、' + K('[苦手:にがて] ') + c.weak + '字 / ' + t + '字">' +
         '<i class="m" style="width:' + (100 * c.mastered / t) + '%"></i><i class="c" style="width:' + (100 * c.candidate / t) + '%"></i><i class="w" style="width:' + (100 * c.weak / t) + '%"></i>' +
         '</span><span class="n">' + done + ' / ' + t + '字</span>' +
         (tested ? '<small class="ld">' + K('[覚:おぼ]えた ') + c.mastered + '　' + K('[覚:おぼ]えかけ ') + c.candidate + '　' + K('[苦手:にがて] ') + c.weak + '</small>' : '') + '</div>';
+      var st = plantStage(done, t, c.mastered);
+      if (!big || (big.st < 6 && st <= big.st && done > big.done) || (big.st === 6 && st < 6)) big = { g: g, st: st, done: done, total: t, mastered: c.mastered };
     });
     $('hLevels').innerHTML = html;
+    if (big) {
+      var left = plantNext(big.done, big.total, big.mastered);
+      var got = levels().filter(function (g) {
+        if (!hasGrade(g)) return false;
+        var ch = gradeChars(g); return statusCounts(ch).mastered >= ch.length;
+      });
+      $('hGrow').innerHTML = plantSvg(big.st, K(SHORT_NAME[big.g]) + ' ' + K(plantName(big.st, big.g)), big.g) +
+        '<div class="gtx"><b>' + K(SHORT_NAME[big.g]) + 'の ' + K(plantName(big.st, big.g)) + '</b>' +
+        '<em class="fl">' + (big.st >= 6 ? gotName(big.g) + (plantOf(big.g).end === 'fruit' ? K('が みのったよ！') : K('が [満開:まんかい]に なったよ！')) : big.st >= 5 ? plantOf(big.g).nm + K('が [咲:さ]いたよ！') : K('[育:そだ]てている[花:はな]：') + plantOf(big.g).nm) + '</em>' +
+        '<span>' + big.done + ' / ' + big.total + K('[字:じ] [書:か]けたよ') + '</span>' +
+        (got.length ? '<span class="got">' + K('そだてた：') + got.map(function (g) { return gotIcon(g) + '<b>' + K(SHORT_NAME[g]) + '</b>'; }).join('') + '</span>' : '') +
+        '<small>' + (big.st >= 6 ? K('ぜんぶ [覚:おぼ]えたね！') : big.st === 5 ? K('あと ') + left + K('[字:じ] 「[覚:おぼ]えた」に なると ') + (plantOf(big.g).end === 'fruit' ? gotName(big.g) + K('が なるよ') : K('[満開:まんかい]に なるよ')) : K('あと ') + left + K('[字:じ]で つぎの すがた')) + '</small></div>';
+    }
     $('hLevelsTitle').textContent = mode === 'kanken' ? K('[級:きゅう]ごとの [覚:おぼ]え[具合:ぐあい]') : K('[学年:がくねん]ごとの [覚:おぼ]え[具合:ぐあい]');
   }
   $('hReviewBtn').onclick = function () { var l = reviewList(); if (l.length) startTest('review', 0, l.slice(0, 10)); };
@@ -750,9 +904,10 @@
   }
 
   // ---------- 漢字の練習 ----------
-  // 1字ずつ「なぞる（2回）→ 見て書く → 見ないで書く」。記録（おぼえぐあい）は変えない。覚えたかどうかはテストで決める
+  // 1字ずつ「なぞる → 見て書く → 見ないで書く」。どの段階にもタップでいつでも切りかえられる
+  // 記録（おぼえぐあい）は変えない。覚えたかどうかはテストで決める
   var DSTEPS = [
-    { key: 'trace', label: 'なぞる', times: 2 },
+    { key: 'trace', label: 'なぞる', times: 1 },
     { key: 'copy', label: '[見:み]て [書:か]く', times: 1 },
     { key: 'recall', label: '[見:み]ないで [書:か]く', times: 1 }
   ];
@@ -870,8 +1025,12 @@
   function dShowStep() {
     var it = dCur(), k = KANJI[it.ch], step = DSTEPS[it.step];
     $('dSteps').innerHTML = DSTEPS.map(function (s, i) {
-      return '<li class="' + (i < it.step ? 'done' : i === it.step ? 'now' : '') + '">' + (i + 1) + '. ' + K(s.label) + (s.times > 1 && i === it.step ? '（' + (it.count + 1) + '/' + s.times + '）' : '') + '</li>';
+      return '<li class="' + (i < it.step ? 'done' : i === it.step ? 'now' : '') + '"><button type="button" data-s="' + i + '" aria-pressed="' + (i === it.step) + '">' + (i + 1) + '. ' + K(s.label) + (s.times > 1 && i === it.step ? '（' + (it.count + 1) + '/' + s.times + '）' : '') + '</button></li>';
     }).join('');
+    // いつでも段階を選びなおせる
+    Array.prototype.forEach.call($('dSteps').querySelectorAll('button'), function (b) {
+      b.onclick = function () { dGoStep(+b.dataset.s); };
+    });
     var hide = step.key === 'recall' && !it.peek;
     $('dModel').innerHTML = hide ? '<div class="hidden-ch" aria-label="' + K('かくれて いるよ') + '">？</div>' :
       orderSvg(it.ch, it.step === 0 && it.count === 0) + '<div class="bigch" aria-hidden="true">' + esc(it.ch) + '</div>';
@@ -894,6 +1053,12 @@
     dpad.setGuide(step.key === 'trace' ? it.ch : null); dpad.setInk(null); dpad.lock(false); dpad.clear();
     $('dPad').classList.remove('ok', 'ng');
     dShowCount(0); dUpdateBtns();
+  }
+  function dGoStep(i) {
+    if (!drill || dBusy || i === dCur().step) return;
+    var it = dCur();
+    it.step = i; it.count = 0; it.peek = false; it.misses = 0;
+    dShowStep();
   }
   $('dUndo').onclick = function () { dpad.undo(); };
   $('dClear').onclick = function () { dpad.clear(); };
@@ -951,6 +1116,217 @@
     }).join('');
     $('ddTest').disabled = !done.length;
     $('ddTest').onclick = function () { var chars = done.map(function (x) { return x.ch; }); drill = null; startTest('review', 0, shuffle(chars)); };
+  }
+
+  // ---------- クイズ（にせ漢字さがし・読みクイズ） ----------
+  // 書くテストとは別の遊び。おぼえぐあい（覚えた・苦手）は変えない
+  var quiz = null, qPickGrade = null, qPickKind = 'mix', qPickN = 10;
+  function strokeBox(st) {
+    var xs = [], ys = [];
+    st.forEach(function (s) { s.forEach(function (p) { xs.push(p[0]); ys.push(p[1]); }); });
+    var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+    var w = Math.max(x1 - x0, y1 - y0, 1);
+    return { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, sc: 200 / (w + 2 * w * 0.14) };
+  }
+  // 筆画をそのまま絵にする（番号なし）。にせ漢字も同じ見た目で描く
+  function strokesSvg(st, box, label) {
+    var tx = function (x) { return (100 + (x - box.cx) * box.sc).toFixed(1); }, ty = function (y) { return (100 + (y - box.cy) * box.sc).toFixed(1); };
+    var html = '<svg class="order" viewBox="0 0 200 200" role="img" aria-label="' + esc(label || '') + '">';
+    st.forEach(function (s) {
+      if (!s.length) return;
+      var d = 'M' + tx(s[0][0]) + ' ' + ty(s[0][1]);
+      if (s.length === 1) d += 'l0.1 0.1';
+      for (var i = 1; i < s.length - 1; i++) d += ' Q' + tx(s[i][0]) + ' ' + ty(s[i][1]) + ' ' + tx((s[i][0] + s[i + 1][0]) / 2) + ' ' + ty((s[i][1] + s[i + 1][1]) / 2);
+      if (s.length > 1) d += ' L' + tx(s[s.length - 1][0]) + ' ' + ty(s[s.length - 1][1]);
+      html += '<path d="' + d + '"/>';
+    });
+    return html + '</svg>';
+  }
+  function cloneStrokes(st) { return st.map(function (s) { return s.map(function (p) { return p.slice(); }); }); }
+  // にせ漢字：1画だけ はっきり変える（消す・足す・短く・長く・ずらす・左右はんてん・かたむける）。
+  // 見てすぐ分かるように、元の形から どれだけ動いたかを測って、小さい変化は使わない
+  function strokeSpan(s) {
+    var xs = s.map(function (p) { return p[0]; }), ys = s.map(function (p) { return p[1]; });
+    return Math.max(Math.max.apply(null, xs) - Math.min.apply(null, xs), Math.max.apply(null, ys) - Math.min.apply(null, ys));
+  }
+  function strokesDiff(a, b) {
+    if (a.length !== b.length) return 999;
+    var m = 0;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i].length !== b[i].length) return 999;
+      for (var j = 0; j < a[i].length; j++) m = Math.max(m, Math.hypot(a[i][j][0] - b[i][j][0], a[i][j][1] - b[i][j][1]));
+    }
+    return m;
+  }
+  function fakeVariants(st) {
+    var out = [], n = st.length;
+    function add(v) { if (v && strokesDiff(st, v) >= 13 && !out.some(function (o) { return strokesDiff(o, v) < 11; })) out.push(v); }
+    function at(i, f) { var v = cloneStrokes(st); v[i] = f(v[i]); return v; }
+    for (var i = 0; i < n; i++) {
+      var s = st[i], span = strokeSpan(s), a = s[0], z = s[s.length - 1];
+      if (n >= 4) { var v = cloneStrokes(st); v.splice(i, 1); add(v); }            // 1画けす
+      if (span >= 22) {
+        add(at(i, function (q) { return q.map(function (p) { return [a[0] + (p[0] - a[0]) * 0.35, a[1] + (p[1] - a[1]) * 0.35]; }); }));   // 短く
+        add(at(i, function (q) { return q.map(function (p) { return [a[0] + (p[0] - a[0]) * 1.75, a[1] + (p[1] - a[1]) * 1.75]; }); }));   // 長く（つき出す）
+        add(at(i, function (q) {                                                   // かたむける
+          var c = q[Math.floor(q.length / 2)], co = Math.cos(0.45), si = Math.sin(0.45);
+          return q.map(function (p) { var x = p[0] - c[0], y = p[1] - c[1]; return [c[0] + x * co - y * si, c[1] + x * si + y * co]; });
+        }));
+      }
+      add(at(i, function (q) { return q.map(function (p) { return [p[0] + 20, p[1] - 14]; }); }));    // ずらす
+      var w = Math.max.apply(null, s.map(function (p) { return p[0]; })) - Math.min.apply(null, s.map(function (p) { return p[0]; }));
+      if (w >= 20) add(at(i, function (q) { var c = (a[0] + z[0]) / 2; return q.map(function (p) { return [2 * c - p[0], p[1]]; }); }));   // 左右はんてん
+      if (n < 12) { var d = cloneStrokes(st); d.push(s.map(function (p) { return [p[0] + 18, p[1] + 18]; })); add(d); }                    // 1画ふやす
+    }
+    return shuffle(out);
+  }
+  function quizFake(ch) {
+    var st = orderStrokes(ch);
+    if (!st || (STD_STROKES[ch] && st.length !== STD_STROKES[ch])) return null;
+    var box = strokeBox(st), k = KANJI[ch];
+    var fakes = fakeVariants(st).slice(0, 3);
+    if (fakes.length < 3) return null;
+    var opts = [{ ok: true, svg: strokesSvg(st, box, K('[正:ただ]しい [形:かたち]')) }].concat(fakes.map(function (f) {
+      return { ok: false, svg: strokesSvg(f, box, K('にせもの')) };
+    }));
+    var yomi = [].concat(k.on, k.kun).filter(Boolean).slice(0, 3).join('・');
+    return { type: 'fake', ch: ch, ask: K('[正:ただ]しい [形:かたち]は どれ？'),
+      sub: (yomi ? '「' + yomi + '」' : '') + (k.meaning ? '　' + esc(k.meaning) : ''), opts: shuffle(opts) };
+  }
+  // 読みクイズ：文の中の漢字の読みを4つから選ぶ
+  var readPool = {};
+  function readingsOf(g) {
+    if (readPool[g]) return readPool[g];
+    var a = [];
+    gradeChars(g).forEach(function (ch) { (QUESTIONS[ch] || []).forEach(function (q) { q.tokens.forEach(function (t) { if (t.b !== undefined && t.r) a.push(t.r); }); }); });
+    readPool[g] = a;
+    return a;
+  }
+  function quizRead(ch, g) {
+    var qs = (QUESTIONS[ch] || []).filter(function (q) { return q.tokens.some(function (t) { return t.b !== undefined && t.r; }); });
+    if (!qs.length) return null;
+    var q = qs[Math.floor(Math.random() * qs.length)];
+    var tok = null;
+    q.tokens.forEach(function (t) { if (!tok && t.b !== undefined) tok = t; });
+    var k = KANJI[ch], mine = {}; [].concat(k.on, k.kun).filter(Boolean).forEach(function (r) { mine[r] = true; });
+    var pool = readingsOf(g).filter(function (r) { return r !== tok.r && !mine[r]; });
+    var near = pool.filter(function (r) { return Math.abs(Array.from(r).length - Array.from(tok.r).length) <= 1; });
+    var src = shuffle((near.length >= 6 ? near : pool).slice()), pick = [], seen = {};
+    for (var i = 0; i < src.length && pick.length < 3; i++) if (!seen[src[i]]) { seen[src[i]] = true; pick.push(src[i]); }
+    if (pick.length < 3) return null;
+    var opts = [{ ok: true, text: tok.r }].concat(pick.map(function (r) { return { ok: false, text: r }; }));
+    return { type: 'read', ch: ch, ask: K('[赤:あか]い [漢字:かんじ]の [読:よ]みは どれ？'), q: q, opts: shuffle(opts) };
+  }
+  function makeQuiz(g, kind, n) {
+    var chars = shuffle(gradeChars(g).slice()), out = [];
+    for (var i = 0; i < chars.length && out.length < n; i++) {
+      var ch = chars[i], want = kind === 'mix' ? (out.length % 2 ? 'read' : 'fake') : kind;
+      var item = want === 'fake' ? quizFake(ch) : quizRead(ch, g);
+      if (!item && kind === 'mix') item = want === 'fake' ? quizRead(ch, g) : quizFake(ch);
+      if (item) out.push(item);
+    }
+    return out;
+  }
+  function renderQuizPick() {
+    if (qPickGrade === null || levels().indexOf(qPickGrade) < 0) qPickGrade = levels().indexOf(pickGrade) >= 0 ? pickGrade : levels()[0];
+    $('qTitle').textContent = mode === 'kanken' ? K('どの [級:きゅう]の クイズ？') : K('[何年生:なんねんせい]の クイズ？');
+    var html = '';
+    levels().forEach(function (g) {
+      var ok = hasGrade(g);
+      html += '<button class="grade' + (ok && g === qPickGrade ? ' on' : '') + '" data-g="' + g + '"' + (ok ? '' : ' disabled') + '><b>' + K(GRADE_NAME[g]) + '</b>' +
+        (ok ? '<span class="sample">' + esc(gradeChars(g).slice(0, 4).join('')) + '…</span>' : '<small>' + K('[準備中:じゅんびちゅう]') + '</small>') + '</button>';
+    });
+    $('qList').innerHTML = html;
+    Array.prototype.forEach.call($('qList').querySelectorAll('.grade'), function (b) { b.onclick = function () { qPickGrade = +b.dataset.g; renderQuizPick(); }; });
+    Array.prototype.forEach.call($('qKind').querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', x.dataset.kind === qPickKind); });
+    Array.prototype.forEach.call($('qCount').querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', +x.dataset.n === qPickN); });
+    $('qStart').disabled = !hasGrade(qPickGrade);
+  }
+  Array.prototype.forEach.call($('qKind').querySelectorAll('button'), function (b) {
+    b.onclick = function () { qPickKind = b.dataset.kind; try { localStorage.setItem('kt-qkind', qPickKind); } catch (e) {} renderQuizPick(); };
+  });
+  Array.prototype.forEach.call($('qCount').querySelectorAll('button'), function (b) {
+    b.onclick = function () { qPickN = +b.dataset.n; renderQuizPick(); };
+  });
+  try { var sk = localStorage.getItem('kt-qkind'); if (sk) qPickKind = sk; } catch (e) {}
+  function startQuiz() {
+    // にせ漢字さがしは手本（KanjiVG）の筆画を使うので、準1級・1級はここで読みこむ
+    var wait = qPickKind === 'read' ? null : ensureRefs(gradeChars(qPickGrade));
+    if (wait) {
+      $('qNote').textContent = K('[漢字:かんじ]の [手本:てほん]を [読:よ]み[込:こ]み[中:ちゅう]…（[初:はじ]めてのときは [少:すこ]し [時間:じかん]が かかります）');
+      $('qStart').disabled = true;
+      wait.then(function () { $('qNote').textContent = ''; $('qStart').disabled = false; startQuiz(); },
+        function () { $('qNote').textContent = K('[手本:てほん]を [読:よ]み[込:こ]めませんでした'); $('qStart').disabled = false; });
+      return;
+    }
+    var items = makeQuiz(qPickGrade, qPickKind, qPickN);
+    if (!items.length) { $('qNote').textContent = K('この [級:きゅう]では クイズを [作:つく]れませんでした'); return; }
+    $('qNote').textContent = '';
+    quiz = { grade: qPickGrade, items: items, idx: 0, ok: 0, answered: false };
+    go('quizrun'); showQuizItem();
+  }
+  $('qStart').onclick = startQuiz;
+  function showQuizItem() {
+    var it = quiz.items[quiz.idx], n = quiz.items.length;
+    quiz.answered = false;
+    $('qNum').textContent = (quiz.idx + 1) + ' / ' + n;
+    $('qProg').style.width = (100 * quiz.idx / n) + '%';
+    $('qAsk').textContent = it.ask;
+    $('qBody').innerHTML = it.type === 'read' ? '<div class="qtext qline">' + renderQ(it.q, 'read') + '</div>'
+      : '<div class="qsub">' + it.sub + '</div>';
+    $('qChoices').className = 'choices ' + it.type;
+    $('qChoices').innerHTML = it.opts.map(function (o, i) {
+      return '<button class="choice" data-i="' + i + '">' + (o.svg || '<span class="rd">' + esc(o.text) + '</span>') + '</button>';
+    }).join('');
+    Array.prototype.forEach.call($('qChoices').querySelectorAll('.choice'), function (b) { b.onclick = function () { answerQuiz(+b.dataset.i); }; });
+    $('qFb').hidden = true; $('qFb').innerHTML = '';
+    $('qNextRow').hidden = true;
+    window.scrollTo(0, 0);
+  }
+  function answerQuiz(i) {
+    if (quiz.answered) return;
+    quiz.answered = true;
+    var it = quiz.items[quiz.idx], ok = it.opts[i].ok;
+    it.got = ok;
+    if (ok) quiz.ok++;
+    Array.prototype.forEach.call($('qChoices').querySelectorAll('.choice'), function (b, j) {
+      b.disabled = true;
+      if (it.opts[j].ok) b.classList.add('right');
+      if (j === i && !ok) b.classList.add('bad');
+    });
+    var k = KANJI[it.ch];
+    $('qFb').className = 'fb ' + (ok ? 'correct' : 'wrong');
+    $('qFb').innerHTML = '<div class="head"><span class="ans">' + esc(it.ch) + '</span><div><div class="verdict">' + (ok ? K('[正解:せいかい]！') : K('[残念:ざんねん]')) + '</div>' +
+      '<div>' + (it.type === 'read' ? K('[読:よ]み：') + esc(it.opts.filter(function (o) { return o.ok; })[0].text) : K('[画数:かくすう] ') + (STD_STROKES[it.ch] || '—') + K('[画:かく]')) + '</div></div></div>' +
+      (k && k.words && k.words.length ? '<div class="qwords">' + esc(k.words.slice(0, 3).join('　')) + '</div>' : '');
+    $('qFb').hidden = false;
+    $('qNextRow').hidden = false;
+    $('qNext').textContent = quiz.idx + 1 < quiz.items.length ? K('[次:つぎ]へ') : K('けっか を [見:み]る');
+    $('qNext').focus({ preventScroll: true });
+    if (ok) quizTimer = setTimeout(function () { if (quiz && quiz.answered) nextQuiz(); }, 900);
+  }
+  var quizTimer = null;
+  function nextQuiz() {
+    clearTimeout(quizTimer);
+    if (quiz.idx + 1 < quiz.items.length) { quiz.idx++; showQuizItem(); return; }
+    renderQuizDone(); go('quizdone');
+  }
+  $('qNext').onclick = nextQuiz;
+  $('qQuit').onclick = function () { clearTimeout(quizTimer); if (quiz && quiz.idx) { renderQuizDone(); go('quizdone'); } else { quiz = null; go('home'); } };
+  function renderQuizDone() {
+    var done = quiz.items.filter(function (x) { return x.got !== undefined; });
+    $('qdScore').textContent = quiz.ok;
+    $('qdOf').textContent = '/ ' + done.length + K('[問:もん] [正解:せいかい]');
+    var bad = done.filter(function (x) { return !x.got; });
+    $('qdNote').textContent = bad.length ? K('[間違:まちが]えた [漢字:かんじ]：') + bad.map(function (x) { return x.ch; }).join('　') : K('ぜんぶ [正解:せいかい]！');
+    $('qdList').innerHTML = done.map(function (x) {
+      return '<div class="it' + (x.got ? '' : ' ng') + '"><b>' + esc(x.ch) + '</b><small>' + (x.type === 'read' ? K('[読:よ]み') : K('[形:かたち]')) + '</small></div>';
+    }).join('');
+    $('qdPractice').disabled = !bad.length;
+    $('qdPractice').onclick = function () {
+      var list = bad.map(function (x) { return x.ch; }).filter(function (x, i, a) { return a.indexOf(x) === i; });
+      quiz = null; startDrill(list);
+    };
   }
 
   // ---------- 結果 ----------
