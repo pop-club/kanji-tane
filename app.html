@@ -203,6 +203,10 @@ h2 { font-size: 1.15rem; }
   .fb { padding: 12px; gap: 8px; }
   .fb .ans { font-size: 3.2rem; }
   .fb .verdict { font-size: 1.25rem; }
+  /* 書き直しの知らせは小さく（書く枠の大きさは変えない） */
+  .fb.retry { padding: 6px 12px; gap: 0; }
+  .fb.retry .verdict { font-size: 1.05rem; line-height: 1.35; }
+  .fb.retry .head > div > div:not(.verdict) { font-size: .85rem; line-height: 1.35; }
   .controls { gap: 8px; }
   .controls .btn { min-height: 52px; font-size: .95rem; }
   .skip { min-height: 40px; }
