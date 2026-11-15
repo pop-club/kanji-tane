@@ -272,15 +272,19 @@
   function go(h) { if (location.hash === '#' + h) route(); else location.hash = h; }
 
   // ---------- たねキャラの成長 ----------
-  // 覚えぐあいに合わせて、アイコンのたねが 芽 → 葉 → つぼみ → 花 → 実 と育つ。
-  // 絵は icons/icon.svg と同じ形・同じ色。stage 0〜6
-  var PLANT_NAME = ['たね', '[芽:め]', '[双葉:ふたば]', '[茎:くき]', 'つぼみ', '[花:はな]', '[実:み]'];
-  // 最後の姿は級ごとにちがう（花で完成する級と、実で完成する級）
-  function plantName(st, g) { return st === 6 ? (plantOf(g).end === 'fruit' ? '[実:み]' : 'まんかい') : PLANT_NAME[st]; }
+  // 覚えぐあいに合わせて、アイコンのたねが 芽 → 葉 → つぼみ → 花 → 満開 と育つ。
+  // 絵は icons/icon.svg と同じ形・同じ色。stage 0〜6。最後まで その級の花のまま（花が ふえていく）
+  var PLANT_NAME = ['たね', '[芽:め]', '[双葉:ふたば]', '[茎:くき]', 'つぼみ', '[花:はな]', '[満開:まんかい]'];
+  function plantName(st) { return PLANT_NAME[st] || PLANT_NAME[0]; }
   function plantStage(done, total, mastered) {
     if (total && mastered >= total) return 6;
     var p = total ? done / total : 0;
     return !done ? 0 : p < 0.1 ? 1 : p < 0.25 ? 2 : p < 0.5 ? 3 : p < 0.75 ? 4 : 5;
+  }
+  // stage 5（花）の あいだは、「おぼえた」が ふえるほど 咲く花が 1 → 2 → 3 と ふえる
+  function bloomCount(st, total, mastered) {
+    if (st !== 5) return st >= 6 ? 5 : 0;
+    return 1 + Math.min(2, Math.floor(3 * (total ? mastered / total : 0)));
   }
   // つぎの すがたまで あと何字か
   function plantNext(done, total, mastered) {
@@ -292,22 +296,23 @@
   }
   // 級・学年ごとに咲く花がちがう（育てた花がたまっていく感じにする）
   var PLANTS = {
-    1:  { nm: 'さくら',      sh: 'round',  fl: '#f9b8cd', ce: '#ffd66e', lf: '#43b96f', l2: '#5ccc82', end: 'flower', fs: 'cherry', fn: 'さくらんぼ', fr: '#ef6f6f' },
-    2:  { nm: 'ひまわり',    sh: 'thin',   fl: '#ffd05c', ce: '#8a5a2b', lf: '#3faa63', l2: '#63c98a', end: 'fruit', fs: 'orange', fn: 'みかん', fr: '#f8a33c' },
-    3:  { nm: 'コスモス',    sh: 'point',  fl: '#e59ad8', ce: '#ffd66e', lf: '#4fbd7a', l2: '#76d79a', end: 'flower', fs: 'grape', fn: 'ぶどう', fr: '#9b6fd0' },
-    4:  { nm: 'チューリップ', sh: 'bell',   fl: '#f07d7d', ce: '#ffd66e', lf: '#36a95f', l2: '#5ccc82', end: 'fruit', fs: 'berry', fn: 'いちご', fr: '#e8536a' },
-    5:  { nm: 'あじさい',    sh: 'cluster',fl: '#8fb7f2', ce: '#cfe0ff', lf: '#2f9e5b', l2: '#52c37c', end: 'flower', fs: 'grape', fn: 'ブルーベリー', fr: '#6f8fef' },
-    6:  { nm: 'うめ',        sh: 'round',  fl: '#fff2f6', ce: '#f6a8c0', lf: '#3faa63', l2: '#69cf8e', end: 'fruit', fs: 'peach', fn: 'もも', fr: '#f9a7b8' },
-    65: { nm: 'きく',        sh: 'thin',   fl: '#fff0b8', ce: '#ffb347', lf: '#3b9e60', l2: '#64c98a', end: 'flower', fs: 'apple', fn: 'りんご', fr: '#e24b4b' },
-    7:  { nm: 'あさがお',    sh: 'round',  fl: '#8aa8f0', ce: '#ffffff', lf: '#3aa862', l2: '#63c98a', end: 'fruit', fs: 'lemon', fn: 'レモン', fr: '#f6d44b' },
-    8:  { nm: 'すいせん',    sh: 'point',  fl: '#fff6cf', ce: '#ffb347', lf: '#45b06c', l2: '#6fd296', end: 'fruit', fs: 'persimmon', fn: 'かき', fr: '#ef8a3a' },
-    9:  { nm: 'ばら',        sh: 'bell',   fl: '#e8577a', ce: '#ffd66e', lf: '#2f9e5b', l2: '#52c37c', end: 'flower', fs: 'apple', fn: 'あおりんご', fr: '#7fc24b' },
-    10: { nm: 'はす',        sh: 'point',  fl: '#f7c0d6', ce: '#ffe08a', lf: '#3faa63', l2: '#6fd296', end: 'fruit', fs: 'peach', fn: 'びわ', fr: '#f3c66a' },
-    11: { nm: 'ふじ',        sh: 'cluster',fl: '#c3a6ef', ce: '#e5d8ff', lf: '#3b9e60', l2: '#63c98a', end: 'flower', fs: 'berry', fn: 'きいちご', fr: '#f28fb0' },
-    12: { nm: 'きんもくせい', sh: 'thin',   fl: '#ffb45c', ce: '#fff0c8', lf: '#2f9e5b', l2: '#52c37c', end: 'fruit', fs: 'orange', fn: 'きんかん', fr: '#ff9a3c' }
+    1:  { nm: 'さくら',      sh: 'round',  fl: '#f9b8cd', ce: '#ffd66e', lf: '#43b96f', l2: '#5ccc82' },
+    2:  { nm: 'ひまわり',    sh: 'thin',   fl: '#ffd05c', ce: '#8a5a2b', lf: '#3faa63', l2: '#63c98a' },
+    3:  { nm: 'コスモス',    sh: 'point',  fl: '#e59ad8', ce: '#ffd66e', lf: '#4fbd7a', l2: '#76d79a' },
+    4:  { nm: 'チューリップ', sh: 'bell',   fl: '#f07d7d', ce: '#ffd66e', lf: '#36a95f', l2: '#5ccc82' },
+    5:  { nm: 'あじさい',    sh: 'cluster',fl: '#8fb7f2', ce: '#cfe0ff', lf: '#2f9e5b', l2: '#52c37c' },
+    6:  { nm: 'うめ',        sh: 'round',  fl: '#fff2f6', ce: '#f6a8c0', lf: '#3faa63', l2: '#69cf8e' },
+    65: { nm: 'きく',        sh: 'thin',   fl: '#fff0b8', ce: '#ffb347', lf: '#3b9e60', l2: '#64c98a' },
+    7:  { nm: 'あさがお',    sh: 'round',  fl: '#8aa8f0', ce: '#ffffff', lf: '#3aa862', l2: '#63c98a' },
+    8:  { nm: 'すいせん',    sh: 'point',  fl: '#fff6cf', ce: '#ffb347', lf: '#45b06c', l2: '#6fd296' },
+    9:  { nm: 'ばら',        sh: 'bell',   fl: '#e8577a', ce: '#ffd66e', lf: '#2f9e5b', l2: '#52c37c' },
+    10: { nm: 'はす',        sh: 'point',  fl: '#f7c0d6', ce: '#ffe08a', lf: '#3faa63', l2: '#6fd296' },
+    11: { nm: 'ふじ',        sh: 'cluster',fl: '#c3a6ef', ce: '#e5d8ff', lf: '#3b9e60', l2: '#63c98a' },
+    12: { nm: 'きんもくせい', sh: 'thin',   fl: '#ffb45c', ce: '#fff0c8', lf: '#2f9e5b', l2: '#52c37c' }
   };
   function plantOf(g) { return PLANTS[+g] || PLANTS[1]; }
-  try { window.__plantSvg = function (st, l, g) { return plantSvg(st, l, g); }; } catch (e) {}
+  try { window.__plantSvg = function (st, l, g, n) { return plantSvg(st, l, g, n); }; } catch (e) {}
+  function paleEdge(P) { return P.fl.charAt(1) === 'f' && P.fl.charAt(3) === 'f' ? 1.5 : 0; }
   function flowerSvg(cx, cy, P, scale) {
     var k = scale || 1, s = '', i, a;
     function pet(deg, inner) { return '<g transform="rotate(' + deg.toFixed(1) + ' ' + cx + ' ' + cy + ')">' + inner + '</g>'; }
@@ -326,60 +331,33 @@
     } else {
       for (i = 0; i < 5; i++) {
         a = -Math.PI / 2 + i * Math.PI * 2 / 5;
-        s += '<ellipse cx="' + (cx + 20 * k * Math.cos(a)).toFixed(1) + '" cy="' + (cy + 20 * k * Math.sin(a)).toFixed(1) + '" rx="' + (13 * k) + '" ry="' + (13 * k) + '" fill="' + P.fl + '" stroke="#e9dccb" stroke-width="' + (P.fl.charAt(1) === 'f' && P.fl.charAt(3) === 'f' ? 1.5 : 0) + '"/>';
+        s += '<ellipse cx="' + (cx + 20 * k * Math.cos(a)).toFixed(1) + '" cy="' + (cy + 20 * k * Math.sin(a)).toFixed(1) + '" rx="' + (13 * k) + '" ry="' + (13 * k) + '" fill="' + P.fl + '" stroke="#e9dccb" stroke-width="' + paleEdge(P) + '"/>';
       }
       s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (10 * k) + '" fill="' + P.ce + '"/>';
     }
     return s;
   }
-  // 実（級ごとにちがう くだものキャラ）
-  function fruitSvg(cx, cy, P) {
-    var f = P.fs || 'apple', s = '', fx = cx, fy = cy, i;
-    function stem(x, y) { return '<path d="M' + x + ' ' + y + ' C' + (x + 4) + ' ' + (y - 7) + ' ' + (x + 12) + ' ' + (y - 9) + ' ' + (x + 17) + ' ' + (y - 8) + '" stroke="#2f9e5b" stroke-width="5" fill="none" stroke-linecap="round"/>'; }
-    if (f === 'cherry') {
-      s += '<path d="M138 70 C140 80 136 86 134 90 M138 70 C144 80 152 84 157 88" stroke="#2f9e5b" stroke-width="4" fill="none" stroke-linecap="round"/>';
-      s += '<circle cx="134" cy="97" r="11" fill="' + P.fr + '"/><circle cx="158" cy="95" r="11" fill="' + P.fr + '"/>';
-      fx = 158; fy = 95;
-    } else if (f === 'grape') {
-      var pts = [[0, -13], [-11, -5], [11, -5], [-6, 6], [6, 6], [0, 16]];
-      for (i = 0; i < pts.length; i++) s += '<circle cx="' + (cx + pts[i][0]) + '" cy="' + (cy + pts[i][1]) + '" r="8" fill="' + P.fr + '"/>';
-      s += stem(cx, cy - 20);
-      fy = cy + 6;
-    } else if (f === 'berry') {
-      s += '<path d="M' + (cx - 14) + ' ' + (cy - 8) + ' C' + (cx - 14) + ' ' + (cy + 10) + ' ' + (cx - 5) + ' ' + (cy + 18) + ' ' + cx + ' ' + (cy + 18) + ' C' + (cx + 5) + ' ' + (cy + 18) + ' ' + (cx + 14) + ' ' + (cy + 10) + ' ' + (cx + 14) + ' ' + (cy - 8) + ' C' + (cx + 8) + ' ' + (cy - 15) + ' ' + (cx - 8) + ' ' + (cy - 15) + ' ' + (cx - 14) + ' ' + (cy - 8) + ' Z" fill="' + P.fr + '"/>';
-      s += '<path d="M' + (cx - 13) + ' ' + (cy - 9) + ' C' + (cx - 6) + ' ' + (cy - 16) + ' ' + (cx + 6) + ' ' + (cy - 16) + ' ' + (cx + 13) + ' ' + (cy - 9) + ' C' + (cx + 6) + ' ' + (cy - 6) + ' ' + (cx - 6) + ' ' + (cy - 6) + ' ' + (cx - 13) + ' ' + (cy - 9) + ' Z" fill="#43b96f"/>';
-      fy = cy + 3;
-    } else if (f === 'lemon') {
-      s += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="16" ry="12" fill="' + P.fr + '"/>';
-      s += '<path d="M' + (cx + 15) + ' ' + cy + ' l7 -2 -7 -3" fill="' + P.fr + '"/>' + stem(cx - 6, cy - 12);
-    } else if (f === 'peach') {
-      s += '<path d="M' + cx + ' ' + (cy - 12) + ' C' + (cx + 16) + ' ' + (cy - 20) + ' ' + (cx + 18) + ' ' + (cy + 8) + ' ' + cx + ' ' + (cy + 16) + ' C' + (cx - 18) + ' ' + (cy + 8) + ' ' + (cx - 16) + ' ' + (cy - 20) + ' ' + cx + ' ' + (cy - 12) + ' Z" fill="' + P.fr + '"/>';
-      s += '<path d="M' + cx + ' ' + (cy - 11) + ' L' + cx + ' ' + (cy + 10) + '" stroke="#e58aa0" stroke-width="2" opacity=".6"/>' + stem(cx, cy - 14);
-      fy = cy + 2;
-    } else if (f === 'persimmon') {
-      s += '<ellipse cx="' + cx + '" cy="' + (cy + 2) + '" rx="16" ry="13" fill="' + P.fr + '"/>';
-      s += '<path d="M' + (cx - 12) + ' ' + (cy - 9) + ' L' + cx + ' ' + (cy - 14) + ' L' + (cx + 12) + ' ' + (cy - 9) + ' L' + cx + ' ' + (cy - 4) + ' Z" fill="#43b96f"/>';
-      fy = cy + 4;
-    } else {
-      s += '<path d="M' + cx + ' ' + (cy - 10) + ' C' + (cx + 17) + ' ' + (cy - 18) + ' ' + (cx + 17) + ' ' + (cy + 10) + ' ' + cx + ' ' + (cy + 15) + ' C' + (cx - 17) + ' ' + (cy + 10) + ' ' + (cx - 17) + ' ' + (cy - 18) + ' ' + cx + ' ' + (cy - 10) + ' Z" fill="' + P.fr + '"/>';
-      s += stem(cx, cy - 12);
-      fy = cy + 2;
-    }
-    // かお
-    s += '<ellipse cx="' + (fx - 4.5) + '" cy="' + fy + '" rx="1.9" ry="2.3" fill="#3b2a1a"/><ellipse cx="' + (fx + 4.5) + '" cy="' + fy + '" rx="1.9" ry="2.3" fill="#3b2a1a"/>';
-    s += '<path d="M' + (fx - 3) + ' ' + (fy + 5) + ' C' + (fx - 1) + ' ' + (fy + 7.5) + ' ' + (fx + 1) + ' ' + (fy + 7.5) + ' ' + (fx + 3) + ' ' + (fy + 5) + '" stroke="#3b2a1a" stroke-width="1.6" fill="none" stroke-linecap="round"/>';
-    return s;
+  // つぼみ（stage 4 のつぼみ。小さくしても使う）
+  function budSvg(cx, cy, P, k) {
+    return '<ellipse cx="' + cx + '" cy="' + cy + '" rx="' + (15 * k) + '" ry="' + (20 * k) + '" fill="' + P.fl + '" stroke="#e9dccb" stroke-width="' + paleEdge(P) + '"/>' +
+      '<path d="M' + cx + ' ' + (cy - 18 * k) + ' C' + (cx + 7 * k) + ' ' + (cy - 12 * k) + ' ' + (cx + 7 * k) + ' ' + (cy - 4 * k) + ' ' + cx + ' ' + (cy + 2 * k) + '" stroke="' + P.ce + '" stroke-width="' + (5 * k) + '" fill="none" stroke-linecap="round"/>';
   }
+  function branch(d) { return '<path d="' + d + '" stroke="#2f9e5b" stroke-width="4.5" stroke-linecap="round" fill="none"/>'; }
+  // 完成した級のしるし（その級の花）
   function gotIcon(g) {
     var P = plantOf(g);
-    if (P.end === 'fruit') return '<svg class="fruit" viewBox="120 60 52 52" role="img" aria-label="' + esc(SHORT_NAME[g] + ' ' + P.fn) + '">' + fruitSvg(146, 88, P) + '</svg>';
-    return '<svg class="fruit" viewBox="68 12 58 58" role="img" aria-label="' + esc(SHORT_NAME[g] + ' ' + P.nm) + '">' + flowerSvg(97, 41, P, 1) + '</svg>';
+    return '<svg class="gic" viewBox="64 8 66 66" role="img" aria-label="' + esc(K(SHORT_NAME[g]) + ' ' + P.nm) + '">' + flowerSvg(97, 41, P, 1) + '</svg>';
   }
-  function gotName(g) { var P = plantOf(g); return P.end === 'fruit' ? P.fn : P.nm; }
-  function plantSvg(stage, label, g) {
+  // n: 咲いている花の数（stage 5 は 1〜3。stage 6 は満開）
+  function plantSvg(stage, label, g, n) {
     var P = plantOf(g == null ? 1 : g);
+    if (n == null) n = bloomCount(stage, 0, 0);
     var s = '<svg class="plant" viewBox="0 0 200 210" role="img" aria-label="' + esc(label || '') + '">';
     s += '<ellipse cx="100" cy="186" rx="66" ry="13" fill="#9fd8b1"/>';   // つち
+    if (stage >= 6) s += branch('M24 186 C24 176 25 166 26 156') + branch('M176 186 C176 176 175 166 174 156');   // つちからも 小さい花
+    if (stage === 5 && n >= 2) s += branch('M99 104 C82 92 66 80 54 68');
+    if (stage === 5 && n >= 3) s += branch('M99 100 C116 86 132 72 148 62');
+    if (stage >= 6) s += branch('M99 104 C80 92 64 70 56 54') + branch('M99 100 C118 88 136 66 144 50') + branch('M98 110 C80 104 58 96 40 82') + branch('M99 106 C120 100 144 90 162 76');
     if (stage >= 1) {   // くき
       var top = [0, 120, 96, 62, 52, 46, 44][stage];
       s += '<path d="M100 132 C100 ' + (top + 28) + ' 99 ' + (top + 12) + ' 97 ' + top + '" stroke="#2f9e5b" stroke-width="7" stroke-linecap="round" fill="none"/>';
@@ -390,11 +368,17 @@
       s += '<path d="M99 100 C112 66 146 58 166 71 C165 98 130 117 99 100 Z" fill="' + P.l2 + '"/>';
     }
     if (stage >= 3) s += '<path d="M98 72 C84 52 58 48 47 57 C50 77 78 86 98 72 Z" fill="' + P.lf + '"/>';
-    if (stage === 4) s += '<ellipse cx="97" cy="42" rx="15" ry="20" fill="' + P.fl + '" stroke="#e9dccb" stroke-width="' + (P.fl.charAt(1) === 'f' && P.fl.charAt(3) === 'f' ? 1.5 : 0) + '"/><path d="M97 24 C104 30 104 38 97 44" stroke="' + P.ce + '" stroke-width="5" fill="none" stroke-linecap="round"/>';
-    if (stage === 5) s += flowerSvg(97, 42, P, 0.85);
+    if (stage === 4) s += budSvg(97, 42, P, 1);
+    if (stage === 5) {
+      s += n >= 2 ? flowerSvg(52, 66, P, 0.55) : budSvg(50, 70, P, 0.42);
+      s += n >= 3 ? flowerSvg(150, 60, P, 0.55) : budSvg(150, 62, P, 0.42);
+      s += flowerSvg(97, 42, P, 0.85);
+    }
     if (stage >= 6) {
-      if (P.end === 'fruit') s += '<g transform="translate(97 46) scale(1.45) translate(-146 -88)">' + fruitSvg(146, 88, P) + '</g>';
-      else s += flowerSvg(97, 40, P, 1.25) + flowerSvg(45, 74, P, 0.5) + flowerSvg(151, 64, P, 0.5);
+      s += flowerSvg(26, 152, P, 0.34) + flowerSvg(174, 152, P, 0.34);
+      s += budSvg(40, 80, P, 0.4) + budSvg(162, 74, P, 0.4);
+      s += flowerSvg(54, 54, P, 0.64) + flowerSvg(146, 50, P, 0.64);
+      s += flowerSvg(100, 38, P, 0.98);
     }
     // たね（かお）
     s += '<path d="M100 120 C133 120 153 147 153 170 C153 193 129 205 100 205 C71 205 47 193 47 170 C47 147 67 120 100 120 Z" fill="#eeb06a"/>';
@@ -402,10 +386,59 @@
     s += '<ellipse cx="81" cy="168" rx="6" ry="7.5" fill="#3b2a1a"/><ellipse cx="119" cy="168" rx="6" ry="7.5" fill="#3b2a1a"/>';
     s += '<circle cx="83" cy="165" r="2" fill="#fff"/><circle cx="121" cy="165" r="2" fill="#fff"/>';
     s += '<ellipse cx="68" cy="181" rx="9" ry="5" fill="#f39a8c" opacity=".75"/><ellipse cx="132" cy="181" rx="9" ry="5" fill="#f39a8c" opacity=".75"/>';
-    s += stage >= 6 ? '<path d="M89 180 C95 190 105 190 111 180" stroke="#3b2a1a" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M89 180 C95 190 105 190 111 180" stroke="#3b2a1a" stroke-width="4" stroke-linecap="round" fill="none"/>'
+    s += stage >= 6 ? '<path d="M89 180 C95 190 105 190 111 180" stroke="#3b2a1a" stroke-width="4" stroke-linecap="round" fill="none"/>'
       : '<path d="M91 180 C95 186 105 186 109 180" stroke="#3b2a1a" stroke-width="4" stroke-linecap="round" fill="none"/>';
     return s + '</svg>';
   }
+  // 花のことば（ホームと「大きく見る」で同じ文）
+  function plantMsg(st, g) {
+    var nm = plantOf(g).nm;
+    return st >= 6 ? nm + K('が [満開:まんかい]に なったよ！') : st >= 5 ? nm + K('が [咲:さ]いたよ！') : K('[育:そだ]てている[花:はな]：') + nm;
+  }
+  function plantHint(st, left) {
+    return st >= 6 ? K('ぜんぶ [覚:おぼ]えたね！') : st === 5 ? K('あと ') + left + K('[字:じ] 「[覚:おぼ]えた」に なると [満開:まんかい]') : K('あと ') + left + K('[字:じ]で つぎの すがた');
+  }
+
+  // ---------- 大きく見る（育ち具合をタッチ） ----------
+  var plantInfo = {}, plantOpener = null;
+  function openPlant(g, opener) {
+    var d = plantInfo[g]; if (!d) return;
+    var st = d.st, n = bloomCount(st, d.total, d.mastered), left = plantNext(d.done, d.total, d.mastered), i, strip = '';
+    for (i = 0; i <= 6; i++) strip += '<li' + (i === st ? ' aria-current="step"' : '') + '>' + plantSvg(i, '', g, i === 5 ? (st === 5 ? n : 1) : null) + '<span>' + K(plantName(i)) + '</span></li>';
+    $('pdTitle').textContent = K(SHORT_NAME[g]) + 'の ' + plantOf(g).nm;
+    $('pdBody').innerHTML = '<div class="pdpic">' + plantSvg(st, K(SHORT_NAME[g]) + ' ' + K(plantName(st)), g, n) + '</div>' +
+      '<p class="pdst"><b>' + K(plantName(st)) + '</b><em>' + plantMsg(st, g) + '</em></p>' +
+      '<dl class="pdnum"><div class="m"><dt>' + K('[覚:おぼ]えた') + '</dt><dd>' + d.mastered + K('[字:じ]') + '</dd></div>' +
+      '<div class="c"><dt>' + K('[覚:おぼ]えかけ') + '</dt><dd>' + d.candidate + K('[字:じ]') + '</dd></div>' +
+      '<div><dt>' + K('[全部:ぜんぶ]の [字:じ]') + '</dt><dd>' + d.total + K('[字:じ]') + '</dd></div></dl>' +
+      '<p class="pdnext">' + plantHint(st, left) + '</p>' +
+      '<ol class="pdstrip" aria-label="' + esc(K('[育:そだ]つ じゅんばん')) + '">' + strip + '</ol>';
+    plantOpener = opener || document.activeElement;
+    $('plantDlg').hidden = false;
+    document.body.classList.add('dlg-open');
+    $('pdClose').focus();
+  }
+  function closePlant() {
+    if ($('plantDlg').hidden) return;
+    $('plantDlg').hidden = true;
+    document.body.classList.remove('dlg-open');
+    var o = plantOpener; plantOpener = null;
+    if (o && o.focus && document.body.contains(o)) o.focus();
+  }
+  $('pdClose').onclick = closePlant;
+  $('plantDlg').addEventListener('click', function (e) { if (e.target === this) closePlant(); });
+  $('plantDlg').addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { e.preventDefault(); closePlant(); }
+    else if (e.key === 'Tab') { e.preventDefault(); $('pdClose').focus(); }   // 押せるのは「とじる」だけ。フォーカスを外に出さない
+  });
+  window.addEventListener('hashchange', closePlant);
+  function plantTap(e) {
+    var el = e.target.closest ? e.target.closest('[data-pg]') : null;
+    if (!el) return;
+    if (e.type === 'keydown') { if (e.key !== 'Enter' && e.key !== ' ') return; e.preventDefault(); }
+    openPlant(el.getAttribute('data-pg'), el);
+  }
+  ['hGrow', 'hLevels'].forEach(function (id) { $(id).addEventListener('click', plantTap); $(id).addEventListener('keydown', plantTap); });
 
   // ---------- ホーム ----------
   function renderHome() {
@@ -423,11 +456,12 @@
       }
       // 数字は「せいかいした字（おぼえた＋おぼえかけ）」。おぼえた は2回つづけて正解したときなので、1回めのテストでは 0 のまま
       var chars = gradeChars(g), c = statusCounts(chars), t = chars.length, done = c.mastered + c.candidate, tested = t - c.new;
-      html += '<div class="level">' + plantSvg(plantStage(done, t, c.mastered), '', g) + '<span>' + K(SHORT_NAME[g]) + '</span><span class="bar" role="img" aria-label="' + K(SHORT_NAME[g]) + ' ' + K('[覚:おぼ]えた ') + c.mastered + '字、' + K('[覚:おぼ]えかけ ') + c.candidate + '字、' + K('[苦手:にがて] ') + c.weak + '字 / ' + t + '字">' +
+      var st = plantStage(done, t, c.mastered);
+      plantInfo[g] = { st: st, done: done, total: t, mastered: c.mastered, candidate: c.candidate };
+      html += '<div class="level tap" role="button" tabindex="0" data-pg="' + g + '" aria-label="' + esc(K(SHORT_NAME[g]) + ' ' + K('[覚:おぼ]えた ') + c.mastered + '字、' + K('[覚:おぼ]えかけ ') + c.candidate + '字、' + K('[苦手:にがて] ') + c.weak + '字 / ' + t + '字。' + K('タッチすると [大:おお]きく [見:み]える')) + '">' + plantSvg(st, '', g, bloomCount(st, t, c.mastered)) + '<span>' + K(SHORT_NAME[g]) + '</span><span class="bar" role="img" aria-label="' + K(SHORT_NAME[g]) + ' ' + K('[覚:おぼ]えた ') + c.mastered + '字、' + K('[覚:おぼ]えかけ ') + c.candidate + '字、' + K('[苦手:にがて] ') + c.weak + '字 / ' + t + '字">' +
         '<i class="m" style="width:' + (100 * c.mastered / t) + '%"></i><i class="c" style="width:' + (100 * c.candidate / t) + '%"></i><i class="w" style="width:' + (100 * c.weak / t) + '%"></i>' +
         '</span><span class="n">' + done + ' / ' + t + '字</span>' +
         (tested ? '<small class="ld">' + K('[覚:おぼ]えた ') + c.mastered + '　' + K('[覚:おぼ]えかけ ') + c.candidate + '　' + K('[苦手:にがて] ') + c.weak + '</small>' : '') + '</div>';
-      var st = plantStage(done, t, c.mastered);
       if (!big || (big.st < 6 && st <= big.st && done > big.done) || (big.st === 6 && st < 6)) big = { g: g, st: st, done: done, total: t, mastered: c.mastered };
     });
     $('hLevels').innerHTML = html;
@@ -437,12 +471,18 @@
         if (!hasGrade(g)) return false;
         var ch = gradeChars(g); return statusCounts(ch).mastered >= ch.length;
       });
-      $('hGrow').innerHTML = plantSvg(big.st, K(SHORT_NAME[big.g]) + ' ' + K(plantName(big.st, big.g)), big.g) +
-        '<div class="gtx"><b>' + K(SHORT_NAME[big.g]) + 'の ' + K(plantName(big.st, big.g)) + '</b>' +
-        '<em class="fl">' + (big.st >= 6 ? gotName(big.g) + (plantOf(big.g).end === 'fruit' ? K('が みのったよ！') : K('が [満開:まんかい]に なったよ！')) : big.st >= 5 ? plantOf(big.g).nm + K('が [咲:さ]いたよ！') : K('[育:そだ]てている[花:はな]：') + plantOf(big.g).nm) + '</em>' +
+      var gl = K(SHORT_NAME[big.g]) + ' ' + K(plantName(big.st));
+      $('hGrow').setAttribute('data-pg', big.g);
+      $('hGrow').setAttribute('aria-label', gl + '。' + plantMsg(big.st, big.g) + '。' + K('タッチすると [大:おお]きく [見:み]える'));
+      $('hGrow').innerHTML = plantSvg(big.st, gl, big.g, bloomCount(big.st, big.total, big.mastered)) +
+        '<div class="gtx"><b>' + K(SHORT_NAME[big.g]) + 'の ' + K(plantName(big.st)) + '</b>' +
+        '<em class="fl">' + plantMsg(big.st, big.g) + '</em>' +
         '<span>' + big.done + ' / ' + big.total + K('[字:じ] [書:か]けたよ') + '</span>' +
         (got.length ? '<span class="got">' + K('そだてた：') + got.map(function (g) { return gotIcon(g) + '<b>' + K(SHORT_NAME[g]) + '</b>'; }).join('') + '</span>' : '') +
-        '<small>' + (big.st >= 6 ? K('ぜんぶ [覚:おぼ]えたね！') : big.st === 5 ? K('あと ') + left + K('[字:じ] 「[覚:おぼ]えた」に なると ') + (plantOf(big.g).end === 'fruit' ? gotName(big.g) + K('が なるよ') : K('[満開:まんかい]に なるよ')) : K('あと ') + left + K('[字:じ]で つぎの すがた')) + '</small></div>';
+        '<small>' + plantHint(big.st, left) + '</small></div>' +
+        '<span class="zoom" aria-hidden="true">🔍</span>';
+    } else {
+      $('hGrow').removeAttribute('data-pg');
     }
     $('hLevelsTitle').textContent = mode === 'kanken' ? K('[級:きゅう]ごとの [覚:おぼ]え[具合:ぐあい]') : K('[学年:がくねん]ごとの [覚:おぼ]え[具合:ぐあい]');
   }
