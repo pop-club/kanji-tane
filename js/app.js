@@ -42,7 +42,7 @@
   // 学年別漢字配当表（2020年度施行、js/grades.js）。習った字かどうかの判断に使う
   var STD_STROKES = window.POPKANJI_STROKES || {};   // 標準の画数（js/stroke-counts.js）
   // 判定ミスの報告先（Google Apps Script のウェブアプリ URL）。空なら送らない（今までどおり端末の中だけで記録する）
-  var REPORT_URL = window.POPKANJI_REPORT_URL || '';
+  var REPORT_URL = window.POPKANJI_REPORT_URL || 'https://script.google.com/macros/s/AKfycbwXKyThC6aNYodJZLmWgu3c1IOUQUafF7_Z30UMd1CXpZgvW0jb8Xc0DZL2VL7OKeih7Q/exec';
   var REPORT_TIMEOUT = 20000;
   var GRADE_OF = {};
   var GL = window.POPKANJI_GRADES || {};
