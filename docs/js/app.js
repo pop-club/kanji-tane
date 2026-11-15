@@ -251,6 +251,7 @@
     var h = (location.hash || '#home').slice(1);
     if (views.indexOf(h) < 0) h = 'home';
     if (session && h !== 'test' && !(drill && drill.back && h === 'drillrun')) leaveTest();   // 練習（テストから）の間は つづける
+    if (drill && h !== 'drillrun' && h !== 'drilldone') { drill = null; dBusy = false; }   // 練習の画面から はなれたら 練習は おわり
     if (h === 'test' && !session) h = 'home';
     if (h === 'result' && !lastResult) h = 'home';
     if ((h === 'drillrun' || h === 'drilldone') && !drill) h = 'drill';
@@ -601,6 +602,7 @@
         function () { $('loadstate').textContent = K('[手本:てほん]を [読:よ]み[込:こ]めませんでした'); $('gStart').disabled = false; });
       return;
     }
+    quitArmed = false; $('tQuit').textContent = K('やめる');   // 前のテストの「本当に やめる？」を持ちこさない
     session = { id: 's' + Date.now(), at: Date.now(), mode: mode, grade: grade, idx: 0, kind: kind, items: items };
     if (!pad) pad = new window.PopKanjiPad($('tPad'), { onChange: function (n) {
       $('tPadHint').hidden = n > 0;
@@ -658,19 +660,31 @@
   }
   // スマホ縦向き：問題・書く枠・ボタンが1画面に収まるように、枠の大きさを決める
   var narrowMq = window.matchMedia('(orientation: portrait), (max-width: 820px) and (min-height: 561px)');
+  // 書いているあいだ（1回め・書き直し・練習）は、いつも同じ大きさ（はじめに書くときの画面で決めた大きさ）にする。
+  // 書き直しの知らせ（#tFb）が出ても枠は小さくしない。小さくするのは 答えが決まって 結果を見せるときだけ
   function fitPad() {
     var w = $('tPad').parentNode;
     w.style.width = '';
     if (!session || !narrowMq.matches || $('v-test').hidden) return;
+    var writing = !answered || practicing;
+    var fb = $('tFb'), fbHidden = fb.hidden, bodyPr = document.body.classList.contains('practicing');
+    var y0 = window.scrollY;
+    if (writing) { fb.hidden = true; document.body.classList.remove('practicing'); }
     var full = w.getBoundingClientRect().width;
     var top = $('tPad').getBoundingClientRect().top + window.scrollY;
     var below = 0;
     Array.prototype.forEach.call(w.children, function (c) { if (c.id !== 'tPad' && !c.hidden) below += c.getBoundingClientRect().height + 10; });
+    if (writing) { fb.hidden = fbHidden; document.body.classList.toggle('practicing', bodyPr); if (window.scrollY !== y0) window.scrollTo(0, y0); }
     var vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
     var avail = Math.floor(vh - top - below - 12);
-    var min = answered && !practicing ? 150 : 230;
+    var min = writing ? 230 : 150;
     var size = Math.max(min, Math.min(full, avail));
     if (size < full) w.style.width = size + 'px';
+    // 書き直しの知らせで ボタンが画面の下に出たときは、答えるボタンまで見えるように少しだけ動かす
+    if (writing && !fb.hidden && !answered) {
+      var b = $('tControls').getBoundingClientRect().bottom;
+      if (b > vh - 8) window.scrollBy(0, Math.ceil(b - vh + 8));
+    }
   }
   window.addEventListener('resize', function () { if (session) fitPad(); });
   function infoDl(ch) {
@@ -845,6 +859,7 @@
   $('tUndo').onclick = function () { pad.undo(); };
   $('tClear').onclick = function () { pad.clear(); };
   $('tAnswer').onclick = function () {
+    if (!session) return;   // 最後の問題で2回おしたときなど（テストはもう終わっている）
     if (practicing) { if (pad.strokes().length) practiceCheck(); return; }
     if (!ready || answered || !pad.strokes().length) return;
     var it = cur();
@@ -929,12 +944,14 @@
     }
   }
   $('tSkip').onclick = function () {
+    if (!session) return;   // 最後の問題で2回おしたときなど（テストはもう終わっている）
     if (answered) return;
     cur().tries++;
     feedback('wrong', cur().parts ? K('[答:こた]えは この [言葉:ことば]') : K('[答:こた]えは この [漢字:かんじ]'), K('[次:つぎ]は [書:か]けるように [練習:れんしゅう] しよう。'), true, false);
     finishItem('wrong', null);
   };
   $('tNext').onclick = function () {
+    if (!session) return;   // 最後の問題で2回おしたときなど（テストはもう終わっている）
     var it = cur();
     it.result = pending;
     // 「もういちど」は答えを見た直後なので、記録（にがて・おぼえた）は変えない
@@ -971,6 +988,7 @@
   }
   var quitArmed = false;
   $('tQuit').onclick = function () {
+    if (!session) return;   // 最後の問題で2回おしたときなど（テストはもう終わっている）
     if (!quitArmed) { quitArmed = true; this.textContent = K('[本当:ほんとう]に やめる？'); var b = this; setTimeout(function () { quitArmed = false; b.textContent = K('やめる'); }, 3000); return; }
     quitArmed = false; this.textContent = 'やめる';
     var done = answeredItems();
@@ -1214,82 +1232,10 @@
     $('ddTest').onclick = function () { var chars = done.map(function (x) { return x.ch; }); drill = null; startTest('review', 0, shuffle(chars)); };
   }
 
-  // ---------- クイズ（にせ漢字さがし・読みクイズ） ----------
+  // ---------- 読みの問題 ----------
   // 書くテストとは別の遊び。おぼえぐあい（覚えた・苦手）は変えない
-  var quiz = null, qPickGrade = null, qPickKind = 'mix', qPickN = 10;
-  function strokeBox(st) {
-    var xs = [], ys = [];
-    st.forEach(function (s) { s.forEach(function (p) { xs.push(p[0]); ys.push(p[1]); }); });
-    var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
-    var w = Math.max(x1 - x0, y1 - y0, 1);
-    return { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, sc: 200 / (w + 2 * w * 0.14) };
-  }
-  // 筆画をそのまま絵にする（番号なし）。にせ漢字も同じ見た目で描く
-  function strokesSvg(st, box, label) {
-    var tx = function (x) { return (100 + (x - box.cx) * box.sc).toFixed(1); }, ty = function (y) { return (100 + (y - box.cy) * box.sc).toFixed(1); };
-    var html = '<svg class="order" viewBox="0 0 200 200" role="img" aria-label="' + esc(label || '') + '">';
-    st.forEach(function (s) {
-      if (!s.length) return;
-      var d = 'M' + tx(s[0][0]) + ' ' + ty(s[0][1]);
-      if (s.length === 1) d += 'l0.1 0.1';
-      for (var i = 1; i < s.length - 1; i++) d += ' Q' + tx(s[i][0]) + ' ' + ty(s[i][1]) + ' ' + tx((s[i][0] + s[i + 1][0]) / 2) + ' ' + ty((s[i][1] + s[i + 1][1]) / 2);
-      if (s.length > 1) d += ' L' + tx(s[s.length - 1][0]) + ' ' + ty(s[s.length - 1][1]);
-      html += '<path d="' + d + '"/>';
-    });
-    return html + '</svg>';
-  }
-  function cloneStrokes(st) { return st.map(function (s) { return s.map(function (p) { return p.slice(); }); }); }
-  // にせ漢字：1画だけ はっきり変える（消す・足す・短く・長く・ずらす・左右はんてん・かたむける）。
-  // 見てすぐ分かるように、元の形から どれだけ動いたかを測って、小さい変化は使わない
-  function strokeSpan(s) {
-    var xs = s.map(function (p) { return p[0]; }), ys = s.map(function (p) { return p[1]; });
-    return Math.max(Math.max.apply(null, xs) - Math.min.apply(null, xs), Math.max.apply(null, ys) - Math.min.apply(null, ys));
-  }
-  function strokesDiff(a, b) {
-    if (a.length !== b.length) return 999;
-    var m = 0;
-    for (var i = 0; i < a.length; i++) {
-      if (a[i].length !== b[i].length) return 999;
-      for (var j = 0; j < a[i].length; j++) m = Math.max(m, Math.hypot(a[i][j][0] - b[i][j][0], a[i][j][1] - b[i][j][1]));
-    }
-    return m;
-  }
-  function fakeVariants(st) {
-    var out = [], n = st.length;
-    function add(v) { if (v && strokesDiff(st, v) >= 13 && !out.some(function (o) { return strokesDiff(o, v) < 11; })) out.push(v); }
-    function at(i, f) { var v = cloneStrokes(st); v[i] = f(v[i]); return v; }
-    for (var i = 0; i < n; i++) {
-      var s = st[i], span = strokeSpan(s), a = s[0], z = s[s.length - 1];
-      if (n >= 4) { var v = cloneStrokes(st); v.splice(i, 1); add(v); }            // 1画けす
-      if (span >= 22) {
-        add(at(i, function (q) { return q.map(function (p) { return [a[0] + (p[0] - a[0]) * 0.35, a[1] + (p[1] - a[1]) * 0.35]; }); }));   // 短く
-        add(at(i, function (q) { return q.map(function (p) { return [a[0] + (p[0] - a[0]) * 1.75, a[1] + (p[1] - a[1]) * 1.75]; }); }));   // 長く（つき出す）
-        add(at(i, function (q) {                                                   // かたむける
-          var c = q[Math.floor(q.length / 2)], co = Math.cos(0.45), si = Math.sin(0.45);
-          return q.map(function (p) { var x = p[0] - c[0], y = p[1] - c[1]; return [c[0] + x * co - y * si, c[1] + x * si + y * co]; });
-        }));
-      }
-      add(at(i, function (q) { return q.map(function (p) { return [p[0] + 20, p[1] - 14]; }); }));    // ずらす
-      var w = Math.max.apply(null, s.map(function (p) { return p[0]; })) - Math.min.apply(null, s.map(function (p) { return p[0]; }));
-      if (w >= 20) add(at(i, function (q) { var c = (a[0] + z[0]) / 2; return q.map(function (p) { return [2 * c - p[0], p[1]]; }); }));   // 左右はんてん
-      if (n < 12) { var d = cloneStrokes(st); d.push(s.map(function (p) { return [p[0] + 18, p[1] + 18]; })); add(d); }                    // 1画ふやす
-    }
-    return shuffle(out);
-  }
-  function quizFake(ch) {
-    var st = orderStrokes(ch);
-    if (!st || (STD_STROKES[ch] && st.length !== STD_STROKES[ch])) return null;
-    var box = strokeBox(st), k = KANJI[ch];
-    var fakes = fakeVariants(st).slice(0, 3);
-    if (fakes.length < 3) return null;
-    var opts = [{ ok: true, svg: strokesSvg(st, box, K('[正:ただ]しい [形:かたち]')) }].concat(fakes.map(function (f) {
-      return { ok: false, svg: strokesSvg(f, box, K('にせもの')) };
-    }));
-    var yomi = [].concat(k.on, k.kun).filter(Boolean).slice(0, 3).join('・');
-    return { type: 'fake', ch: ch, ask: K('[正:ただ]しい [形:かたち]は どれ？'),
-      sub: (yomi ? '「' + yomi + '」' : '') + (k.meaning ? '　' + esc(k.meaning) : ''), opts: shuffle(opts) };
-  }
-  // 読みクイズ：文の中の漢字の読みを4つから選ぶ
+  var quiz = null, qPickGrade = null, qPickN = 10;
+  // 文の中の漢字の読みを4つから選ぶ
   var readPool = {};
   function readingsOf(g) {
     if (readPool[g]) return readPool[g];
@@ -1313,19 +1259,17 @@
     var opts = [{ ok: true, text: tok.r }].concat(pick.map(function (r) { return { ok: false, text: r }; }));
     return { type: 'read', ch: ch, ask: K('[赤:あか]い [漢字:かんじ]の [読:よ]みは どれ？'), q: q, opts: shuffle(opts) };
   }
-  function makeQuiz(g, kind, n) {
+  function makeQuiz(g, n) {
     var chars = shuffle(gradeChars(g).slice()), out = [];
     for (var i = 0; i < chars.length && out.length < n; i++) {
-      var ch = chars[i], want = kind === 'mix' ? (out.length % 2 ? 'read' : 'fake') : kind;
-      var item = want === 'fake' ? quizFake(ch) : quizRead(ch, g);
-      if (!item && kind === 'mix') item = want === 'fake' ? quizRead(ch, g) : quizFake(ch);
+      var item = quizRead(chars[i], g);
       if (item) out.push(item);
     }
     return out;
   }
   function renderQuizPick() {
     if (qPickGrade === null || levels().indexOf(qPickGrade) < 0) qPickGrade = levels().indexOf(pickGrade) >= 0 ? pickGrade : levels()[0];
-    $('qTitle').textContent = mode === 'kanken' ? K('どの [級:きゅう]の クイズ？') : K('[何年生:なんねんせい]の クイズ？');
+    $('qTitle').textContent = mode === 'kanken' ? K('どの [級:きゅう]の [読:よ]みの [問題:もんだい]？') : K('[何年生:なんねんせい]の [読:よ]みの [問題:もんだい]？');
     var html = '';
     levels().forEach(function (g) {
       var ok = hasGrade(g);
@@ -1334,29 +1278,15 @@
     });
     $('qList').innerHTML = html;
     Array.prototype.forEach.call($('qList').querySelectorAll('.grade'), function (b) { b.onclick = function () { qPickGrade = +b.dataset.g; renderQuizPick(); }; });
-    Array.prototype.forEach.call($('qKind').querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', x.dataset.kind === qPickKind); });
     Array.prototype.forEach.call($('qCount').querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', +x.dataset.n === qPickN); });
     $('qStart').disabled = !hasGrade(qPickGrade);
   }
-  Array.prototype.forEach.call($('qKind').querySelectorAll('button'), function (b) {
-    b.onclick = function () { qPickKind = b.dataset.kind; try { localStorage.setItem('kt-qkind', qPickKind); } catch (e) {} renderQuizPick(); };
-  });
   Array.prototype.forEach.call($('qCount').querySelectorAll('button'), function (b) {
     b.onclick = function () { qPickN = +b.dataset.n; renderQuizPick(); };
   });
-  try { var sk = localStorage.getItem('kt-qkind'); if (sk) qPickKind = sk; } catch (e) {}
   function startQuiz() {
-    // にせ漢字さがしは手本（KanjiVG）の筆画を使うので、準1級・1級はここで読みこむ
-    var wait = qPickKind === 'read' ? null : ensureRefs(gradeChars(qPickGrade));
-    if (wait) {
-      $('qNote').textContent = K('[漢字:かんじ]の [手本:てほん]を [読:よ]み[込:こ]み[中:ちゅう]…（[初:はじ]めてのときは [少:すこ]し [時間:じかん]が かかります）');
-      $('qStart').disabled = true;
-      wait.then(function () { $('qNote').textContent = ''; $('qStart').disabled = false; startQuiz(); },
-        function () { $('qNote').textContent = K('[手本:てほん]を [読:よ]み[込:こ]めませんでした'); $('qStart').disabled = false; });
-      return;
-    }
-    var items = makeQuiz(qPickGrade, qPickKind, qPickN);
-    if (!items.length) { $('qNote').textContent = K('この [級:きゅう]では クイズを [作:つく]れませんでした'); return; }
+    var items = makeQuiz(qPickGrade, qPickN);
+    if (!items.length) { $('qNote').textContent = K('この [級:きゅう]では [問題:もんだい]を [作:つく]れませんでした'); return; }
     $('qNote').textContent = '';
     quiz = { grade: qPickGrade, items: items, idx: 0, ok: 0, answered: false };
     go('quizrun'); showQuizItem();
@@ -1368,11 +1298,10 @@
     $('qNum').textContent = (quiz.idx + 1) + ' / ' + n;
     $('qProg').style.width = (100 * quiz.idx / n) + '%';
     $('qAsk').textContent = it.ask;
-    $('qBody').innerHTML = it.type === 'read' ? '<div class="qtext qline">' + renderQ(it.q, 'read') + '</div>'
-      : '<div class="qsub">' + it.sub + '</div>';
+    $('qBody').innerHTML = '<div class="qtext qline">' + renderQ(it.q, 'read') + '</div>';
     $('qChoices').className = 'choices ' + it.type;
     $('qChoices').innerHTML = it.opts.map(function (o, i) {
-      return '<button class="choice" data-i="' + i + '">' + (o.svg || '<span class="rd">' + esc(o.text) + '</span>') + '</button>';
+      return '<button class="choice" data-i="' + i + '"><span class="rd">' + esc(o.text) + '</span></button>';
     }).join('');
     Array.prototype.forEach.call($('qChoices').querySelectorAll('.choice'), function (b) { b.onclick = function () { answerQuiz(+b.dataset.i); }; });
     $('qFb').hidden = true; $('qFb').innerHTML = '';
@@ -1393,7 +1322,7 @@
     var k = KANJI[it.ch];
     $('qFb').className = 'fb ' + (ok ? 'correct' : 'wrong');
     $('qFb').innerHTML = '<div class="head"><span class="ans">' + esc(it.ch) + '</span><div><div class="verdict">' + (ok ? K('[正解:せいかい]！') : K('[残念:ざんねん]')) + '</div>' +
-      '<div>' + (it.type === 'read' ? K('[読:よ]み：') + esc(it.opts.filter(function (o) { return o.ok; })[0].text) : K('[画数:かくすう] ') + (STD_STROKES[it.ch] || '—') + K('[画:かく]')) + '</div></div></div>' +
+      '<div>' + K('[読:よ]み：') + esc(it.opts.filter(function (o) { return o.ok; })[0].text) + '</div></div></div>' +
       (k && k.words && k.words.length ? '<div class="qwords">' + esc(k.words.slice(0, 3).join('　')) + '</div>' : '');
     $('qFb').hidden = false;
     $('qNextRow').hidden = false;
@@ -1416,7 +1345,7 @@
     var bad = done.filter(function (x) { return !x.got; });
     $('qdNote').textContent = bad.length ? K('[間違:まちが]えた [漢字:かんじ]：') + bad.map(function (x) { return x.ch; }).join('　') : K('ぜんぶ [正解:せいかい]！');
     $('qdList').innerHTML = done.map(function (x) {
-      return '<div class="it' + (x.got ? '' : ' ng') + '"><b>' + esc(x.ch) + '</b><small>' + (x.type === 'read' ? K('[読:よ]み') : K('[形:かたち]')) + '</small></div>';
+      return '<div class="it' + (x.got ? '' : ' ng') + '"><b>' + esc(x.ch) + '</b><small>' + K('[読:よ]み') + '</small></div>';
     }).join('');
     $('qdPractice').disabled = !bad.length;
     $('qdPractice').onclick = function () {
@@ -1452,7 +1381,7 @@
   };
   $('rAgain').onclick = function () {
     if (lastResult.mode === 'grade') startTest('grade', lastResult.grade);
-    else { var l = reviewList(); if (l.length) startTest('review', 0, l.slice(0, 10)); else go('home'); }
+    else startTest('review', 0, uniq(lastResult.items.filter(function (x) { return !x.again; }).map(function (x) { return x.ch; })));   // さっきと同じ字で
   };
   function uniq(a) { return a.filter(function (x, i) { return a.indexOf(x) === i; }); }
 
@@ -1575,17 +1504,17 @@
       a.download = 'kanji-tane-' + new Date().toISOString().slice(0, 10) + '.json';
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
-      $('dMsg').textContent = '書き出しました。';
-    } catch (e) { $('dMsg').textContent = '書き出せませんでした。'; }
+      $('dataMsg').textContent = '書き出しました。';
+    } catch (e) { $('dataMsg').textContent = '書き出せませんでした。'; }
   };
   $('dImport').onchange = function () {
     var f = this.files && this.files[0]; if (!f) return;
     var rd = new FileReader();
     rd.onload = function () {
       var data;
-      try { data = JSON.parse(rd.result); } catch (e) { $('dMsg').textContent = 'ファイルを読めませんでした。かんじのたね で書き出したファイルを選んでください。'; return; }
-      Store.importData(data).then(function () { selected = null; $('dMsg').textContent = '読み込みました。'; renderData(); },
-        function (e) { $('dMsg').textContent = e.message + '。かんじのたね で書き出したファイルを選んでください。'; });
+      try { data = JSON.parse(rd.result); } catch (e) { $('dataMsg').textContent = 'ファイルを読めませんでした。かんじのたね で書き出したファイルを選んでください。'; return; }
+      Store.importData(data).then(function () { selected = null; $('dataMsg').textContent = '読み込みました。'; renderData(); },
+        function (e) { $('dataMsg').textContent = e.message + '。かんじのたね で書き出したファイルを選んでください。'; });
     };
     rd.readAsText(f);
     this.value = '';
@@ -1594,7 +1523,7 @@
   $('dReset').onclick = function () {
     if (!resetArmed) { resetArmed = true; this.textContent = '本当に消す（元に戻せません）'; var b = this; setTimeout(function () { resetArmed = false; b.textContent = '学習の記録をすべて消す'; }, 4000); return; }
     resetArmed = false; this.textContent = '学習の記録をすべて消す';
-    Store.reset().then(function () { selected = null; $('dMsg').textContent = '学習の記録を消しました。'; renderData(); });
+    Store.reset().then(function () { selected = null; $('dataMsg').textContent = '学習の記録を消しました。'; renderData(); });
   };
 
   function renderAbout() {

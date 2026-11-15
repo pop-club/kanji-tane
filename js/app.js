@@ -251,6 +251,7 @@
     var h = (location.hash || '#home').slice(1);
     if (views.indexOf(h) < 0) h = 'home';
     if (session && h !== 'test' && !(drill && drill.back && h === 'drillrun')) leaveTest();   // 練習（テストから）の間は つづける
+    if (drill && h !== 'drillrun' && h !== 'drilldone') { drill = null; dBusy = false; }   // 練習の画面から はなれたら 練習は おわり
     if (h === 'test' && !session) h = 'home';
     if (h === 'result' && !lastResult) h = 'home';
     if ((h === 'drillrun' || h === 'drilldone') && !drill) h = 'drill';
@@ -601,6 +602,7 @@
         function () { $('loadstate').textContent = K('[手本:てほん]を [読:よ]み[込:こ]めませんでした'); $('gStart').disabled = false; });
       return;
     }
+    quitArmed = false; $('tQuit').textContent = K('やめる');   // 前のテストの「本当に やめる？」を持ちこさない
     session = { id: 's' + Date.now(), at: Date.now(), mode: mode, grade: grade, idx: 0, kind: kind, items: items };
     if (!pad) pad = new window.PopKanjiPad($('tPad'), { onChange: function (n) {
       $('tPadHint').hidden = n > 0;
@@ -857,6 +859,7 @@
   $('tUndo').onclick = function () { pad.undo(); };
   $('tClear').onclick = function () { pad.clear(); };
   $('tAnswer').onclick = function () {
+    if (!session) return;   // 最後の問題で2回おしたときなど（テストはもう終わっている）
     if (practicing) { if (pad.strokes().length) practiceCheck(); return; }
     if (!ready || answered || !pad.strokes().length) return;
     var it = cur();
@@ -941,12 +944,14 @@
     }
   }
   $('tSkip').onclick = function () {
+    if (!session) return;   // 最後の問題で2回おしたときなど（テストはもう終わっている）
     if (answered) return;
     cur().tries++;
     feedback('wrong', cur().parts ? K('[答:こた]えは この [言葉:ことば]') : K('[答:こた]えは この [漢字:かんじ]'), K('[次:つぎ]は [書:か]けるように [練習:れんしゅう] しよう。'), true, false);
     finishItem('wrong', null);
   };
   $('tNext').onclick = function () {
+    if (!session) return;   // 最後の問題で2回おしたときなど（テストはもう終わっている）
     var it = cur();
     it.result = pending;
     // 「もういちど」は答えを見た直後なので、記録（にがて・おぼえた）は変えない
@@ -983,6 +988,7 @@
   }
   var quitArmed = false;
   $('tQuit').onclick = function () {
+    if (!session) return;   // 最後の問題で2回おしたときなど（テストはもう終わっている）
     if (!quitArmed) { quitArmed = true; this.textContent = K('[本当:ほんとう]に やめる？'); var b = this; setTimeout(function () { quitArmed = false; b.textContent = K('やめる'); }, 3000); return; }
     quitArmed = false; this.textContent = 'やめる';
     var done = answeredItems();
@@ -1375,7 +1381,7 @@
   };
   $('rAgain').onclick = function () {
     if (lastResult.mode === 'grade') startTest('grade', lastResult.grade);
-    else { var l = reviewList(); if (l.length) startTest('review', 0, l.slice(0, 10)); else go('home'); }
+    else startTest('review', 0, uniq(lastResult.items.filter(function (x) { return !x.again; }).map(function (x) { return x.ch; })));   // さっきと同じ字で
   };
   function uniq(a) { return a.filter(function (x, i) { return a.indexOf(x) === i; }); }
 
@@ -1498,17 +1504,17 @@
       a.download = 'kanji-tane-' + new Date().toISOString().slice(0, 10) + '.json';
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
-      $('dMsg').textContent = '書き出しました。';
-    } catch (e) { $('dMsg').textContent = '書き出せませんでした。'; }
+      $('dataMsg').textContent = '書き出しました。';
+    } catch (e) { $('dataMsg').textContent = '書き出せませんでした。'; }
   };
   $('dImport').onchange = function () {
     var f = this.files && this.files[0]; if (!f) return;
     var rd = new FileReader();
     rd.onload = function () {
       var data;
-      try { data = JSON.parse(rd.result); } catch (e) { $('dMsg').textContent = 'ファイルを読めませんでした。かんじのたね で書き出したファイルを選んでください。'; return; }
-      Store.importData(data).then(function () { selected = null; $('dMsg').textContent = '読み込みました。'; renderData(); },
-        function (e) { $('dMsg').textContent = e.message + '。かんじのたね で書き出したファイルを選んでください。'; });
+      try { data = JSON.parse(rd.result); } catch (e) { $('dataMsg').textContent = 'ファイルを読めませんでした。かんじのたね で書き出したファイルを選んでください。'; return; }
+      Store.importData(data).then(function () { selected = null; $('dataMsg').textContent = '読み込みました。'; renderData(); },
+        function (e) { $('dataMsg').textContent = e.message + '。かんじのたね で書き出したファイルを選んでください。'; });
     };
     rd.readAsText(f);
     this.value = '';
@@ -1517,7 +1523,7 @@
   $('dReset').onclick = function () {
     if (!resetArmed) { resetArmed = true; this.textContent = '本当に消す（元に戻せません）'; var b = this; setTimeout(function () { resetArmed = false; b.textContent = '学習の記録をすべて消す'; }, 4000); return; }
     resetArmed = false; this.textContent = '学習の記録をすべて消す';
-    Store.reset().then(function () { selected = null; $('dMsg').textContent = '学習の記録を消しました。'; renderData(); });
+    Store.reset().then(function () { selected = null; $('dataMsg').textContent = '学習の記録を消しました。'; renderData(); });
   };
 
   function renderAbout() {
