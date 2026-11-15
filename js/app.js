@@ -41,6 +41,9 @@
   }
   // 学年別漢字配当表（2020年度施行、js/grades.js）。習った字かどうかの判断に使う
   var STD_STROKES = window.POPKANJI_STROKES || {};   // 標準の画数（js/stroke-counts.js）
+  // 判定ミスの報告先（Google Apps Script のウェブアプリ URL）。空なら送らない（今までどおり端末の中だけで記録する）
+  var REPORT_URL = window.POPKANJI_REPORT_URL || '';
+  var REPORT_TIMEOUT = 20000;
   var GRADE_OF = {};
   var GL = window.POPKANJI_GRADES || {};
   Object.keys(GL).forEach(function (g) { Array.from(GL[g]).forEach(function (c) { GRADE_OF[c] = +g; }); });
@@ -681,7 +684,9 @@
     var html = '<div class="fb ' + kind + '" role="status"><div class="head">' + (showAns ? '<span class="ans' + (it.parts ? ' word' : '') + '">' + esc(it.parts ? it.word : it.ch) + '</span>' : '') + '<div><div class="verdict">' + verdict + '</div>' +
       (detail ? '<div>' + detail + '</div>' : '') + '</div></div>' + (withInfo ? infoDl(it.ch) : '') +
       (kind === 'wrong' || kind === 'recog' ? '<button class="btn practice" id="tPractice">✏️ ' + K('お[手本:てほん]を [見:み]て [練習:れんしゅう]する') + '</button><div class="pmsg" id="tPmsg" aria-live="polite"></div>' : '') +
-      (misjudge ? '<button class="misjudge" id="tMis">' + K('[正:ただ]しく [書:か]いたのに [間違:まちが]いに なった') + '</button>' : '') + '</div>';
+      (misjudge ? '<button class="misjudge" id="tMis">' + K('[正:ただ]しく [書:か]いたのに [間違:まちが]いに なった') + '</button>' : '') +
+      (kind === 'correct' ? '<button class="misjudge" id="tMisOk">' + K('[間違:まちが]えて [書:か]いたのに [正解:せいかい]に なった') + '</button>' : '') +
+      '<div class="rmsg" id="tRmsg" aria-live="polite" hidden></div></div>';
     $('tFb').innerHTML = html; $('tFb').hidden = false;
     setTimeout(fitPad, 0);
     // 間違えたときの練習は、練習モードと同じ画面（大きな書く枠）で1字だけ。終わったらテストに戻る
@@ -691,12 +696,90 @@
       if (c.parts) { var bad = c.parts.filter(function (p) { return p.res !== 'correct' && KANJI[p.ch]; }).map(function (p) { return p.ch; }); if (bad.length) list = bad.filter(function (x, i) { return bad.indexOf(x) === i; }); }
       startDrill(list, { back: 'test', word: c.word });
     };
-    if (misjudge) $('tMis').onclick = function () {
-      pending = 'recog';
-      $('tFb').firstChild.className = 'fb recog';
-      $('tFb').querySelector('.verdict').textContent = K('[間違:まちが]いに しませんでした');
-      this.remove();
+    // 判定ミスの報告：記録はすぐに直し（まちがい・正解のどちらにもしない）、REPORT_URL があれば分析用に送る
+    function onMisjudge(type, label) {
+      return function () {
+        var btn = this;
+        if (btn.disabled) return;
+        if (!btn.dataset.marked) {
+          btn.dataset.marked = '1';
+          pending = 'recog';
+          $('tFb').firstChild.className = 'fb recog';
+          $('tFb').querySelector('.verdict').textContent = label;
+          var other = $(btn.id === 'tMis' ? 'tMisOk' : 'tMis'); if (other) other.remove();
+        }
+        if (!REPORT_URL) { btn.remove(); return; }
+        sendReport(btn, type, it);
+      };
+    }
+    if (misjudge) $('tMis').onclick = onMisjudge('false_negative', K('[間違:まちが]いに しませんでした'));
+    if ($('tMisOk')) $('tMisOk').onclick = onMisjudge('false_positive', K('[正解:せいかい]に しませんでした'));
+  }
+  // 報告用の画像：書いた線だけを 白地に黒で 256×256 にかく（枠の点線・お手本・画面の色は入れない）
+  function strokesImage(strokes) {
+    var cv = document.createElement('canvas'); cv.width = cv.height = 256;
+    var c = cv.getContext('2d');
+    c.fillStyle = '#fff'; c.fillRect(0, 0, 256, 256);
+    c.strokeStyle = '#000'; c.lineCap = 'round'; c.lineJoin = 'round'; c.lineWidth = 8;
+    (strokes || []).forEach(function (st) {
+      if (!st.length) return;
+      c.beginPath(); c.moveTo(st[0][0], st[0][1]);
+      if (st.length === 1) c.lineTo(st[0][0] + 0.1, st[0][1] + 0.1);
+      for (var i = 1; i < st.length; i++) c.lineTo(st[i][0], st[i][1]);
+      c.stroke();
+    });
+    return cv.toDataURL('image/png');
+  }
+  function reportPayload(type, it) {
+    var strokes = it.strokes || [];   // finishItem で 256 座標にしたもの（熟語は出題の字）
+    var cands = [], judged = null;
+    try {
+      if (strokes.length) {
+        cands = R.recognize(strokes, { width: 256, height: 256 }, 10);
+        judged = R.judge(cands, it.ch);
+      }
+    } catch (e) {}
+    var mp = it.parts ? it.parts.filter(function (p) { return p.main; })[0] : null;
+    return {
+      targetKanji: it.ch,
+      imageData: strokesImage(strokes),
+      strokeData: {
+        reportType: type,   // false_negative: 正しく書いたのに まちがい / false_positive: まちがえたのに 正解
+        appVersion: ($('aVer') || {}).textContent || null,
+        questionId: it.q ? it.q.id : null,
+        word: it.parts ? it.word : null,
+        tries: it.tries,
+        strokeCount: strokes.length,
+        standardStrokes: STD_STROKES[it.ch] || null,
+        verdict: judged ? judged.result : null,
+        seenAs: it.seenAs || (mp && mp.seenAs) || null,
+        candidates: cands.map(function (c) { return { char: c.char, score: Math.round(c.score * 1000) / 1000 }; }),
+        strokes: strokes   // 256×256 の座標。[[ [x,y], ... ], ...]
+      }
     };
+  }
+  function sendReport(btn, type, it) {
+    var msg = $('tRmsg'), orig = btn.dataset.label || (btn.dataset.label = btn.innerHTML);
+    btn.disabled = true; btn.textContent = K('[送信中:そうしんちゅう]…');
+    msg.hidden = true; msg.className = 'rmsg';
+    var ctl = window.AbortController ? new AbortController() : null;
+    var timer = ctl && setTimeout(function () { ctl.abort(); }, REPORT_TIMEOUT);
+    // text/plain で送ると プリフライトが起きず、GAS でも CORS エラーにならない（GAS 側は e.postData.contents を JSON.parse する）
+    fetch(REPORT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(reportPayload(type, it)), redirect: 'follow', signal: ctl ? ctl.signal : undefined })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (res) {
+        if (!res || res.status !== 'success') throw new Error((res && res.message) || 'error');
+        if (!btn.isConnected) return;
+        btn.remove();
+        msg.textContent = K('[送:おく]りました。ありがとう！'); msg.className = 'rmsg ok'; msg.hidden = false;
+      })
+      .catch(function () {
+        if (!btn.isConnected) return;
+        btn.disabled = false; btn.innerHTML = orig;
+        msg.textContent = K('[送:おく]れませんでした。[記録:きろく]は [直:なお]したよ。もう[一度:いちど] おすと [送:おく]りなおせます'); msg.className = 'rmsg ng'; msg.hidden = false;
+      })
+      .then(function () { if (timer) clearTimeout(timer); });
   }
   function finishItem(result, seenAs) {
     var it = cur();
@@ -867,7 +950,7 @@
   // 熟語テストでは it.rec（出題の字そのものの結果。null = 書けていたが、となりの字がちがった → 記録を変えない）
   function applyRec(it, pending) {
     if (!it.parts) { applyResult(it.ch, it.q.id, pending); return; }
-    var r = pending === 'recog' && it.rec === 'wrong' ? 'recog' : it.rec;   // 「正しく書いたのに」を押したとき
+    var r = pending === 'recog' && (it.rec === 'wrong' || it.rec === 'correct') ? 'recog' : it.rec;   // 判定ミスの報告を押したとき
     if (r) applyResult(it.ch, it.q.id, r);
   }
   var quitArmed = false;
@@ -1505,6 +1588,7 @@
     var ok = [], soon = [];
     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].forEach(function (g) { (hasGrade(g) ? ok : soon).push(g); });
     var nm = function (g) { return g <= 6 ? '小' + g : GRADE_NAME[g]; };
+    if ($('aReport')) $('aReport').hidden = !REPORT_URL;
     $('aRange').textContent = '問題があるのは ' + ok.map(function (g) { return nm(g) + '（' + GRADE_TOTAL[g] + '字）'; }).join('・') + ' です。' +
       (soon.length ? soon.map(nm).join('・') + ' は準備中です。' : '') +
       ' 手書きの読み取りは、小学校の1026字、中学・高校の1110字（漢検4級〜2級）、JIS第1・第2水準の常用外の4223字（漢検準1級・1級の目安）に対応しています。中学からの字の手本は漢検モードにしたときに、準1級・1級の手本はその字をテストするときに読みこみます。' +

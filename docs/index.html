@@ -338,6 +338,10 @@ body.practicing #tNextRow { position: static; }
   .dsteps li button { font-size: .8rem; padding: 4px 9px; min-height: 28px; }
 }
 .fb .misjudge { background: none; border: none; color: var(--muted); text-decoration: underline; font-size: .85rem; cursor: pointer; padding: 0; align-self: flex-start; min-height: 36px; }
+.fb .misjudge:disabled { cursor: wait; text-decoration: none; opacity: .7; }
+.fb .rmsg { font-size: .85rem; color: var(--muted); }
+.fb .rmsg.ok { color: var(--ok); }
+.fb .rmsg.ng { color: var(--retry); }
 
 /* 結果 */
 .score { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
@@ -707,11 +711,12 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
       <h2>プライバシー</h2>
       <ul>
         <li>手書きの文字の読み取りは、すべてこの端末の中で行います。手書きの文字や学習の記録を、外部に送ることはありません。</li>
+        <li id="aReport" hidden>「ただしく かいたのに まちがいに なった」「まちがえて かいたのに せいかいに なった」を押したときだけ、その字の手書きの線（画像と座標）と読み取りの結果を、読み取りの改善のために開発者へ送ります。名前や学習の記録は送りません。</li>
         <li>アカウント登録はありません。Cookie も使いません。</li>
         <li>学習の記録は、この端末のブラウザ（IndexedDB）にだけ保存されます。</li>
       </ul>
       <h2>バージョン</h2>
-      <p>いまの バージョン：<b id="aVer">2026.11.13-1722</b></p>
+      <p>いまの バージョン：<b id="aVer">2026.11.15-2158</b></p>
       <p>サイトを 新しくしたのに 前のままのときは、このボタンを おしてください。学習の記録は 消えません。</p>
       <button class="btn small" id="aUpdate" style="align-self:flex-start">あたらしい バージョンを よみこむ</button>
       <p class="msg" id="aUpMsg" aria-live="polite"></p>
@@ -722,6 +727,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
         <li>読み取りの1位が答えの字なら「せいかい」です。</li>
         <li>答えの字と別の字で迷ったときは、「もういちど かいてね」と表示し、まちがいにはしません。3回読み取れなかったときも、まちがいにはしません。</li>
         <li>正しく書いたのに「まちがい」になったときは、「ただしく かいたのに まちがいに なった」を押すと、まちがいとして記録しません。</li>
+        <li>まちがえて書いたのに「せいかい」になったときは、「まちがえて かいたのに せいかいに なった」を押すと、せいかいとして記録しません。</li>
         <li>2回続けて正解すると「おぼえた」になり、1週間後にもう一度確認します。</li>
       </ul>
       <h2>使っているもの</h2>
@@ -741,14 +747,14 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
   </footer>
 </div>
 
-<script src="vendor/kanjicanvas/kanji-canvas.js?v=2026.11.13-1722"></script>
-<script src="js/joyo.js?v=2026.11.13-1722"></script>
-<script src="js/recognizer.js?v=2026.11.13-1722"></script>
-<script src="js/store.js?v=2026.11.13-1722"></script>
-<script src="js/pad.js?v=2026.11.13-1722"></script>
-<script src="js/stroke-counts.js?v=2026.11.13-1722"></script>
-<script src="js/grades.js?v=2026.11.13-1722"></script>
-<script src="js/questions.js?v=2026.11.13-1722"></script>
-<script src="js/app.js?v=2026.11.13-1722"></script>
+<script src="vendor/kanjicanvas/kanji-canvas.js?v=2026.11.15-2158"></script>
+<script src="js/joyo.js?v=2026.11.15-2158"></script>
+<script src="js/recognizer.js?v=2026.11.15-2158"></script>
+<script src="js/store.js?v=2026.11.15-2158"></script>
+<script src="js/pad.js?v=2026.11.15-2158"></script>
+<script src="js/stroke-counts.js?v=2026.11.15-2158"></script>
+<script src="js/grades.js?v=2026.11.15-2158"></script>
+<script src="js/questions.js?v=2026.11.15-2158"></script>
+<script src="js/app.js?v=2026.11.15-2158"></script>
 </body>
 </html>
