@@ -658,19 +658,31 @@
   }
   // スマホ縦向き：問題・書く枠・ボタンが1画面に収まるように、枠の大きさを決める
   var narrowMq = window.matchMedia('(orientation: portrait), (max-width: 820px) and (min-height: 561px)');
+  // 書いているあいだ（1回め・書き直し・練習）は、いつも同じ大きさ（はじめに書くときの画面で決めた大きさ）にする。
+  // 書き直しの知らせ（#tFb）が出ても枠は小さくしない。小さくするのは 答えが決まって 結果を見せるときだけ
   function fitPad() {
     var w = $('tPad').parentNode;
     w.style.width = '';
     if (!session || !narrowMq.matches || $('v-test').hidden) return;
+    var writing = !answered || practicing;
+    var fb = $('tFb'), fbHidden = fb.hidden, bodyPr = document.body.classList.contains('practicing');
+    var y0 = window.scrollY;
+    if (writing) { fb.hidden = true; document.body.classList.remove('practicing'); }
     var full = w.getBoundingClientRect().width;
     var top = $('tPad').getBoundingClientRect().top + window.scrollY;
     var below = 0;
     Array.prototype.forEach.call(w.children, function (c) { if (c.id !== 'tPad' && !c.hidden) below += c.getBoundingClientRect().height + 10; });
+    if (writing) { fb.hidden = fbHidden; document.body.classList.toggle('practicing', bodyPr); if (window.scrollY !== y0) window.scrollTo(0, y0); }
     var vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
     var avail = Math.floor(vh - top - below - 12);
-    var min = answered && !practicing ? 150 : 230;
+    var min = writing ? 230 : 150;
     var size = Math.max(min, Math.min(full, avail));
     if (size < full) w.style.width = size + 'px';
+    // 書き直しの知らせで ボタンが画面の下に出たときは、答えるボタンまで見えるように少しだけ動かす
+    if (writing && !fb.hidden && !answered) {
+      var b = $('tControls').getBoundingClientRect().bottom;
+      if (b > vh - 8) window.scrollBy(0, Math.ceil(b - vh + 8));
+    }
   }
   window.addEventListener('resize', function () { if (session) fitPad(); });
   function infoDl(ch) {
