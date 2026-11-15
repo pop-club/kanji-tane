@@ -10,6 +10,9 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="かんじのたね">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#dff5e6">
 <meta name="description" content="手書きで答える小学生の漢字テスト。まちがえた字は練習プリントにして印刷できます。通信なしで端末の中だけで動きます。">
 <style>
@@ -530,6 +533,11 @@ body.practicing #tNextRow { position: static; }
 .saveerr { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); margin: 0 auto; z-index: 50; width: fit-content; max-width: 560px;
   background: var(--ng-bg); color: var(--ink); border: 1px solid var(--ng); border-radius: 12px; padding: 10px 14px; font-size: .9rem; box-shadow: 0 4px 16px rgba(0,0,0,.18); }
 .saveerr[hidden] { display: none; }
+/* 問題データの読みこみ中・読みこめなかったとき（テスト中も見えるように 画面の下に固定） */
+.netmsg { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); margin: 0 auto; z-index: 51; width: fit-content; max-width: 560px;
+  background: var(--sky-soft); color: var(--ink); border: 1px solid var(--sky); border-radius: 12px; padding: 10px 14px; font-size: .9rem; box-shadow: 0 4px 16px rgba(0,0,0,.18); }
+.netmsg.ng { background: var(--ng-bg); border-color: var(--ng); }
+.netmsg[hidden] { display: none; }
 footer a.fhint { color: var(--retry); }
 footer { font-size: .78rem; color: var(--muted); display: flex; gap: 6px 16px; flex-wrap: wrap; }
 footer a, footer button { color: var(--muted); background: none; border: none; padding: 0; text-decoration: underline; cursor: pointer; font-size: .78rem; min-height: 32px; }
@@ -843,9 +851,10 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
         <li id="aReport" hidden>「ただしく かいたのに まちがいに なった」「まちがえて かいたのに せいかいに なった」を押したときだけ、その字の手書きの線（画像と座標）と読み取りの結果を、読み取りの改善のために開発者へ送ります。名前や学習の記録は送りません。</li>
         <li>アカウント登録はありません。Cookie も使いません。</li>
         <li>学習の記録は、この端末のブラウザ（IndexedDB）にだけ保存されます。</li>
+        <li>1回開くと、アプリのファイル（問題・手本）をこの端末にとっておき、次からは通信がなくても使えます（漢検の級の問題と中学からの手本は、使ったことのあるものだけ）。ホーム画面に追加することもできます。</li>
       </ul>
       <h2>バージョン</h2>
-      <p>いまの バージョン：<b id="aVer">2026.11.16-0809</b></p>
+      <p>いまの バージョン：<b id="aVer">2026.11.16-0834</b></p>
       <p>サイトを 新しくしたのに 前のままのときは、このボタンを おしてください。学習の記録は 消えません。</p>
       <button class="btn small" id="aUpdate" style="align-self:flex-start">あたらしい バージョンを よみこむ</button>
       <p class="msg" id="aUpMsg" aria-live="polite"></p>
@@ -871,6 +880,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
   </section>
 
   <div class="saveerr" id="saveErr" role="status" aria-live="polite" hidden></div>
+  <div class="netmsg" id="netMsg" role="status" aria-live="polite" hidden></div>
   <footer>
     <a href="#data" data-k="[学習:がくしゅう] データ">がくしゅう データ</a>
     <a href="#about" data-k="このアプリについて">このアプリについて</a>
@@ -878,12 +888,12 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
   </footer>
 </div>
 
-<script src="vendor/kanjicanvas/kanji-canvas.js?v=2026.11.16-0809"></script>
-<script src="js/joyo.js?v=2026.11.16-0809"></script>
-<script src="js/recognizer.js?v=2026.11.16-0809"></script>
-<script src="js/store.js?v=2026.11.16-0809"></script>
-<script src="js/pad.js?v=2026.11.16-0809"></script>
-<script src="js/stroke-counts.js?v=2026.11.16-0809"></script>
+<script src="vendor/kanjicanvas/kanji-canvas.js?v=2026.11.16-0834"></script>
+<script src="js/joyo.js?v=2026.11.16-0834"></script>
+<script src="js/recognizer.js?v=2026.11.16-0834"></script>
+<script src="js/store.js?v=2026.11.16-0834"></script>
+<script src="js/pad.js?v=2026.11.16-0834"></script>
+<script src="js/stroke-counts.js?v=2026.11.16-0834"></script>
 <!-- 育ち具合を大きく見る -->
 <div class="pdlg" id="plantDlg" hidden>
   <div class="pbox" role="dialog" aria-modal="true" aria-labelledby="pdTitle">
@@ -892,8 +902,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
   </div>
 </div>
 
-<script src="js/grades.js?v=2026.11.16-0809"></script>
-<script src="js/questions.js?v=2026.11.16-0809"></script>
-<script src="js/app.js?v=2026.11.16-0809"></script>
+<script src="js/grades.js?v=2026.11.16-0834"></script>
+<script src="js/app.js?v=2026.11.16-0834"></script>
 </body>
 </html>
