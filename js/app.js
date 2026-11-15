@@ -8,7 +8,7 @@
 (function () {
   'use strict';
   var R = window.PopKanjiRecognizer, Store = window.PopKanjiStore;
-  var QD = window.POPKANJI_QUESTIONS || {};
+  var QD = window.POPKANJI_QUESTIONS = window.POPKANJI_QUESTIONS || {};
   // 学年の番号: 1〜6 = 小学校、7〜10 = 中学の字を漢検の級で分けたもの（4級・3級・準2級・2級）
   // 65 = 漢検5級（小学校で習う1026字ぜんぶ。卒業テストのように使う）
   var SHO_ALL = 65;
@@ -23,21 +23,29 @@
   var mode = 'sho';
   try { if (localStorage.getItem('kt-mode') === 'kanken') mode = 'kanken'; } catch (e) {}
   function levels() { return MODES[mode]; }
-  function inMode(ch) { var k = KANJI[ch]; return !!k && (levels().indexOf(k.grade) >= 0 || (mode === 'kanken' && k.grade <= 6)); }
+  function inMode(ch) { var g = QG[ch]; return !!g && (levels().indexOf(g) >= 0 || (mode === 'kanken' && g <= 6)); }
   var DAY = 86400000, REVIEW_AFTER = 7 * DAY, MAX_RETRY = 3;
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
 
   // ---------- 問題データ ----------
-  var KANJI = {}, QUESTIONS = {}, QBYID = {};
-  Object.keys(QD).forEach(function (g) {
+  // 問題は 学年・級ごとのファイル（q/<学年>.js）。はじめは読まず、テスト・練習・読みの問題・プリントの前に、使う学年のぶんだけ読む。
+  // ホームの字数・育ち具合は js/grades.js の POPKANJI_QCHARS（問題のある字の一覧）で数える
+  var QCH = window.POPKANJI_QCHARS || {};
+  var QG = {};   // 字 → 問題のある学年・級
+  Object.keys(QCH).forEach(function (g) { Array.from(QCH[g]).forEach(function (c) { QG[c] = +g; }); });
+  var KANJI = {}, QUESTIONS = {}, QBYID = {}, qAdded = {};
+  function addGrade(g) {
     var d = QD[g];
+    if (!d || qAdded[g]) return;
+    qAdded[g] = true;
     Object.keys(d.kanji).forEach(function (ch) { KANJI[ch] = d.kanji[ch]; KANJI[ch].char = ch; QUESTIONS[ch] = []; });
     d.questions.forEach(function (q) { QUESTIONS[q.kanji].push(q); QBYID[q.id] = q; });
-  });
+  }
+  Object.keys(QD).forEach(addGrade);
   function gradeChars(g) {
-    if (+g === SHO_ALL) return [1, 2, 3, 4, 5, 6].reduce(function (a, k) { return a.concat(QD[k] ? Object.keys(QD[k].kanji) : []); }, []);
-    return QD[g] ? Object.keys(QD[g].kanji) : [];
+    if (+g === SHO_ALL) return [1, 2, 3, 4, 5, 6].reduce(function (a, k) { return a.concat(gradeChars(k)); }, []);
+    return QCH[g] ? Array.from(QCH[g]) : [];
   }
   // 学年別漢字配当表（2020年度施行、js/grades.js）。習った字かどうかの判断に使う
   var STD_STROKES = window.POPKANJI_STROKES || {};   // 標準の画数（js/stroke-counts.js）
@@ -47,7 +55,7 @@
   var GRADE_OF = {};
   var GL = window.POPKANJI_GRADES || {};
   Object.keys(GL).forEach(function (g) { Array.from(GL[g]).forEach(function (c) { GRADE_OF[c] = +g; }); });
-  function hasGrade(g) { return +g === SHO_ALL ? [1, 2, 3, 4, 5, 6].every(function (k) { return !!QD[k]; }) : !!QD[g]; }
+  function hasGrade(g) { return +g === SHO_ALL ? [1, 2, 3, 4, 5, 6].every(function (k) { return !!QCH[k]; }) : !!QCH[g]; }
 
   /*
    * 画面の文字を、その子のレベルに合わせて漢字にする。
@@ -79,7 +87,7 @@
    */
   function renderQ(q, mode) {
     // 中学の字の問題では、小学校で習った字だけの言葉には ふりがなを付けない
-    var plainElem = !!(q.kanji && KANJI[q.kanji] && KANJI[q.kanji].grade >= 7);
+    var plainElem = !!(q.kanji && QG[q.kanji] >= 7);
     var words = [[]];
     q.tokens.forEach(function (t) {
       if (t.t === undefined) { words[words.length - 1].push(t); return; }
@@ -122,7 +130,7 @@
 
   // ---------- 習熟度 ----------
   function rec(ch) {
-    return Store.get(ch) || { char: ch, grade: KANJI[ch] ? KANJI[ch].grade : 0, status: 'new', correct: 0, wrong: 0, streak: 0, recogErr: 0, history: [] };
+    return Store.get(ch) || { char: ch, grade: QG[ch] || 0, status: 'new', correct: 0, wrong: 0, streak: 0, recogErr: 0, history: [] };
   }
   function isDue(r, now) { return r.status === 'mastered' && r.reviewAt && r.reviewAt <= (now || Date.now()); }
   function applyResult(ch, qid, result) {
@@ -184,7 +192,7 @@
     updateAnswerBtn();
   }, function () {
     $('loadstate').textContent = K('[読:よ]み[取:と]りの データを [読:よ]み[込:こ]めませんでした。ページを [読:よ]み[込:こ]み[直:なお]してください。');
-  });
+  }).then(function () { registerSW(); });   // 手本を読みおわってから（はじめの読みこみと とりあわないように）
   // 中学の字の手本（約4MB）は、漢検モードにしたときだけ読む
   var midLoading = null;
   function loadMidRefs() {
@@ -213,6 +221,53 @@
     var lvs = Object.keys(need).filter(function (k) { return !window['POPKANJI_KVG_REFS_' + k]; });
     if (!lvs.length) return null;
     return Promise.all(lvs.map(function (k) { return loadExtRefs(+k); }));
+  }
+  // 問題データ（q/<学年>.js）を読む。1回読めば あとは そのまま。失敗したら 次に また読みにいく
+  var qLoading = {};
+  function loadGrade(g) {
+    g = String(g);
+    if (QD[g]) { addGrade(g); return Promise.resolve(); }
+    if (!qLoading[g]) qLoading[g] = loadScript('q/' + g + '.js').then(function () {
+      if (!QD[g]) throw new Error('no data');
+      addGrade(g);
+    }).catch(function (e) { delete qLoading[g]; throw e; });
+    return qLoading[g];
+  }
+  // 字の問題データがまだなら、その学年のファイルを読む Promise（ぜんぶあれば null）
+  function needChars(chars) {
+    var gs = {};
+    chars.forEach(function (ch) { var g = QG[ch]; if (g && !KANJI[ch]) gs[g] = true; });
+    var list = Object.keys(gs);
+    return list.length ? Promise.all(list.map(loadGrade)) : null;
+  }
+  function needGrade(g) { return needChars(gradeChars(g)); }
+  // 読みこみの知らせ（画面の下）。テスト中でも見えるように固定で出す
+  var netTimer = null;
+  function netMsg(text, bad) {
+    var el = $('netMsg'); if (!el) return;
+    clearTimeout(netTimer);
+    el.textContent = text || '';
+    el.classList.toggle('ng', !!bad);
+    el.hidden = !text;
+    if (text && bad) netTimer = setTimeout(function () { el.hidden = true; }, 10000);
+  }
+  function netFailText() {
+    return K('[通信:つうしん]できないので [問題:もんだい]を [読:よ]み[込:こ]めませんでした。インターネットに つないでから もう[一度:いちど] [試:ため]してね');
+  }
+  // wait（Promise）が終わってから then を動かす。そのあいだ ボタン（btns）を おせなくする。失敗したら知らせて ボタンを もどす
+  var dataBusy = false;
+  function waitData(wait, then, btns) {
+    if (dataBusy) return;
+    dataBusy = true;
+    btns = (btns || []).map($).filter(Boolean);
+    var was = btns.map(function (b) { return b.disabled; });
+    btns.forEach(function (b) { b.disabled = true; });
+    netMsg('');   // 前の「読み込めませんでした」は けす
+    var showT = setTimeout(function () { netMsg(K('[問題:もんだい]を [読:よ]み[込:こ]み[中:ちゅう]…')); }, 150);
+    function back() { dataBusy = false; clearTimeout(showT); btns.forEach(function (b, i) { b.disabled = was[i]; }); }
+    // つながったまま 返事が来ないときも、ずっと待たせない（45秒で あきらめる。あとで届けば 次は すぐ使える）
+    var limit = new Promise(function (res, rej) { setTimeout(function () { rej(new Error('timeout')); }, 45000); });
+    Promise.race([wait, limit]).then(function () { back(); netMsg(''); then(); }, function () { back(); netMsg(netFailText(), true); });
   }
   function setMode(m) {
     if (m === mode || session) return;
@@ -632,6 +687,8 @@
   }
   function startTest(mode, grade, chars) {
     if (!chars) chars = chooseForGrade(grade, pickN);
+    var qwait = needChars(chars);
+    if (qwait) { waitData(qwait, function () { startTest(mode, grade, chars); }, ['gStart', 'hReviewBtn', 'wTest', 'rAgain']); return; }
     var kind = pickKind === 'word' && appMode() === 'kanken' ? 'word' : 'single';
     var items = chars.map(function (ch) { return newItem(ch); });
     var need = chars.slice();
@@ -755,7 +812,7 @@
     if ($('tPractice')) $('tPractice').onclick = function () {
       // 熟語のときは、書けなかった字だけ（なければ出題の字）を練習する
       var c = cur(), list = [c.ch];
-      if (c.parts) { var bad = c.parts.filter(function (p) { return p.res !== 'correct' && KANJI[p.ch]; }).map(function (p) { return p.ch; }); if (bad.length) list = bad.filter(function (x, i) { return bad.indexOf(x) === i; }); }
+      if (c.parts) { var bad = c.parts.filter(function (p) { return p.res !== 'correct' && QG[p.ch]; }).map(function (p) { return p.ch; }); if (bad.length) list = bad.filter(function (x, i) { return bad.indexOf(x) === i; }); }
       startDrill(list, { back: 'test', word: c.word });
     };
     // 判定ミスの報告：まちがえて おさないように、1回めは「ほんとうに？」と聞く（4びょうで もとに もどる）。
@@ -1130,6 +1187,8 @@
   });
   $('dStart').onclick = function () { startDrill(chooseForGrade(dPickGrade, dPickN)); };
   function startDrill(chars, opt) {
+    var qwait = needChars(chars);
+    if (qwait) { waitData(qwait, function () { startDrill(chars, opt); }, ['dStart', 'tPractice', 'qdDrill']); return; }
     var wait = ensureRefs(chars);
     if (wait) {
       $('loadstate').textContent = K('[漢字:かんじ]の [手本:てほん]を [読:よ]み[込:こ]み[中:ちゅう]…');
@@ -1412,6 +1471,8 @@
     b.onclick = function () { qPickN = +b.dataset.n; renderQuizPick(); };
   });
   function startQuiz() {
+    var qwait = needGrade(qPickGrade);
+    if (qwait) { waitData(qwait, startQuiz, ['qStart']); return; }
     var items = makeQuiz(qPickGrade, qPickN);
     if (!items.length) { $('qNote').textContent = K('この [級:きゅう]では [問題:もんだい]を [作:つく]れませんでした'); return; }
     $('qNote').textContent = '';
@@ -1516,13 +1577,52 @@
 
   // ---------- 新しいバージョンの読みこみ ----------
   // ブラウザに残っている古いページを取りなおしてから開きなおす（学習の記録 IndexedDB はそのまま）
+  // Service Worker があるときは、新しい sw.js を取りにいき、入ったら すぐ切りかえてから開きなおす
   $('aUpdate').onclick = function () {
     var btn = this; btn.disabled = true; $('aUpMsg').textContent = K('[読:よ]み[込:こ]み[中:ちゅう]…');
-    var url = location.pathname + '?t=' + Date.now();
-    fetch(location.pathname, { cache: 'reload' }).catch(function () {}).then(function () {
-      location.replace(url + '#home');
+    var url = location.pathname + '?t=' + Date.now() + '#home', done = false;
+    function reload() { if (done) return; done = true; location.replace(url); }
+    function fail() {
+      if (done) return; done = true; btn.disabled = false;
+      $('aUpMsg').textContent = K('[通信:つうしん]できないので、あたらしい バージョンを [調:しら]べられませんでした。インターネットに つないでから おしてね');
+    }
+    if (!swReg) { fetch(location.pathname, { cache: 'reload' }).catch(function () {}).then(reload); return; }
+    if (navigator.onLine === false) { fail(); return; }
+    navigator.serviceWorker.addEventListener('controllerchange', reload);
+    swReg.update().then(function () {
+      var w = swReg.installing || swReg.waiting;
+      if (!w) { reload(); return; }   // 新しい版の sw.js はない → ページだけ取りなおす（ページは いつも通信を先に使う）
+      function step() {
+        if (w.state === 'installed') w.postMessage({ type: 'skipWaiting' });
+        else if (w.state === 'activated' || w.state === 'redundant') reload();
+      }
+      w.addEventListener('statechange', step); step();
+      setTimeout(reload, 20000);   // 何かで止まっても 開きなおす
+    }, function () {
+      // sw.js を取れない: つながっていなければ知らせる（sw.js は Service Worker が とっておかないので、いつも通信になる）
+      fetch('sw.js?check=' + Date.now(), { cache: 'no-store' }).then(function (r) { if (r.ok) reload(); else fail(); }, fail);
     });
   };
+
+  // ---------- オフライン（Service Worker、sw.js） ----------
+  // 1回開いたら 通信がなくても使えるように、アプリのファイルを この端末に とっておく。
+  // 新しい版の sw.js が入っても 開いているページは そのまま。このページが その版のときだけ すぐ切りかえる
+  // （ふつうは次に開いたとき。上の「あたらしい バージョンを よみこむ」で すぐ切りかえることもできる）
+  var swReg = null;
+  function registerSW() {
+    if (!APP_VER || !('serviceWorker' in navigator) || !window.isSecureContext || !/^https?:$/.test(location.protocol)) return;   // APP_VER なし = build.sh を通していない
+    try {
+      navigator.serviceWorker.register('sw.js').then(function (reg) {
+        swReg = reg;
+        function offer() { if (reg.waiting) reg.waiting.postMessage({ type: 'skipWaiting', ifVersion: APP_VER }); }
+        offer();
+        reg.addEventListener('updatefound', function () {
+          var w = reg.installing;
+          if (w) w.addEventListener('statechange', function () { if (w.state === 'installed') offer(); });
+        });
+      }, function () {});
+    } catch (e) {}
+  }
 
   // ---------- 苦手リスト ----------
   var weakGrade = 1, selected = null;
@@ -1563,7 +1663,7 @@
     });
     updateSel();
   }
-  function selList() { return Object.keys(selected || {}).filter(function (ch) { return selected[ch] && KANJI[ch]; }); }
+  function selList() { return Object.keys(selected || {}).filter(function (ch) { return selected[ch] && QG[ch]; }); }
   function updateSel() {
     var n = selList().length;
     $('wSel').textContent = n + K('字 [選:えら]んで います');
@@ -1588,6 +1688,16 @@
   }
   function sheetQ(q, answer) { return renderQ(q, answer ? 'sheetans' : 'sheet'); }
   function renderPrint() {
+    // ほかの学年の字も 入っていることがある（苦手リスト・復習）。問題データがまだの学年は 先に読む
+    var pw = needChars(printChars);
+    if (pw) {
+      $('pSheets').innerHTML = '<p class="sub">' + K('[問題:もんだい]を [読:よ]み[込:こ]み[中:ちゅう]…') + '</p>'; $('pNote').textContent = '';
+      $('pPrintBtn').disabled = true;
+      pw.then(function () { if (location.hash === '#print') renderPrint(); },
+        function () { if (location.hash === '#print') $('pSheets').innerHTML = '<p class="msg" role="alert">' + esc(netFailText()) + '</p>'; });
+      return;
+    }
+    $('pPrintBtn').disabled = false;
     var per = +$('pPer').value, trace = $('pTrace').checked, withAns = $('pAnswer').checked;
     var rows = [];
     printChars.forEach(function (ch) { questionsForPrint(ch, per).forEach(function (q) { rows.push({ ch: ch, q: q }); }); });
