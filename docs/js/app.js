@@ -243,11 +243,14 @@
     window.scrollTo(0, 0);
     document.body.classList.toggle('testing', name === 'test' || name === 'drillrun');
     if (name !== 'test') document.body.classList.remove('practicing');
+    // テスト中は モードを切りかえられない（ボタンを おせない見た目にする）
+    Array.prototype.forEach.call(document.querySelectorAll('#modeSw button'), function (b) { b.disabled = name === 'test' || name === 'drillrun'; });
     if (name === 'test' && pad) setTimeout(function () { fitPad(); pad.redraw(); }, 0);
   }
   function route() {
     var h = (location.hash || '#home').slice(1);
     if (views.indexOf(h) < 0) h = 'home';
+    if (session && h !== 'test' && !(drill && drill.back && h === 'drillrun')) leaveTest();   // 練習（テストから）の間は つづける
     if (h === 'test' && !session) h = 'home';
     if (h === 'result' && !lastResult) h = 'home';
     if ((h === 'drillrun' || h === 'drilldone') && !drill) h = 'drill';
@@ -953,14 +956,24 @@
     var r = pending === 'recog' && (it.rec === 'wrong' || it.rec === 'correct') ? 'recog' : it.rec;   // 判定ミスの報告を押したとき
     if (r) applyResult(it.ch, it.q.id, r);
   }
+  // こたえた ところまでの問題（「つぎへ」を おす前の 問題も ふくめる。記録もここで つける）
+  function answeredItems() {
+    var it = cur();
+    if (answered && !it.result) { it.result = pending; if (!it.again) applyRec(it, pending); }
+    return session.items.filter(function (x) { return x.result; });
+  }
+  // 「やめる」を おさずに テストの画面から はなれたとき（ブラウザの もどる・ロゴ・下のリンクなど）。
+  // こたえた ところまでを保存して テストを おわりにする（のこったままだと モードを切りかえられなくなる）
+  function leaveTest() {
+    var done = answeredItems();
+    if (done.length) saveSession(done);
+    session = null;
+  }
   var quitArmed = false;
   $('tQuit').onclick = function () {
     if (!quitArmed) { quitArmed = true; this.textContent = K('[本当:ほんとう]に やめる？'); var b = this; setTimeout(function () { quitArmed = false; b.textContent = K('やめる'); }, 3000); return; }
     quitArmed = false; this.textContent = 'やめる';
-    // こたえた ところまでを保存する（「つぎへ」を おす前の 問題も ふくめる）
-    var it = cur();
-    if (answered && !it.result) { it.result = pending; if (!it.again) applyRec(it, pending); }
-    var done = session.items.filter(function (x) { return x.result; });
+    var done = answeredItems();
     if (!done.length) { session = null; go('home'); return; }
     saveSession(done);
     lastResult = { mode: session.mode, grade: session.grade, items: done, partial: true };

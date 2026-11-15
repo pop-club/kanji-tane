@@ -71,6 +71,7 @@ a { color: var(--sky); }
 .modesw { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); }
 .modesw button { min-height: 40px; padding: 0 14px; border: none; border-radius: 999px; background: none; font-weight: 700; font-size: .9rem; color: var(--muted); cursor: pointer; white-space: nowrap; }
 .modesw button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.modesw button:disabled { cursor: not-allowed; opacity: .55; }
 .modesw button:focus-visible { outline: 3px solid var(--sky); outline-offset: 1px; }
 .top .loadstate { flex-basis: 100%; }
 .top .loadstate:empty { display: none; }

@@ -76,6 +76,7 @@ a { color: var(--sky); }
 .modesw { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); }
 .modesw button { min-height: 40px; padding: 0 14px; border: none; border-radius: 999px; background: none; font-weight: 700; font-size: .9rem; color: var(--muted); cursor: pointer; white-space: nowrap; }
 .modesw button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.modesw button:disabled { cursor: not-allowed; opacity: .55; }
 .modesw button:focus-visible { outline: 3px solid var(--sky); outline-offset: 1px; }
 .top .loadstate { flex-basis: 100%; }
 .top .loadstate:empty { display: none; }
@@ -716,7 +717,7 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
         <li>学習の記録は、この端末のブラウザ（IndexedDB）にだけ保存されます。</li>
       </ul>
       <h2>バージョン</h2>
-      <p>いまの バージョン：<b id="aVer">2026.11.15-2219</b></p>
+      <p>いまの バージョン：<b id="aVer">2026.11.15-2232</b></p>
       <p>サイトを 新しくしたのに 前のままのときは、このボタンを おしてください。学習の記録は 消えません。</p>
       <button class="btn small" id="aUpdate" style="align-self:flex-start">あたらしい バージョンを よみこむ</button>
       <p class="msg" id="aUpMsg" aria-live="polite"></p>
@@ -747,14 +748,14 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
   </footer>
 </div>
 
-<script src="vendor/kanjicanvas/kanji-canvas.js?v=2026.11.15-2219"></script>
-<script src="js/joyo.js?v=2026.11.15-2219"></script>
-<script src="js/recognizer.js?v=2026.11.15-2219"></script>
-<script src="js/store.js?v=2026.11.15-2219"></script>
-<script src="js/pad.js?v=2026.11.15-2219"></script>
-<script src="js/stroke-counts.js?v=2026.11.15-2219"></script>
-<script src="js/grades.js?v=2026.11.15-2219"></script>
-<script src="js/questions.js?v=2026.11.15-2219"></script>
-<script src="js/app.js?v=2026.11.15-2219"></script>
+<script src="vendor/kanjicanvas/kanji-canvas.js?v=2026.11.15-2232"></script>
+<script src="js/joyo.js?v=2026.11.15-2232"></script>
+<script src="js/recognizer.js?v=2026.11.15-2232"></script>
+<script src="js/store.js?v=2026.11.15-2232"></script>
+<script src="js/pad.js?v=2026.11.15-2232"></script>
+<script src="js/stroke-counts.js?v=2026.11.15-2232"></script>
+<script src="js/grades.js?v=2026.11.15-2232"></script>
+<script src="js/questions.js?v=2026.11.15-2232"></script>
+<script src="js/app.js?v=2026.11.15-2232"></script>
 </body>
 </html>
