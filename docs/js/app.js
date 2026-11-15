@@ -246,6 +246,7 @@
     // テスト中は モードを切りかえられない（ボタンを おせない見た目にする）
     Array.prototype.forEach.call(document.querySelectorAll('#modeSw button'), function (b) { b.disabled = name === 'test' || name === 'drillrun'; });
     if (name === 'test' && pad) setTimeout(function () { fitPad(); pad.redraw(); }, 0);
+    if (name === 'drillrun' && dpad) setTimeout(dFitPad, 0);
   }
   function route() {
     var h = (location.hash || '#home').slice(1);
@@ -267,19 +268,24 @@
     if (h === 'data') renderData();
     if (h === 'about') renderAbout();
     show(h);
+    updateExportHint(h);
   }
   function go(h) { if (location.hash === '#' + h) route(); else location.hash = h; }
 
   // ---------- たねキャラの成長 ----------
-  // 覚えぐあいに合わせて、アイコンのたねが 芽 → 葉 → つぼみ → 花 → 実 と育つ。
-  // 絵は icons/icon.svg と同じ形・同じ色。stage 0〜6
-  var PLANT_NAME = ['たね', '[芽:め]', '[双葉:ふたば]', '[茎:くき]', 'つぼみ', '[花:はな]', '[実:み]'];
-  // 最後の姿は級ごとにちがう（花で完成する級と、実で完成する級）
-  function plantName(st, g) { return st === 6 ? (plantOf(g).end === 'fruit' ? '[実:み]' : 'まんかい') : PLANT_NAME[st]; }
+  // 覚えぐあいに合わせて、アイコンのたねが 芽 → 葉 → つぼみ → 花 → 満開 と育つ。
+  // 絵は icons/icon.svg と同じ形・同じ色。stage 0〜6。最後まで その級の花のまま（花が ふえていく）
+  var PLANT_NAME = ['たね', '[芽:め]', '[双葉:ふたば]', '[茎:くき]', 'つぼみ', '[花:はな]', '[満開:まんかい]'];
+  function plantName(st) { return PLANT_NAME[st] || PLANT_NAME[0]; }
   function plantStage(done, total, mastered) {
     if (total && mastered >= total) return 6;
     var p = total ? done / total : 0;
     return !done ? 0 : p < 0.1 ? 1 : p < 0.25 ? 2 : p < 0.5 ? 3 : p < 0.75 ? 4 : 5;
+  }
+  // stage 5（花）の あいだは、「おぼえた」が ふえるほど 咲く花が 1 → 2 → 3 と ふえる
+  function bloomCount(st, total, mastered) {
+    if (st !== 5) return st >= 6 ? 5 : 0;
+    return 1 + Math.min(2, Math.floor(3 * (total ? mastered / total : 0)));
   }
   // つぎの すがたまで あと何字か
   function plantNext(done, total, mastered) {
@@ -291,22 +297,23 @@
   }
   // 級・学年ごとに咲く花がちがう（育てた花がたまっていく感じにする）
   var PLANTS = {
-    1:  { nm: 'さくら',      sh: 'round',  fl: '#f9b8cd', ce: '#ffd66e', lf: '#43b96f', l2: '#5ccc82', end: 'flower', fs: 'cherry', fn: 'さくらんぼ', fr: '#ef6f6f' },
-    2:  { nm: 'ひまわり',    sh: 'thin',   fl: '#ffd05c', ce: '#8a5a2b', lf: '#3faa63', l2: '#63c98a', end: 'fruit', fs: 'orange', fn: 'みかん', fr: '#f8a33c' },
-    3:  { nm: 'コスモス',    sh: 'point',  fl: '#e59ad8', ce: '#ffd66e', lf: '#4fbd7a', l2: '#76d79a', end: 'flower', fs: 'grape', fn: 'ぶどう', fr: '#9b6fd0' },
-    4:  { nm: 'チューリップ', sh: 'bell',   fl: '#f07d7d', ce: '#ffd66e', lf: '#36a95f', l2: '#5ccc82', end: 'fruit', fs: 'berry', fn: 'いちご', fr: '#e8536a' },
-    5:  { nm: 'あじさい',    sh: 'cluster',fl: '#8fb7f2', ce: '#cfe0ff', lf: '#2f9e5b', l2: '#52c37c', end: 'flower', fs: 'grape', fn: 'ブルーベリー', fr: '#6f8fef' },
-    6:  { nm: 'うめ',        sh: 'round',  fl: '#fff2f6', ce: '#f6a8c0', lf: '#3faa63', l2: '#69cf8e', end: 'fruit', fs: 'peach', fn: 'もも', fr: '#f9a7b8' },
-    65: { nm: 'きく',        sh: 'thin',   fl: '#fff0b8', ce: '#ffb347', lf: '#3b9e60', l2: '#64c98a', end: 'flower', fs: 'apple', fn: 'りんご', fr: '#e24b4b' },
-    7:  { nm: 'あさがお',    sh: 'round',  fl: '#8aa8f0', ce: '#ffffff', lf: '#3aa862', l2: '#63c98a', end: 'fruit', fs: 'lemon', fn: 'レモン', fr: '#f6d44b' },
-    8:  { nm: 'すいせん',    sh: 'point',  fl: '#fff6cf', ce: '#ffb347', lf: '#45b06c', l2: '#6fd296', end: 'fruit', fs: 'persimmon', fn: 'かき', fr: '#ef8a3a' },
-    9:  { nm: 'ばら',        sh: 'bell',   fl: '#e8577a', ce: '#ffd66e', lf: '#2f9e5b', l2: '#52c37c', end: 'flower', fs: 'apple', fn: 'あおりんご', fr: '#7fc24b' },
-    10: { nm: 'はす',        sh: 'point',  fl: '#f7c0d6', ce: '#ffe08a', lf: '#3faa63', l2: '#6fd296', end: 'fruit', fs: 'peach', fn: 'びわ', fr: '#f3c66a' },
-    11: { nm: 'ふじ',        sh: 'cluster',fl: '#c3a6ef', ce: '#e5d8ff', lf: '#3b9e60', l2: '#63c98a', end: 'flower', fs: 'berry', fn: 'きいちご', fr: '#f28fb0' },
-    12: { nm: 'きんもくせい', sh: 'thin',   fl: '#ffb45c', ce: '#fff0c8', lf: '#2f9e5b', l2: '#52c37c', end: 'fruit', fs: 'orange', fn: 'きんかん', fr: '#ff9a3c' }
+    1:  { nm: 'さくら',      sh: 'round',  fl: '#f9b8cd', ce: '#ffd66e', lf: '#43b96f', l2: '#5ccc82' },
+    2:  { nm: 'ひまわり',    sh: 'thin',   fl: '#ffd05c', ce: '#8a5a2b', lf: '#3faa63', l2: '#63c98a' },
+    3:  { nm: 'コスモス',    sh: 'point',  fl: '#e59ad8', ce: '#ffd66e', lf: '#4fbd7a', l2: '#76d79a' },
+    4:  { nm: 'チューリップ', sh: 'bell',   fl: '#f07d7d', ce: '#ffd66e', lf: '#36a95f', l2: '#5ccc82' },
+    5:  { nm: 'あじさい',    sh: 'cluster',fl: '#8fb7f2', ce: '#cfe0ff', lf: '#2f9e5b', l2: '#52c37c' },
+    6:  { nm: 'うめ',        sh: 'round',  fl: '#fff2f6', ce: '#f6a8c0', lf: '#3faa63', l2: '#69cf8e' },
+    65: { nm: 'きく',        sh: 'thin',   fl: '#fff0b8', ce: '#ffb347', lf: '#3b9e60', l2: '#64c98a' },
+    7:  { nm: 'あさがお',    sh: 'round',  fl: '#8aa8f0', ce: '#ffffff', lf: '#3aa862', l2: '#63c98a' },
+    8:  { nm: 'すいせん',    sh: 'point',  fl: '#fff6cf', ce: '#ffb347', lf: '#45b06c', l2: '#6fd296' },
+    9:  { nm: 'ばら',        sh: 'bell',   fl: '#e8577a', ce: '#ffd66e', lf: '#2f9e5b', l2: '#52c37c' },
+    10: { nm: 'はす',        sh: 'point',  fl: '#f7c0d6', ce: '#ffe08a', lf: '#3faa63', l2: '#6fd296' },
+    11: { nm: 'ふじ',        sh: 'cluster',fl: '#c3a6ef', ce: '#e5d8ff', lf: '#3b9e60', l2: '#63c98a' },
+    12: { nm: 'きんもくせい', sh: 'thin',   fl: '#ffb45c', ce: '#fff0c8', lf: '#2f9e5b', l2: '#52c37c' }
   };
   function plantOf(g) { return PLANTS[+g] || PLANTS[1]; }
-  try { window.__plantSvg = function (st, l, g) { return plantSvg(st, l, g); }; } catch (e) {}
+  try { window.__plantSvg = function (st, l, g, n) { return plantSvg(st, l, g, n); }; } catch (e) {}
+  function paleEdge(P) { return P.fl.charAt(1) === 'f' && P.fl.charAt(3) === 'f' ? 1.5 : 0; }
   function flowerSvg(cx, cy, P, scale) {
     var k = scale || 1, s = '', i, a;
     function pet(deg, inner) { return '<g transform="rotate(' + deg.toFixed(1) + ' ' + cx + ' ' + cy + ')">' + inner + '</g>'; }
@@ -325,60 +332,33 @@
     } else {
       for (i = 0; i < 5; i++) {
         a = -Math.PI / 2 + i * Math.PI * 2 / 5;
-        s += '<ellipse cx="' + (cx + 20 * k * Math.cos(a)).toFixed(1) + '" cy="' + (cy + 20 * k * Math.sin(a)).toFixed(1) + '" rx="' + (13 * k) + '" ry="' + (13 * k) + '" fill="' + P.fl + '" stroke="#e9dccb" stroke-width="' + (P.fl.charAt(1) === 'f' && P.fl.charAt(3) === 'f' ? 1.5 : 0) + '"/>';
+        s += '<ellipse cx="' + (cx + 20 * k * Math.cos(a)).toFixed(1) + '" cy="' + (cy + 20 * k * Math.sin(a)).toFixed(1) + '" rx="' + (13 * k) + '" ry="' + (13 * k) + '" fill="' + P.fl + '" stroke="#e9dccb" stroke-width="' + paleEdge(P) + '"/>';
       }
       s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (10 * k) + '" fill="' + P.ce + '"/>';
     }
     return s;
   }
-  // 実（級ごとにちがう くだものキャラ）
-  function fruitSvg(cx, cy, P) {
-    var f = P.fs || 'apple', s = '', fx = cx, fy = cy, i;
-    function stem(x, y) { return '<path d="M' + x + ' ' + y + ' C' + (x + 4) + ' ' + (y - 7) + ' ' + (x + 12) + ' ' + (y - 9) + ' ' + (x + 17) + ' ' + (y - 8) + '" stroke="#2f9e5b" stroke-width="5" fill="none" stroke-linecap="round"/>'; }
-    if (f === 'cherry') {
-      s += '<path d="M138 70 C140 80 136 86 134 90 M138 70 C144 80 152 84 157 88" stroke="#2f9e5b" stroke-width="4" fill="none" stroke-linecap="round"/>';
-      s += '<circle cx="134" cy="97" r="11" fill="' + P.fr + '"/><circle cx="158" cy="95" r="11" fill="' + P.fr + '"/>';
-      fx = 158; fy = 95;
-    } else if (f === 'grape') {
-      var pts = [[0, -13], [-11, -5], [11, -5], [-6, 6], [6, 6], [0, 16]];
-      for (i = 0; i < pts.length; i++) s += '<circle cx="' + (cx + pts[i][0]) + '" cy="' + (cy + pts[i][1]) + '" r="8" fill="' + P.fr + '"/>';
-      s += stem(cx, cy - 20);
-      fy = cy + 6;
-    } else if (f === 'berry') {
-      s += '<path d="M' + (cx - 14) + ' ' + (cy - 8) + ' C' + (cx - 14) + ' ' + (cy + 10) + ' ' + (cx - 5) + ' ' + (cy + 18) + ' ' + cx + ' ' + (cy + 18) + ' C' + (cx + 5) + ' ' + (cy + 18) + ' ' + (cx + 14) + ' ' + (cy + 10) + ' ' + (cx + 14) + ' ' + (cy - 8) + ' C' + (cx + 8) + ' ' + (cy - 15) + ' ' + (cx - 8) + ' ' + (cy - 15) + ' ' + (cx - 14) + ' ' + (cy - 8) + ' Z" fill="' + P.fr + '"/>';
-      s += '<path d="M' + (cx - 13) + ' ' + (cy - 9) + ' C' + (cx - 6) + ' ' + (cy - 16) + ' ' + (cx + 6) + ' ' + (cy - 16) + ' ' + (cx + 13) + ' ' + (cy - 9) + ' C' + (cx + 6) + ' ' + (cy - 6) + ' ' + (cx - 6) + ' ' + (cy - 6) + ' ' + (cx - 13) + ' ' + (cy - 9) + ' Z" fill="#43b96f"/>';
-      fy = cy + 3;
-    } else if (f === 'lemon') {
-      s += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="16" ry="12" fill="' + P.fr + '"/>';
-      s += '<path d="M' + (cx + 15) + ' ' + cy + ' l7 -2 -7 -3" fill="' + P.fr + '"/>' + stem(cx - 6, cy - 12);
-    } else if (f === 'peach') {
-      s += '<path d="M' + cx + ' ' + (cy - 12) + ' C' + (cx + 16) + ' ' + (cy - 20) + ' ' + (cx + 18) + ' ' + (cy + 8) + ' ' + cx + ' ' + (cy + 16) + ' C' + (cx - 18) + ' ' + (cy + 8) + ' ' + (cx - 16) + ' ' + (cy - 20) + ' ' + cx + ' ' + (cy - 12) + ' Z" fill="' + P.fr + '"/>';
-      s += '<path d="M' + cx + ' ' + (cy - 11) + ' L' + cx + ' ' + (cy + 10) + '" stroke="#e58aa0" stroke-width="2" opacity=".6"/>' + stem(cx, cy - 14);
-      fy = cy + 2;
-    } else if (f === 'persimmon') {
-      s += '<ellipse cx="' + cx + '" cy="' + (cy + 2) + '" rx="16" ry="13" fill="' + P.fr + '"/>';
-      s += '<path d="M' + (cx - 12) + ' ' + (cy - 9) + ' L' + cx + ' ' + (cy - 14) + ' L' + (cx + 12) + ' ' + (cy - 9) + ' L' + cx + ' ' + (cy - 4) + ' Z" fill="#43b96f"/>';
-      fy = cy + 4;
-    } else {
-      s += '<path d="M' + cx + ' ' + (cy - 10) + ' C' + (cx + 17) + ' ' + (cy - 18) + ' ' + (cx + 17) + ' ' + (cy + 10) + ' ' + cx + ' ' + (cy + 15) + ' C' + (cx - 17) + ' ' + (cy + 10) + ' ' + (cx - 17) + ' ' + (cy - 18) + ' ' + cx + ' ' + (cy - 10) + ' Z" fill="' + P.fr + '"/>';
-      s += stem(cx, cy - 12);
-      fy = cy + 2;
-    }
-    // かお
-    s += '<ellipse cx="' + (fx - 4.5) + '" cy="' + fy + '" rx="1.9" ry="2.3" fill="#3b2a1a"/><ellipse cx="' + (fx + 4.5) + '" cy="' + fy + '" rx="1.9" ry="2.3" fill="#3b2a1a"/>';
-    s += '<path d="M' + (fx - 3) + ' ' + (fy + 5) + ' C' + (fx - 1) + ' ' + (fy + 7.5) + ' ' + (fx + 1) + ' ' + (fy + 7.5) + ' ' + (fx + 3) + ' ' + (fy + 5) + '" stroke="#3b2a1a" stroke-width="1.6" fill="none" stroke-linecap="round"/>';
-    return s;
+  // つぼみ（stage 4 のつぼみ。小さくしても使う）
+  function budSvg(cx, cy, P, k) {
+    return '<ellipse cx="' + cx + '" cy="' + cy + '" rx="' + (15 * k) + '" ry="' + (20 * k) + '" fill="' + P.fl + '" stroke="#e9dccb" stroke-width="' + paleEdge(P) + '"/>' +
+      '<path d="M' + cx + ' ' + (cy - 18 * k) + ' C' + (cx + 7 * k) + ' ' + (cy - 12 * k) + ' ' + (cx + 7 * k) + ' ' + (cy - 4 * k) + ' ' + cx + ' ' + (cy + 2 * k) + '" stroke="' + P.ce + '" stroke-width="' + (5 * k) + '" fill="none" stroke-linecap="round"/>';
   }
+  function branch(d) { return '<path d="' + d + '" stroke="#2f9e5b" stroke-width="4.5" stroke-linecap="round" fill="none"/>'; }
+  // 完成した級のしるし（その級の花）
   function gotIcon(g) {
     var P = plantOf(g);
-    if (P.end === 'fruit') return '<svg class="fruit" viewBox="120 60 52 52" role="img" aria-label="' + esc(SHORT_NAME[g] + ' ' + P.fn) + '">' + fruitSvg(146, 88, P) + '</svg>';
-    return '<svg class="fruit" viewBox="68 12 58 58" role="img" aria-label="' + esc(SHORT_NAME[g] + ' ' + P.nm) + '">' + flowerSvg(97, 41, P, 1) + '</svg>';
+    return '<svg class="gic" viewBox="64 8 66 66" role="img" aria-label="' + esc(K(SHORT_NAME[g]) + ' ' + P.nm) + '">' + flowerSvg(97, 41, P, 1) + '</svg>';
   }
-  function gotName(g) { var P = plantOf(g); return P.end === 'fruit' ? P.fn : P.nm; }
-  function plantSvg(stage, label, g) {
+  // n: 咲いている花の数（stage 5 は 1〜3。stage 6 は満開）
+  function plantSvg(stage, label, g, n) {
     var P = plantOf(g == null ? 1 : g);
+    if (n == null) n = bloomCount(stage, 0, 0);
     var s = '<svg class="plant" viewBox="0 0 200 210" role="img" aria-label="' + esc(label || '') + '">';
     s += '<ellipse cx="100" cy="186" rx="66" ry="13" fill="#9fd8b1"/>';   // つち
+    if (stage >= 6) s += branch('M24 186 C24 176 25 166 26 156') + branch('M176 186 C176 176 175 166 174 156');   // つちからも 小さい花
+    if (stage === 5 && n >= 2) s += branch('M99 104 C82 92 66 80 54 68');
+    if (stage === 5 && n >= 3) s += branch('M99 100 C116 86 132 72 148 62');
+    if (stage >= 6) s += branch('M99 104 C80 92 64 70 56 54') + branch('M99 100 C118 88 136 66 144 50') + branch('M98 110 C80 104 58 96 40 82') + branch('M99 106 C120 100 144 90 162 76');
     if (stage >= 1) {   // くき
       var top = [0, 120, 96, 62, 52, 46, 44][stage];
       s += '<path d="M100 132 C100 ' + (top + 28) + ' 99 ' + (top + 12) + ' 97 ' + top + '" stroke="#2f9e5b" stroke-width="7" stroke-linecap="round" fill="none"/>';
@@ -389,11 +369,17 @@
       s += '<path d="M99 100 C112 66 146 58 166 71 C165 98 130 117 99 100 Z" fill="' + P.l2 + '"/>';
     }
     if (stage >= 3) s += '<path d="M98 72 C84 52 58 48 47 57 C50 77 78 86 98 72 Z" fill="' + P.lf + '"/>';
-    if (stage === 4) s += '<ellipse cx="97" cy="42" rx="15" ry="20" fill="' + P.fl + '" stroke="#e9dccb" stroke-width="' + (P.fl.charAt(1) === 'f' && P.fl.charAt(3) === 'f' ? 1.5 : 0) + '"/><path d="M97 24 C104 30 104 38 97 44" stroke="' + P.ce + '" stroke-width="5" fill="none" stroke-linecap="round"/>';
-    if (stage === 5) s += flowerSvg(97, 42, P, 0.85);
+    if (stage === 4) s += budSvg(97, 42, P, 1);
+    if (stage === 5) {
+      s += n >= 2 ? flowerSvg(52, 66, P, 0.55) : budSvg(50, 70, P, 0.42);
+      s += n >= 3 ? flowerSvg(150, 60, P, 0.55) : budSvg(150, 62, P, 0.42);
+      s += flowerSvg(97, 42, P, 0.85);
+    }
     if (stage >= 6) {
-      if (P.end === 'fruit') s += '<g transform="translate(97 46) scale(1.45) translate(-146 -88)">' + fruitSvg(146, 88, P) + '</g>';
-      else s += flowerSvg(97, 40, P, 1.25) + flowerSvg(45, 74, P, 0.5) + flowerSvg(151, 64, P, 0.5);
+      s += flowerSvg(26, 152, P, 0.34) + flowerSvg(174, 152, P, 0.34);
+      s += budSvg(40, 80, P, 0.4) + budSvg(162, 74, P, 0.4);
+      s += flowerSvg(54, 54, P, 0.64) + flowerSvg(146, 50, P, 0.64);
+      s += flowerSvg(100, 38, P, 0.98);
     }
     // たね（かお）
     s += '<path d="M100 120 C133 120 153 147 153 170 C153 193 129 205 100 205 C71 205 47 193 47 170 C47 147 67 120 100 120 Z" fill="#eeb06a"/>';
@@ -401,10 +387,59 @@
     s += '<ellipse cx="81" cy="168" rx="6" ry="7.5" fill="#3b2a1a"/><ellipse cx="119" cy="168" rx="6" ry="7.5" fill="#3b2a1a"/>';
     s += '<circle cx="83" cy="165" r="2" fill="#fff"/><circle cx="121" cy="165" r="2" fill="#fff"/>';
     s += '<ellipse cx="68" cy="181" rx="9" ry="5" fill="#f39a8c" opacity=".75"/><ellipse cx="132" cy="181" rx="9" ry="5" fill="#f39a8c" opacity=".75"/>';
-    s += stage >= 6 ? '<path d="M89 180 C95 190 105 190 111 180" stroke="#3b2a1a" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M89 180 C95 190 105 190 111 180" stroke="#3b2a1a" stroke-width="4" stroke-linecap="round" fill="none"/>'
+    s += stage >= 6 ? '<path d="M89 180 C95 190 105 190 111 180" stroke="#3b2a1a" stroke-width="4" stroke-linecap="round" fill="none"/>'
       : '<path d="M91 180 C95 186 105 186 109 180" stroke="#3b2a1a" stroke-width="4" stroke-linecap="round" fill="none"/>';
     return s + '</svg>';
   }
+  // 花のことば（ホームと「大きく見る」で同じ文）
+  function plantMsg(st, g) {
+    var nm = plantOf(g).nm;
+    return st >= 6 ? nm + K('が [満開:まんかい]に なったよ！') : st >= 5 ? nm + K('が [咲:さ]いたよ！') : K('[育:そだ]てている[花:はな]：') + nm;
+  }
+  function plantHint(st, left) {
+    return st >= 6 ? K('ぜんぶ [覚:おぼ]えたね！') : st === 5 ? K('あと ') + left + K('[字:じ] 「[覚:おぼ]えた」に なると [満開:まんかい]') : K('あと ') + left + K('[字:じ]で つぎの すがた');
+  }
+
+  // ---------- 大きく見る（育ち具合をタッチ） ----------
+  var plantInfo = {}, plantOpener = null;
+  function openPlant(g, opener) {
+    var d = plantInfo[g]; if (!d) return;
+    var st = d.st, n = bloomCount(st, d.total, d.mastered), left = plantNext(d.done, d.total, d.mastered), i, strip = '';
+    for (i = 0; i <= 6; i++) strip += '<li' + (i === st ? ' aria-current="step"' : '') + '>' + plantSvg(i, '', g, i === 5 ? (st === 5 ? n : 1) : null) + '<span>' + K(plantName(i)) + '</span></li>';
+    $('pdTitle').textContent = K(SHORT_NAME[g]) + 'の ' + plantOf(g).nm;
+    $('pdBody').innerHTML = '<div class="pdpic">' + plantSvg(st, K(SHORT_NAME[g]) + ' ' + K(plantName(st)), g, n) + '</div>' +
+      '<p class="pdst"><b>' + K(plantName(st)) + '</b><em>' + plantMsg(st, g) + '</em></p>' +
+      '<dl class="pdnum"><div class="m"><dt>' + K('[覚:おぼ]えた') + '</dt><dd>' + d.mastered + K('[字:じ]') + '</dd></div>' +
+      '<div class="c"><dt>' + K('[覚:おぼ]えかけ') + '</dt><dd>' + d.candidate + K('[字:じ]') + '</dd></div>' +
+      '<div><dt>' + K('[全部:ぜんぶ]の [字:じ]') + '</dt><dd>' + d.total + K('[字:じ]') + '</dd></div></dl>' +
+      '<p class="pdnext">' + plantHint(st, left) + '</p>' +
+      '<ol class="pdstrip" aria-label="' + esc(K('[育:そだ]つ じゅんばん')) + '">' + strip + '</ol>';
+    plantOpener = opener || document.activeElement;
+    $('plantDlg').hidden = false;
+    document.body.classList.add('dlg-open');
+    $('pdClose').focus();
+  }
+  function closePlant() {
+    if ($('plantDlg').hidden) return;
+    $('plantDlg').hidden = true;
+    document.body.classList.remove('dlg-open');
+    var o = plantOpener; plantOpener = null;
+    if (o && o.focus && document.body.contains(o)) o.focus();
+  }
+  $('pdClose').onclick = closePlant;
+  $('plantDlg').addEventListener('click', function (e) { if (e.target === this) closePlant(); });
+  $('plantDlg').addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { e.preventDefault(); closePlant(); }
+    else if (e.key === 'Tab') { e.preventDefault(); $('pdClose').focus(); }   // 押せるのは「とじる」だけ。フォーカスを外に出さない
+  });
+  window.addEventListener('hashchange', closePlant);
+  function plantTap(e) {
+    var el = e.target.closest ? e.target.closest('[data-pg]') : null;
+    if (!el) return;
+    if (e.type === 'keydown') { if (e.key !== 'Enter' && e.key !== ' ') return; e.preventDefault(); }
+    openPlant(el.getAttribute('data-pg'), el);
+  }
+  ['hGrow', 'hLevels'].forEach(function (id) { $(id).addEventListener('click', plantTap); $(id).addEventListener('keydown', plantTap); });
 
   // ---------- ホーム ----------
   function renderHome() {
@@ -422,11 +457,12 @@
       }
       // 数字は「せいかいした字（おぼえた＋おぼえかけ）」。おぼえた は2回つづけて正解したときなので、1回めのテストでは 0 のまま
       var chars = gradeChars(g), c = statusCounts(chars), t = chars.length, done = c.mastered + c.candidate, tested = t - c.new;
-      html += '<div class="level">' + plantSvg(plantStage(done, t, c.mastered), '', g) + '<span>' + K(SHORT_NAME[g]) + '</span><span class="bar" role="img" aria-label="' + K(SHORT_NAME[g]) + ' ' + K('[覚:おぼ]えた ') + c.mastered + '字、' + K('[覚:おぼ]えかけ ') + c.candidate + '字、' + K('[苦手:にがて] ') + c.weak + '字 / ' + t + '字">' +
+      var st = plantStage(done, t, c.mastered);
+      plantInfo[g] = { st: st, done: done, total: t, mastered: c.mastered, candidate: c.candidate };
+      html += '<div class="level tap" role="button" tabindex="0" data-pg="' + g + '" aria-label="' + esc(K(SHORT_NAME[g]) + ' ' + K('[覚:おぼ]えた ') + c.mastered + '字、' + K('[覚:おぼ]えかけ ') + c.candidate + '字、' + K('[苦手:にがて] ') + c.weak + '字 / ' + t + '字。' + K('タッチすると [大:おお]きく [見:み]える')) + '">' + plantSvg(st, '', g, bloomCount(st, t, c.mastered)) + '<span>' + K(SHORT_NAME[g]) + '</span><span class="bar" role="img" aria-label="' + K(SHORT_NAME[g]) + ' ' + K('[覚:おぼ]えた ') + c.mastered + '字、' + K('[覚:おぼ]えかけ ') + c.candidate + '字、' + K('[苦手:にがて] ') + c.weak + '字 / ' + t + '字">' +
         '<i class="m" style="width:' + (100 * c.mastered / t) + '%"></i><i class="c" style="width:' + (100 * c.candidate / t) + '%"></i><i class="w" style="width:' + (100 * c.weak / t) + '%"></i>' +
         '</span><span class="n">' + done + ' / ' + t + '字</span>' +
         (tested ? '<small class="ld">' + K('[覚:おぼ]えた ') + c.mastered + '　' + K('[覚:おぼ]えかけ ') + c.candidate + '　' + K('[苦手:にがて] ') + c.weak + '</small>' : '') + '</div>';
-      var st = plantStage(done, t, c.mastered);
       if (!big || (big.st < 6 && st <= big.st && done > big.done) || (big.st === 6 && st < 6)) big = { g: g, st: st, done: done, total: t, mastered: c.mastered };
     });
     $('hLevels').innerHTML = html;
@@ -436,12 +472,18 @@
         if (!hasGrade(g)) return false;
         var ch = gradeChars(g); return statusCounts(ch).mastered >= ch.length;
       });
-      $('hGrow').innerHTML = plantSvg(big.st, K(SHORT_NAME[big.g]) + ' ' + K(plantName(big.st, big.g)), big.g) +
-        '<div class="gtx"><b>' + K(SHORT_NAME[big.g]) + 'の ' + K(plantName(big.st, big.g)) + '</b>' +
-        '<em class="fl">' + (big.st >= 6 ? gotName(big.g) + (plantOf(big.g).end === 'fruit' ? K('が みのったよ！') : K('が [満開:まんかい]に なったよ！')) : big.st >= 5 ? plantOf(big.g).nm + K('が [咲:さ]いたよ！') : K('[育:そだ]てている[花:はな]：') + plantOf(big.g).nm) + '</em>' +
+      var gl = K(SHORT_NAME[big.g]) + ' ' + K(plantName(big.st));
+      $('hGrow').setAttribute('data-pg', big.g);
+      $('hGrow').setAttribute('aria-label', gl + '。' + plantMsg(big.st, big.g) + '。' + K('タッチすると [大:おお]きく [見:み]える'));
+      $('hGrow').innerHTML = plantSvg(big.st, gl, big.g, bloomCount(big.st, big.total, big.mastered)) +
+        '<div class="gtx"><b>' + K(SHORT_NAME[big.g]) + 'の ' + K(plantName(big.st)) + '</b>' +
+        '<em class="fl">' + plantMsg(big.st, big.g) + '</em>' +
         '<span>' + big.done + ' / ' + big.total + K('[字:じ] [書:か]けたよ') + '</span>' +
         (got.length ? '<span class="got">' + K('そだてた：') + got.map(function (g) { return gotIcon(g) + '<b>' + K(SHORT_NAME[g]) + '</b>'; }).join('') + '</span>' : '') +
-        '<small>' + (big.st >= 6 ? K('ぜんぶ [覚:おぼ]えたね！') : big.st === 5 ? K('あと ') + left + K('[字:じ] 「[覚:おぼ]えた」に なると ') + (plantOf(big.g).end === 'fruit' ? gotName(big.g) + K('が なるよ') : K('[満開:まんかい]に なるよ')) : K('あと ') + left + K('[字:じ]で つぎの すがた')) + '</small></div>';
+        '<small>' + plantHint(big.st, left) + '</small></div>' +
+        '<span class="zoom" aria-hidden="true">🔍</span>';
+    } else {
+      $('hGrow').removeAttribute('data-pg');
     }
     $('hLevelsTitle').textContent = mode === 'kanken' ? K('[級:きゅう]ごとの [覚:おぼ]え[具合:ぐあい]') : K('[学年:がくねん]ごとの [覚:おぼ]え[具合:ぐあい]');
   }
@@ -695,16 +737,19 @@
     return '<dl><dt>' + K('[読:よ]み') + '</dt><dd>' + esc(yomi) + '</dd><dt>' + K('[意味:いみ]') + '</dt><dd>' + mean + '</dd>' +
       (k.words && k.words.length ? '<dt class="dw">' + K('[言葉:ことば]') + '</dt><dd class="kj dw">' + esc(k.words.slice(0, 4).join('　')) + '</dd>' : '') + '</dl>';
   }
-  function feedback(kind, verdict, detail, withInfo, misjudge) {
+  // order: 画数のヒントのとき、書き順を見られる字（「かきじゅんを みる」）
+  function feedback(kind, verdict, detail, withInfo, misjudge, order) {
     var it = cur();
     var showAns = kind !== 'retry';   // 書き直しのときは答えを見せない
     var html = '<div class="fb ' + kind + '" role="status"><div class="head">' + (showAns ? '<span class="ans' + (it.parts ? ' word' : '') + '">' + esc(it.parts ? it.word : it.ch) + '</span>' : '') + '<div><div class="verdict">' + verdict + '</div>' +
-      (detail ? '<div>' + detail + '</div>' : '') + '</div></div>' + (withInfo ? infoDl(it.ch) : '') +
+      (detail || order ? '<div>' + (detail || '') + (order ? ' <button type="button" class="orderbtn" id="tOrderBtn">▶ ' + K('[書:か]き[順:じゅん]を [見:み]る') + '</button>' : '') + '</div>' : '') + '</div></div>' + (withInfo ? infoDl(it.ch) : '') +
       (kind === 'wrong' || kind === 'recog' ? '<button class="btn practice" id="tPractice">✏️ ' + K('お[手本:てほん]を [見:み]て [練習:れんしゅう]する') + '</button><div class="pmsg" id="tPmsg" aria-live="polite"></div>' : '') +
       (misjudge ? '<button class="misjudge" id="tMis">' + K('[正:ただ]しく [書:か]いたのに [間違:まちが]いに なった') + '</button>' : '') +
       (kind === 'correct' ? '<button class="misjudge" id="tMisOk">' + K('[間違:まちが]えて [書:か]いたのに [正解:せいかい]に なった') + '</button>' : '') +
-      '<div class="rmsg" id="tRmsg" aria-live="polite" hidden></div></div>';
+      '<div class="rmsg" id="tRmsg" aria-live="polite" hidden></div></div>' +
+      (order ? '<div class="orderpop" id="tOrderPop" role="dialog" aria-modal="true" aria-label="' + esc(K('[書:か]き[順:じゅん]')) + '" hidden></div>' : '');
     $('tFb').innerHTML = html; $('tFb').hidden = false;
+    if (order) $('tOrderBtn').onclick = function () { showOrderPop(it, order); };
     setTimeout(fitPad, 0);
     // 間違えたときの練習は、練習モードと同じ画面（大きな書く枠）で1字だけ。終わったらテストに戻る
     if ($('tPractice')) $('tPractice').onclick = function () {
@@ -713,12 +758,24 @@
       if (c.parts) { var bad = c.parts.filter(function (p) { return p.res !== 'correct' && KANJI[p.ch]; }).map(function (p) { return p.ch; }); if (bad.length) list = bad.filter(function (x, i) { return bad.indexOf(x) === i; }); }
       startDrill(list, { back: 'test', word: c.word });
     };
-    // 判定ミスの報告：記録はすぐに直し（まちがい・正解のどちらにもしない）、REPORT_URL があれば分析用に送る
+    // 判定ミスの報告：まちがえて おさないように、1回めは「ほんとうに？」と聞く（4びょうで もとに もどる）。
+    // 2回めで 記録を直し（まちがい・正解のどちらにもしない）、REPORT_URL があれば分析用に送る
     function onMisjudge(type, label) {
       return function () {
         var btn = this;
         if (btn.disabled) return;
+        if (!btn.dataset.marked && !btn.dataset.armed) {
+          btn.dataset.armed = '1'; btn.dataset.label = btn.innerHTML;
+          btn.classList.add('armed');
+          btn.textContent = K('ほんとうに？ もう[一度:いちど] おすと [直:なお]します');
+          setTimeout(function () {
+            if (!btn.isConnected || !btn.dataset.armed || btn.dataset.marked) return;
+            delete btn.dataset.armed; btn.classList.remove('armed'); btn.innerHTML = btn.dataset.label;
+          }, 4000);
+          return;
+        }
         if (!btn.dataset.marked) {
+          delete btn.dataset.armed; btn.classList.remove('armed'); btn.innerHTML = btn.dataset.label;
           btn.dataset.marked = '1';
           pending = 'recog';
           $('tFb').firstChild.className = 'fb recog';
@@ -731,6 +788,25 @@
     }
     if (misjudge) $('tMis').onclick = onMisjudge('false_negative', K('[間違:まちが]いに しませんでした'));
     if ($('tMisOk')) $('tMisOk').onclick = onMisjudge('false_positive', K('[正解:せいかい]に しませんでした'));
+  }
+  // テスト中に書き順を見る（画数のヒントのあと）。見たら その問題は 正解でも 記録に入れない（'recog' あつかい）
+  function peekNote() { return K('[書:か]き[順:じゅん]を [見:み]たので、[記録:きろく]には [入:い]れないよ。'); }
+  function showOrderPop(it, chars) {
+    var pop = $('tOrderPop');
+    if (!pop) return;
+    it.peeked = true;
+    function paint() {
+      pop.innerHTML = '<div class="box"><div class="svgs' + (chars.length > 1 ? ' many' : '') + '">' + chars.map(function (ch) { return orderSvg(ch, true); }).join('') + '</div>' +
+        '<p class="note">' + K('[見:み]たときは [記録:きろく]に [入:い]れないよ') + '</p>' +
+        '<div class="row"><button type="button" class="btn" id="tOrderAgain">▶ ' + K('もう[一度:いちど]') + '</button><button type="button" class="btn primary" id="tOrderClose">' + K('とじる') + '</button></div></div>';
+      $('tOrderAgain').onclick = paint;
+      $('tOrderClose').onclick = function () { pop.hidden = true; pop.innerHTML = ''; try { $('tOrderBtn').focus({ preventScroll: true }); } catch (e) {} };
+      try { $('tOrderClose').focus({ preventScroll: true }); } catch (e) {}
+    }
+    pop.hidden = false;
+    paint();
+    pop.onclick = function (e) { if (e.target === pop) $('tOrderClose').onclick(); };
+    pop.onkeydown = function (e) { if (e.key === 'Escape') $('tOrderClose').onclick(); };
   }
   // 報告用の画像：書いた線だけを 白地に黒で 256×256 にかく（枠の点線・お手本・画面の色は入れない）
   function strokesImage(strokes) {
@@ -871,11 +947,12 @@
     // 1回めは画数のヒントを出して書き直し、2回めも画数がちがえば理由を伝えてまちがいにする。
     var std = STD_STROKES[it.ch], n = pad.strokes().length, mismatch = !!std && n !== std;
     if (j.result === 'correct') {
-      feedback('correct', K('[正解:せいかい]！'), it.again ? K('[今度:こんど]は [書:か]けたね。[別:べつ]の [日:ひ]にも [書:か]けたら「[覚:おぼ]えた」に なるよ。') : '', true, false);
+      feedback('correct', K('[正解:せいかい]！'), it.peeked ? peekNote() : it.again ? K('[今度:こんど]は [書:か]けたね。[別:べつ]の [日:ひ]にも [書:か]けたら「[覚:おぼ]えた」に なるよ。') : '', true, false);
       finishItem('correct');
+      if (it.peeked) pending = 'recog';   // 書き順を見たあとの正解は 記録に入れない
     } else if (mismatch && !it.strokeHinted) {
       it.strokeHinted = true;
-      feedback('retry', std + K('[画:かく]で [書:か]いてみよう'), K('[今:いま]は ') + n + K('[画:かく] だったよ。1[画:かく]ずつ [離:はな]して [書:か]こう。'), false, false);
+      feedback('retry', std + K('[画:かく]で [書:か]いてみよう'), K('[今:いま]は ') + n + K('[画:かく] だったよ。1[画:かく]ずつ [離:はな]して [書:か]こう。'), false, false, [it.ch]);
       pad.clear();
     } else if (j.result === 'retry' && it.tries < MAX_RETRY) {
       feedback('retry', K('もう[一度:いちど] ていねいに [書:か]いてね'), K('うまく [読:よ]み[取:と]れなかったよ（') + it.tries + ' / ' + MAX_RETRY + '）', false, false);
@@ -924,15 +1001,18 @@
     var bad = it.parts.filter(function (q) { return !q.ok; });
     var names = function (l) { return l.map(function (q) { return (it.parts.indexOf(q) + 1) + K('[字:じ][目:め]'); }).join('・'); };
     if (!bad.length) {
-      feedback('correct', K('[正解:せいかい]！'), '', true, false);
+      feedback('correct', K('[正解:せいかい]！'), it.peeked ? peekNote() : '', true, false);
       finishItem('correct');
+      if (it.peeked) pending = 'recog';   // applyRec で 出題の字も 'recog' になる
     } else if (it.tries < MAX_RETRY && bad.every(function (q) { return q.res === 'retry' || (q.mismatch && !q.hinted); })) {
       // 読み取りにくかった字・画数がちがった字だけ、もう一度書く（書けた字はそのまま）
       bad.forEach(function (q) { if (q.mismatch) q.hinted = true; q.thumb = ''; q.strokes = null; });
       it.pi = it.parts.indexOf(bad[0]); it.mq.state.cur = it.pi;
       paintWord();
-      var hint = bad.filter(function (q) { return q.mismatch; }).map(function (q) { return (it.parts.indexOf(q) + 1) + K('[字:じ][目:め]は ') + STD_STROKES[q.ch] + K('[画:かく]'); }).join('、');
-      feedback('retry', names(bad) + K('を もう[一度:いちど] ていねいに [書:か]いてね'), hint ? hint + K('で [書:か]いてみよう') : K('うまく [読:よ]み[取:と]れなかったよ（') + it.tries + ' / ' + MAX_RETRY + '）', false, false);
+      var hinted = bad.filter(function (q) { return q.mismatch; });
+      var hint = hinted.map(function (q) { return (it.parts.indexOf(q) + 1) + K('[字:じ][目:め]は ') + STD_STROKES[q.ch] + K('[画:かく]'); }).join('、');
+      var orderChars = hinted.map(function (q) { return q.ch; }).filter(function (c, i, a) { return a.indexOf(c) === i; });
+      feedback('retry', names(bad) + K('を もう[一度:いちど] ていねいに [書:か]いてね'), hint ? hint + K('で [書:か]いてみよう') : K('うまく [読:よ]み[取:と]れなかったよ（') + it.tries + ' / ' + MAX_RETRY + '）', false, false, orderChars.length ? orderChars : null);
       pad.clear(); showCount(0); updateAnswerBtn();
     } else if (bad.every(function (q) { return q.res === 'retry'; })) {
       feedback('recog', K('[読:よ]み[取:と]れませんでした'), K('[間違:まちが]いには しません。[答:こた]えは この [言葉:ことば]です。'), true, false);
@@ -1005,6 +1085,7 @@
         var o = { ch: x.ch, q: x.q.id, result: x.result, tries: x.tries, seenAs: x.seenAs, top: x.top || null };
         if (x.word) o.word = x.word;
         if (x.again) o.again = true;
+        if (x.peeked) o.peeked = true;   // テスト中に書き順を見た（正解でも記録に入れない）
         if (x.result !== 'correct') o.strokes = x.strokes;   // まちがい・読み取れなかった字の筆跡（読み取り改善用、この端末だけ）
         return o;
       }) });
@@ -1133,11 +1214,12 @@
     $('dNext').textContent = drill.idx + 1 < n ? K('[次:つぎ]の [字:じ] ▶') : K('おわる ▶');
     $('dPos').textContent = (drill.idx + 1) + ' / ' + n + K('[字:じ]');
     dShowStep();
+    dFitPad();
   }
   $('dPrev').onclick = function () { if (!drill || dBusy || drill.idx === 0) return; drill.idx--; dShowChar(); };
   $('dNext').onclick = function () { if (!drill || dBusy) return; dNextChar(); };
   function dShowStep() {
-    var it = dCur(), k = KANJI[it.ch], step = DSTEPS[it.step];
+    var it = dCur(), step = DSTEPS[it.step];
     $('dSteps').innerHTML = DSTEPS.map(function (s, i) {
       return '<li class="' + (i < it.step ? 'done' : i === it.step ? 'now' : '') + '"><button type="button" data-s="' + i + '" aria-pressed="' + (i === it.step) + '">' + (i + 1) + '. ' + K(s.label) + (s.times > 1 && i === it.step ? '（' + (it.count + 1) + '/' + s.times + '）' : '') + '</button></li>';
     }).join('');
@@ -1145,11 +1227,23 @@
     Array.prototype.forEach.call($('dSteps').querySelectorAll('button'), function (b) {
       b.onclick = function () { dGoStep(+b.dataset.s); };
     });
-    var hide = step.key === 'recall' && !it.peek;
-    $('dModel').innerHTML = hide ? '<div class="hidden-ch" aria-label="' + K('かくれて いるよ') + '">？</div>' :
-      orderSvg(it.ch, it.step === 0 && it.count === 0) + '<div class="bigch" aria-hidden="true">' + esc(it.ch) + '</div>';
-    if (!hide) $('dModel').insertAdjacentHTML('beforeend', '<button class="btn replay" id="dReplay">▶ ' + K('[書:か]き[順:じゅん]') + '</button>');
-    if ($('dReplay')) $('dReplay').onclick = function () { var svg = $('dModel').querySelector('.order'); if (svg) svg.outerHTML = orderSvg(it.ch, true); };
+    var c = dCard(it, it.step, it.peek, it.step === 0 && it.count === 0);
+    $('dModel').innerHTML = c.model;
+    $('dInfo').innerHTML = c.info;
+    dBindReplay();
+    $('dMsg').textContent = step.key === 'trace' ? K('うすい [字:じ]を なぞって [書:か]こう。[書:か]き[順:じゅん]に [気:き]を つけてね') :
+      step.key === 'copy' ? K('[左:ひだり]の お[手本:てほん]を [見:み]ながら [書:か]こう') : K('お[手本:てほん]を [見:み]ないで [書:か]けるかな？');
+    $('dMsg').className = 'dmsg';
+    dpad.setGuide(step.key === 'trace' ? it.ch : null); dpad.setInk(null); dpad.lock(false); dpad.clear();
+    $('dPad').classList.remove('ok', 'ng');
+    dShowCount(0); dUpdateBtns();
+  }
+  // お手本（書き順）と 読み・画数・言葉の HTML。s = 段階、peek = 見ないで書くときに お手本を見せるか
+  function dCard(it, s, peek, animate) {
+    var k = KANJI[it.ch];
+    var hide = DSTEPS[s].key === 'recall' && !peek;
+    var model = hide ? '<div class="hidden-ch" aria-label="' + K('かくれて いるよ') + '">？</div>' :
+      orderSvg(it.ch, animate) + '<div class="bigch" aria-hidden="true">' + esc(it.ch) + '</div><button class="btn replay" id="dReplay">▶ ' + K('[書:か]き[順:じゅん]') + '</button>';
     // 読み・画数・言葉。見ないで書くときは、問題の文（空欄つき）で思い出す
     var yomi = [].concat(k.on, k.kun).filter(Boolean).join('・') || '—';
     var info = '<dl><dt>' + K('[読:よ]み') + '</dt><dd>' + esc(yomi) + '</dd><dt>' + K('[画数:かくすう]') + '</dt><dd>' + (STD_STROKES[it.ch] || '—') + K('[画:かく]') + '</dd></dl>';
@@ -1160,14 +1254,47 @@
     });
     if (ws.length) info += '<div class="dword"><span class="lb">' + K('この [字:じ]を つかう [言葉:ことば]') + '</span>' + ws.join('') + '</div>';
     if (hide && QUESTIONS[it.ch]) { var q = QUESTIONS[it.ch][0]; info += '<p class="sub" style="margin:.6em 0 .2em">' + K('[四角:しかく]に [入:はい]る [漢字:かんじ]を [書:か]こう') + '</p><div class="qtext qline">' + renderQ(q, 'test') + '</div>'; }
-    $('dInfo').innerHTML = info;
-    $('dMsg').textContent = step.key === 'trace' ? K('うすい [字:じ]を なぞって [書:か]こう。[書:か]き[順:じゅん]に [気:き]を つけてね') :
-      step.key === 'copy' ? K('[左:ひだり]の お[手本:てほん]を [見:み]ながら [書:か]こう') : K('お[手本:てほん]を [見:み]ないで [書:か]けるかな？');
-    $('dMsg').className = 'dmsg';
-    dpad.setGuide(step.key === 'trace' ? it.ch : null); dpad.setInk(null); dpad.lock(false); dpad.clear();
-    $('dPad').classList.remove('ok', 'ng');
-    dShowCount(0); dUpdateBtns();
+    return { model: model, info: info };
   }
+  function dBindReplay() {
+    var it = dCur();
+    if ($('dReplay')) $('dReplay').onclick = function () { var svg = $('dModel').querySelector('.order'); if (svg) svg.outerHTML = orderSvg(it.ch, true); };
+  }
+  // 書く枠の大きさ：お手本・知らせ・ボタン・前後の字まで 1画面に収まるように決める（テストの fitPad と同じ考え方）。
+  // 1字のあいだは大きさを変えない：説明の長さは段階で変わるので、いちばん長い段階に合わせて 字ごとに決める
+  function dFitPad() {
+    if (!drill || $('v-drillrun').hidden) return;
+    var it = dCur(), padEl = $('dPad'), w = padEl.parentNode, card = $('dModel').parentNode;
+    padEl.style.width = ''; padEl.style.alignSelf = ''; w.style.gridTemplateColumns = '';
+    var cr = card.getBoundingClientRect(), pr = padEl.getBoundingClientRect();
+    if (!pr.width) return;
+    var top = pr.top + window.scrollY;
+    if (pr.top >= cr.bottom - 1) {
+      // 枠が説明の下にあるとき：どの段階でも 枠が下がりすぎないように、写しを作って いちばん高い説明の高さを はかる
+      var cl = card.cloneNode(true);
+      Array.prototype.forEach.call(cl.querySelectorAll('[id]'), function (e) { e.removeAttribute('id'); });
+      cl.removeAttribute('id');
+      cl.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;left:0;top:0;box-sizing:border-box;width:' + cr.width + 'px';
+      card.parentNode.appendChild(cl);
+      var maxH = cr.height;
+      [[0, false], [1, false], [2, false], [2, true]].forEach(function (v) {
+        var c = dCard(it, v[0], v[1], false);
+        cl.querySelector('.dmodel').innerHTML = c.model; cl.querySelector('.dinfo').innerHTML = c.info;
+        maxH = Math.max(maxH, cl.getBoundingClientRect().height);
+      });
+      cl.remove();
+      top += maxH - cr.height;
+    }
+    var below = 0, grid = getComputedStyle(w).display === 'grid';
+    if (!grid) Array.prototype.forEach.call(w.children, function (c) { if (c !== padEl && !c.hidden) below += c.getBoundingClientRect().height + 8; });
+    var vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    var size = Math.floor(Math.max(180, Math.min(pr.width, vh - top - below - 10)));
+    if (size >= pr.width) return;
+    // 小さくするのは枠だけ（ボタンの列は はばを そのままにして、字が はみ出さないように）
+    if (grid) { var cols = getComputedStyle(w).gridTemplateColumns.split(' '); cols[0] = size + 'px'; w.style.gridTemplateColumns = cols.join(' '); }
+    else { padEl.style.width = (size - (pr.width - padEl.clientWidth)) + 'px'; padEl.style.alignSelf = 'center'; }
+  }
+  window.addEventListener('resize', function () { if (drill) dFitPad(); });
   function dGoStep(i) {
     if (!drill || dBusy || i === dCur().step) return;
     var it = dCur();
@@ -1361,15 +1488,17 @@
     var items = all.filter(function (x) { return !x.again; }), again = all.filter(function (x) { return x.again; });
     var ok = items.filter(function (x) { return x.result === 'correct'; }).length;
     var wrong = items.filter(function (x) { return x.result === 'wrong'; });
-    var recog = items.filter(function (x) { return x.result === 'recog'; }).length;
+    var recog = items.filter(function (x) { return x.result === 'recog' && !x.peeked; }).length;
+    var peeked = items.filter(function (x) { return x.result === 'recog' && x.peeked; }).length;
     $('rScore').textContent = ok;
     $('rOf').textContent = '/ ' + items.length + K(' [問:もん] [正解:せいかい]') + (lastResult.partial ? K('（[途中:とちゅう]で やめた ところまで）') : '');
     $('rNote').textContent = (wrong.length ? K('[間違:まちが]えた ') + wrong.length + K('字は [苦手:にがて]リストに [入:はい]りました。') : K('[間違:まちが]いは ありませんでした。')) +
       (recog ? K(' [読:よ]み[取:と]れなかった ') + recog + K('字は [間違:まちが]いに していません。') : '') +
+      (peeked ? K(' [書:か]き[順:じゅん]を [見:み]た ') + peeked + K('字は [記録:きろく]に [入:い]れていません。') : '') +
       (again.length ? K(' もう[一度:いちど]：') + again.filter(function (x) { return x.result === 'correct'; }).length + ' / ' + again.length + K('字 [書:か]けました。') : '');
     function row(x) {
       return '<div class="ritem' + (x.again ? ' again' : '') + '"><span class="k">' + esc(x.word || x.ch) + '</span><span class="q qline">' + renderQ(x.parts ? x.mq : x.q, x.result === 'correct' ? 'answer' : 'wrong') +
-        '</span><span class="pill ' + x.result + '">' + (x.again ? K('もう[一度:いちど] ') : '') + K(PILL[x.result]) + '</span></div>';
+        '</span><span class="pill ' + x.result + '">' + (x.again ? K('もう[一度:いちど] ') : '') + K(x.peeked && x.result === 'recog' ? '[書:か]き[順:じゅん]を [見:み]た' : PILL[x.result]) + '</span></div>';
     }
     $('rList').innerHTML = items.map(row).join('') + (again.length ? '<h3 class="rsub">' + K('もう[一度:いちど] [書:か]いた [漢字:かんじ]') + '</h3>' + again.map(row).join('') : '');
     $('rPrint').disabled = !wrong.length;
@@ -1491,10 +1620,114 @@
   $('pBack').onclick = function () { go(printFrom === 'result' && lastResult ? 'result' : 'weak'); };
 
   // ---------- データ ----------
+  /*
+   * 保存の保護: Safari などは しばらく開かないと サイトの保存データを消すことがある。
+   *  - navigator.storage.persist() で「消さないで」とお願いする（起動時に1回）
+   *  - 最後に書き出した日を覚えておき、14日以上たっていたら 書き出しをすすめる
+   */
+  var persistState = null;   // true = 消されない設定 / false = 消されることがある / null = 調べられない
+  var EXPORT_REMIND = 14 * 86400000;
+  function askPersist() {
+    try {
+      var st = navigator.storage;
+      if (!st || !st.persisted) return Promise.resolve();
+      return st.persisted().then(function (p) {
+        if (p || !st.persist) return p;
+        return st.persist();
+      }).then(function (p) { persistState = !!p; }, function () {});
+    } catch (e) { return Promise.resolve(); }
+  }
+  function lastExport() {
+    try { var v = +localStorage.getItem('kt-last-export'); return v > 0 ? v : 0; } catch (e) { return 0; }
+  }
+  function needExport() {
+    var n = Object.keys(Store.all()).length + Store.sessions().length;
+    return n > 0 && Store.persistent() && Date.now() - lastExport() > EXPORT_REMIND;
+  }
+  function updateExportHint(h) {
+    var el = $('fExpHint'); if (!el) return;
+    var on = h === 'home' && needExport();
+    el.hidden = !on;
+    if (on) el.textContent = K('[記録:きろく]の ひかえを [作:つく]ろう');
+  }
+  function fmtDate(t) { var d = new Date(t); return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日'; }
+  // 保存に失敗したとき（容量がいっぱい など）。じゃまにならないように しばらく出して消す
+  var saveErrTimer = null, saveErrAt = 0;
+  Store.onError = function () {
+    var el = $('saveErr'); if (!el) return;
+    if (Date.now() - saveErrAt < 3000 && !el.hidden) return;
+    saveErrAt = Date.now();
+    el.textContent = K('きろくを ほぞん できませんでした（ようりょうが いっぱいかも）');
+    el.hidden = false;
+    clearTimeout(saveErrTimer);
+    saveErrTimer = setTimeout(function () { el.hidden = true; }, 6000);
+  };
+  function escH(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
   function renderData() {
     var n = Object.keys(Store.all()).length, s = Store.sessions().length;
     $('dState').textContent = (Store.persistent() ? 'この端末に保存しています。' : 'この端末に保存できない設定のため、ページを閉じると記録は消えます。') +
       ' 記録のある字: ' + n + '字 ・ テストの回数: ' + s + '回';
+    var ps = $('dPersist');
+    ps.hidden = !Store.persistent();
+    ps.textContent = persistState ? 'この端末に ずっと保存する設定に なっています。' :
+      'ブラウザによっては、長い間このアプリを開かないと 記録が消えることがあります。ときどき ファイルに書き出しておくと安心です。';
+    var le = lastExport();
+    $('dLastExp').textContent = le ? '最後に書き出した日: ' + fmtDate(le) : 'まだ書き出していません。';
+    $('dRemind').hidden = !needExport();
+    renderReport();
+  }
+  // 保護者・先生向け: 最近14日間の日ごとの回数・正答数と、よくまちがえる字
+  function renderReport() {
+    var ss = Store.sessions(), DAYS = 14, today = new Date(); today.setHours(0, 0, 0, 0);
+    var days = [], byDay = {};
+    for (var i = 0; i < DAYS; i++) {
+      var d = new Date(today.getTime()); d.setDate(d.getDate() - i);
+      var o = { t: d.getTime(), n: 0, q: 0, ok: 0 }; days.push(o); byDay[o.t] = o;
+    }
+    var wrong = {};
+    ss.forEach(function (x) {
+      var items = (x.items || []).filter(function (it) { return it && !it.again; });
+      var d0 = new Date(x.at); d0.setHours(0, 0, 0, 0);
+      var day = byDay[d0.getTime()];
+      if (day) {
+        day.n++; day.q += items.length;
+        day.ok += items.filter(function (it) { return it.result === 'correct'; }).length;
+      }
+      (x.items || []).forEach(function (it) {
+        if (!it || it.result !== 'wrong' || !it.ch) return;
+        var w = wrong[it.ch] || (wrong[it.ch] = { ch: it.ch, n: 0, seen: {} });
+        w.n++;
+        if (it.seenAs && it.seenAs !== it.ch) w.seen[it.seenAs] = (w.seen[it.seenAs] || 0) + 1;
+      });
+    });
+    var WD = '日月火水木金土', maxQ = Math.max.apply(null, days.map(function (d) { return d.q; }).concat([1]));
+    var cap = function (t) { return '<caption class="sub" style="text-align:left;caption-side:bottom;padding-top:6px">' + t + '</caption>'; };
+    if (!days.some(function (d) { return d.n; })) $('dDays').innerHTML = '<p class="sub">この14日間のテストの記録はありません。</p>';
+    else {
+      var rows = days.map(function (d) {
+        var dt = new Date(d.t), lab = (dt.getMonth() + 1) + '/' + dt.getDate() + ' ' + WD[dt.getDay()];
+        return '<tr' + (d.n ? '' : ' class="zero"') + '><td class="nw">' + lab + '</td><td class="num">' + d.n + '回</td>' +
+          '<td class="num">' + (d.q ? d.ok + ' / ' + d.q : '—') + '</td>' +
+          '<td aria-hidden="true">' + (d.q ? '<span class="dbar"><i style="width:' + (100 * d.ok / maxQ).toFixed(1) + '%"></i></span>' : '') + '</td>' +
+          '<td class="num">' + (d.q ? Math.round(100 * d.ok / d.q) + '%' : '') + '</td></tr>';
+      }).join('');
+      $('dDays').innerHTML = '<table class="dtab">' + cap('正答 = 正答数 / 出題数。テストの最後に出る「もういちど」の問題はふくめません。') +
+        '<colgroup><col style="width:27%"><col style="width:15%"><col style="width:21%"><col><col style="width:14%"></colgroup>' +
+        '<thead><tr><th scope="col">日付</th><th scope="col" class="num">回数</th><th scope="col" class="num">正答</th><th scope="col" aria-hidden="true"></th><th scope="col" class="num">正答率</th></tr></thead>' +
+        '<tbody>' + rows + '</tbody></table>';
+    }
+    var list = Object.keys(wrong).map(function (k) { return wrong[k]; })
+      .sort(function (a, b) { return b.n - a.n || (a.ch < b.ch ? -1 : 1); }).slice(0, 10);
+    if (!list.length) $('dWrong').innerHTML = '<p class="sub">まちがえた字の記録はありません。</p>';
+    else $('dWrong').innerHTML = '<table class="dtab">' + cap('これまでのすべてのテストから数えています（多い順に10字）。「読み取った字」は、まちがえたときに いちばん多く読み取られた字です。') +
+      '<colgroup><col style="width:16%"><col style="width:24%"><col></colgroup>' +
+      '<thead><tr><th scope="col">字</th><th scope="col" class="num">まちがい</th><th scope="col">読み取った字</th></tr></thead><tbody>' +
+      list.map(function (w) {
+        var top = Object.keys(w.seen).sort(function (a, b) { return w.seen[b] - w.seen[a]; })[0];
+        return '<tr><td class="kj">' + escH(w.ch) + '</td><td class="num">' + w.n + '回</td><td class="seen">' +
+          (top ? '「<span class="kj">' + escH(top) + '</span>」に見えた（' + w.seen[top] + '回）' : '—') + '</td></tr>';
+      }).join('') + '</tbody></table>';
   }
   $('dExport').onclick = function () {
     try {
@@ -1504,6 +1737,8 @@
       a.download = 'kanji-tane-' + new Date().toISOString().slice(0, 10) + '.json';
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+      try { localStorage.setItem('kt-last-export', String(Date.now())); } catch (e) {}
+      renderData();
       $('dataMsg').textContent = '書き出しました。';
     } catch (e) { $('dataMsg').textContent = '書き出せませんでした。'; }
   };
@@ -1539,6 +1774,7 @@
 
   // ---------- はじめ ----------
   Store.init().then(function () {
+    if (Store.persistent()) askPersist().then(function () { if (location.hash === '#data') renderData(); });
     window.addEventListener('hashchange', route);
     route();
   });
