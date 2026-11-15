@@ -401,6 +401,26 @@ body.practicing #tNextRow { position: static; }
 .qrbox .sub { overflow-wrap: anywhere; }
 .prose ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 4px; }
 .msg { font-size: .9rem; min-height: 1.4em; }
+/* 学習データ：保存の保護・保護者向けの記録 */
+.dremind { background: var(--retry-bg); color: var(--ink); border-left: 4px solid var(--retry); border-radius: 8px; padding: 8px 12px; font-size: .9rem; }
+#v-data { display: flex; flex-direction: column; gap: 16px; }
+#v-data[hidden] { display: none; }
+#dReport h2 { font-size: 1.1rem; margin: 0; }
+#dReport h3 { font-size: .95rem; margin: 6px 0 0; }
+.dtab { width: 100%; border-collapse: collapse; font-size: .88rem; table-layout: fixed; }
+.dtab th, .dtab td { padding: 5px 6px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+.dtab th { color: var(--muted); font-weight: normal; font-size: .8rem; }
+.dtab .nw { white-space: nowrap; }
+.dtab .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.dtab .zero td { color: var(--muted); }
+.dbar { display: block; height: 10px; border-radius: 5px; background: var(--sky-soft); overflow: hidden; }
+.dbar i { display: block; height: 100%; background: var(--ok); }
+.dtab .kj { font-family: var(--font-kanji); font-size: 1.35rem; line-height: 1.2; }
+.dtab .seen { overflow-wrap: anywhere; }
+.saveerr { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); margin: 0 auto; z-index: 50; width: fit-content; max-width: 560px;
+  background: var(--ng-bg); color: var(--ink); border: 1px solid var(--ng); border-radius: 12px; padding: 10px 14px; font-size: .9rem; box-shadow: 0 4px 16px rgba(0,0,0,.18); }
+.saveerr[hidden] { display: none; }
+footer a.fhint { color: var(--retry); }
 footer { font-size: .78rem; color: var(--muted); display: flex; gap: 6px 16px; flex-wrap: wrap; }
 footer a, footer button { color: var(--muted); background: none; border: none; padding: 0; text-decoration: underline; cursor: pointer; font-size: .78rem; min-height: 32px; }
 
@@ -675,6 +695,9 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
     <div class="card prose">
       <div class="row" style="justify-content:space-between"><h1 data-k="[学習:がくしゅう] データ">がくしゅう データ</h1><a class="back" href="#home" role="button" style="display:inline-flex;align-items:center;text-decoration:none;color:inherit" data-k="もどる">もどる</a></div>
       <p id="dState"></p>
+      <p id="dPersist"></p>
+      <p class="dremind" id="dRemind" role="note" hidden>しばらく書き出していません。端末の空き容量が少ないときや、長い間このアプリを開かなかったときに、ブラウザが記録を消してしまうことがあります。ときどき「ファイルに書き出す」で控えを作ってください。</p>
+      <p id="dLastExp"></p>
       <p>学習の記録は、この端末のブラウザの中だけに保存されています。別の端末に移すときや、念のための控えには、ファイルに書き出してください。</p>
       <div class="row">
         <button class="btn small" id="dExport">ファイルに書き出す</button>
@@ -685,6 +708,13 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
         <button class="btn small" id="dReset">学習の記録をすべて消す</button>
       </div>
       <p class="msg" id="dataMsg" role="status"></p>
+    </div>
+    <div class="card prose" id="dReport">
+      <h2>保護者・先生向けの記録</h2>
+      <h3>最近14日間のテスト</h3>
+      <div id="dDays"></div>
+      <h3>よくまちがえる字</h3>
+      <div id="dWrong"></div>
     </div>
   </section>
 
@@ -728,9 +758,11 @@ footer a, footer button { color: var(--muted); background: none; border: none; p
     </div>
   </section>
 
+  <div class="saveerr" id="saveErr" role="status" aria-live="polite" hidden></div>
   <footer>
     <a href="#data" data-k="[学習:がくしゅう] データ">がくしゅう データ</a>
     <a href="#about" data-k="このアプリについて">このアプリについて</a>
+    <a href="#data" class="fhint" id="fExpHint" hidden></a>
   </footer>
 </div>
 

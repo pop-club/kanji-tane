@@ -267,6 +267,7 @@
     if (h === 'data') renderData();
     if (h === 'about') renderAbout();
     show(h);
+    updateExportHint(h);
   }
   function go(h) { if (location.hash === '#' + h) route(); else location.hash = h; }
 
@@ -1491,10 +1492,114 @@
   $('pBack').onclick = function () { go(printFrom === 'result' && lastResult ? 'result' : 'weak'); };
 
   // ---------- データ ----------
+  /*
+   * 保存の保護: Safari などは しばらく開かないと サイトの保存データを消すことがある。
+   *  - navigator.storage.persist() で「消さないで」とお願いする（起動時に1回）
+   *  - 最後に書き出した日を覚えておき、14日以上たっていたら 書き出しをすすめる
+   */
+  var persistState = null;   // true = 消されない設定 / false = 消されることがある / null = 調べられない
+  var EXPORT_REMIND = 14 * 86400000;
+  function askPersist() {
+    try {
+      var st = navigator.storage;
+      if (!st || !st.persisted) return Promise.resolve();
+      return st.persisted().then(function (p) {
+        if (p || !st.persist) return p;
+        return st.persist();
+      }).then(function (p) { persistState = !!p; }, function () {});
+    } catch (e) { return Promise.resolve(); }
+  }
+  function lastExport() {
+    try { var v = +localStorage.getItem('kt-last-export'); return v > 0 ? v : 0; } catch (e) { return 0; }
+  }
+  function needExport() {
+    var n = Object.keys(Store.all()).length + Store.sessions().length;
+    return n > 0 && Store.persistent() && Date.now() - lastExport() > EXPORT_REMIND;
+  }
+  function updateExportHint(h) {
+    var el = $('fExpHint'); if (!el) return;
+    var on = h === 'home' && needExport();
+    el.hidden = !on;
+    if (on) el.textContent = K('[記録:きろく]の ひかえを [作:つく]ろう');
+  }
+  function fmtDate(t) { var d = new Date(t); return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日'; }
+  // 保存に失敗したとき（容量がいっぱい など）。じゃまにならないように しばらく出して消す
+  var saveErrTimer = null, saveErrAt = 0;
+  Store.onError = function () {
+    var el = $('saveErr'); if (!el) return;
+    if (Date.now() - saveErrAt < 3000 && !el.hidden) return;
+    saveErrAt = Date.now();
+    el.textContent = K('きろくを ほぞん できませんでした（ようりょうが いっぱいかも）');
+    el.hidden = false;
+    clearTimeout(saveErrTimer);
+    saveErrTimer = setTimeout(function () { el.hidden = true; }, 6000);
+  };
+  function escH(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
   function renderData() {
     var n = Object.keys(Store.all()).length, s = Store.sessions().length;
     $('dState').textContent = (Store.persistent() ? 'この端末に保存しています。' : 'この端末に保存できない設定のため、ページを閉じると記録は消えます。') +
       ' 記録のある字: ' + n + '字 ・ テストの回数: ' + s + '回';
+    var ps = $('dPersist');
+    ps.hidden = !Store.persistent();
+    ps.textContent = persistState ? 'この端末に ずっと保存する設定に なっています。' :
+      'ブラウザによっては、長い間このアプリを開かないと 記録が消えることがあります。ときどき ファイルに書き出しておくと安心です。';
+    var le = lastExport();
+    $('dLastExp').textContent = le ? '最後に書き出した日: ' + fmtDate(le) : 'まだ書き出していません。';
+    $('dRemind').hidden = !needExport();
+    renderReport();
+  }
+  // 保護者・先生向け: 最近14日間の日ごとの回数・正答数と、よくまちがえる字
+  function renderReport() {
+    var ss = Store.sessions(), DAYS = 14, today = new Date(); today.setHours(0, 0, 0, 0);
+    var days = [], byDay = {};
+    for (var i = 0; i < DAYS; i++) {
+      var d = new Date(today.getTime()); d.setDate(d.getDate() - i);
+      var o = { t: d.getTime(), n: 0, q: 0, ok: 0 }; days.push(o); byDay[o.t] = o;
+    }
+    var wrong = {};
+    ss.forEach(function (x) {
+      var items = (x.items || []).filter(function (it) { return it && !it.again; });
+      var d0 = new Date(x.at); d0.setHours(0, 0, 0, 0);
+      var day = byDay[d0.getTime()];
+      if (day) {
+        day.n++; day.q += items.length;
+        day.ok += items.filter(function (it) { return it.result === 'correct'; }).length;
+      }
+      (x.items || []).forEach(function (it) {
+        if (!it || it.result !== 'wrong' || !it.ch) return;
+        var w = wrong[it.ch] || (wrong[it.ch] = { ch: it.ch, n: 0, seen: {} });
+        w.n++;
+        if (it.seenAs && it.seenAs !== it.ch) w.seen[it.seenAs] = (w.seen[it.seenAs] || 0) + 1;
+      });
+    });
+    var WD = '日月火水木金土', maxQ = Math.max.apply(null, days.map(function (d) { return d.q; }).concat([1]));
+    var cap = function (t) { return '<caption class="sub" style="text-align:left;caption-side:bottom;padding-top:6px">' + t + '</caption>'; };
+    if (!days.some(function (d) { return d.n; })) $('dDays').innerHTML = '<p class="sub">この14日間のテストの記録はありません。</p>';
+    else {
+      var rows = days.map(function (d) {
+        var dt = new Date(d.t), lab = (dt.getMonth() + 1) + '/' + dt.getDate() + ' ' + WD[dt.getDay()];
+        return '<tr' + (d.n ? '' : ' class="zero"') + '><td class="nw">' + lab + '</td><td class="num">' + d.n + '回</td>' +
+          '<td class="num">' + (d.q ? d.ok + ' / ' + d.q : '—') + '</td>' +
+          '<td aria-hidden="true">' + (d.q ? '<span class="dbar"><i style="width:' + (100 * d.ok / maxQ).toFixed(1) + '%"></i></span>' : '') + '</td>' +
+          '<td class="num">' + (d.q ? Math.round(100 * d.ok / d.q) + '%' : '') + '</td></tr>';
+      }).join('');
+      $('dDays').innerHTML = '<table class="dtab">' + cap('正答 = 正答数 / 出題数。テストの最後に出る「もういちど」の問題はふくめません。') +
+        '<colgroup><col style="width:27%"><col style="width:15%"><col style="width:21%"><col><col style="width:14%"></colgroup>' +
+        '<thead><tr><th scope="col">日付</th><th scope="col" class="num">回数</th><th scope="col" class="num">正答</th><th scope="col" aria-hidden="true"></th><th scope="col" class="num">正答率</th></tr></thead>' +
+        '<tbody>' + rows + '</tbody></table>';
+    }
+    var list = Object.keys(wrong).map(function (k) { return wrong[k]; })
+      .sort(function (a, b) { return b.n - a.n || (a.ch < b.ch ? -1 : 1); }).slice(0, 10);
+    if (!list.length) $('dWrong').innerHTML = '<p class="sub">まちがえた字の記録はありません。</p>';
+    else $('dWrong').innerHTML = '<table class="dtab">' + cap('これまでのすべてのテストから数えています（多い順に10字）。「読み取った字」は、まちがえたときに いちばん多く読み取られた字です。') +
+      '<colgroup><col style="width:16%"><col style="width:24%"><col></colgroup>' +
+      '<thead><tr><th scope="col">字</th><th scope="col" class="num">まちがい</th><th scope="col">読み取った字</th></tr></thead><tbody>' +
+      list.map(function (w) {
+        var top = Object.keys(w.seen).sort(function (a, b) { return w.seen[b] - w.seen[a]; })[0];
+        return '<tr><td class="kj">' + escH(w.ch) + '</td><td class="num">' + w.n + '回</td><td class="seen">' +
+          (top ? '「<span class="kj">' + escH(top) + '</span>」に見えた（' + w.seen[top] + '回）' : '—') + '</td></tr>';
+      }).join('') + '</tbody></table>';
   }
   $('dExport').onclick = function () {
     try {
@@ -1504,6 +1609,8 @@
       a.download = 'kanji-tane-' + new Date().toISOString().slice(0, 10) + '.json';
       document.body.appendChild(a); a.click(); a.remove();
       setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+      try { localStorage.setItem('kt-last-export', String(Date.now())); } catch (e) {}
+      renderData();
       $('dataMsg').textContent = '書き出しました。';
     } catch (e) { $('dataMsg').textContent = '書き出せませんでした。'; }
   };
@@ -1539,6 +1646,7 @@
 
   // ---------- はじめ ----------
   Store.init().then(function () {
+    if (Store.persistent()) askPersist().then(function () { if (location.hash === '#data') renderData(); });
     window.addEventListener('hashchange', route);
     route();
   });

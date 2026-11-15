@@ -45,7 +45,11 @@
         t.objectStore(name).put(value);
         t.oncomplete = function () { resolve(true); };
         t.onerror = function () { resolve(false); };
+        t.onabort = function () { resolve(false); };   // 容量オーバー（QuotaExceededError）は abort になる
       } catch (e) { resolve(false); }
+    }).then(function (ok) {
+      if (!ok && typeof Store.onError === 'function') { try { Store.onError(name); } catch (e) {} }
+      return ok;
     });
   }
   function clearStore(name) {
@@ -72,6 +76,7 @@
       });
     },
     persistent: function () { return persistent; },
+    onError: null,   // 保存に失敗したときに呼ぶ（app.js が設定する）
     get: function (ch) { return kanji[ch] || null; },
     all: function () { return kanji; },
     save: function (rec) { kanji[rec.char] = rec; return write('kanji', rec); },
