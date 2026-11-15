@@ -366,9 +366,80 @@ body.practicing #tNextRow { position: static; }
   .dword b { font-size: 1.3rem; }
   .dsteps li button { font-size: .8rem; padding: 4px 9px; min-height: 28px; }
 }
+/* スマホ（縦・横）の練習：お手本を左、読み・言葉を右に ならべて 低くし、書く枠とボタンが1画面に収まるように（枠の大きさは js の dFitPad） */
+@media (max-width: 600px), (max-height: 560px) {
+  body.testing #v-drillrun { display: flex; flex-direction: column; gap: 10px; }
+  #v-drillrun .testgrid { gap: 10px; }
+  #v-drillrun .testgrid .col { gap: 10px !important; }
+  #v-drillrun .writer { gap: 8px; }
+  .dcard { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 12px; padding: 10px 12px; align-items: start; }
+  .dcard > .dtarget, .dcard > .dsteps { grid-column: 1 / -1; }
+  .dtarget { padding: 4px 10px; } .dtarget b { font-size: 1.5rem; }
+  .dmodel { display: contents; }
+  .dmodel .order, .dmodel .hidden-ch { order: 1; grid-column: 1; grid-row: span 2; width: min(30vw, 116px); }
+  .dmodel .hidden-ch { font-size: 2.4rem; }
+  .dmodel .bigch { display: none; }
+  .dcard > .dinfo { order: 2; grid-column: 2; font-size: .88rem; }
+  .dmodel .replay { order: 3; grid-column: 2; justify-self: start; min-height: 34px; padding: 0 12px; font-size: .8rem; }
+  .dinfo dl { display: grid; grid-template-columns: auto 1fr; gap: 0 10px; font-size: .88rem; }
+  .dinfo dd { margin: 0; }
+  .dword { gap: 2px 8px; margin-top: 2px; }
+  .dword .lb { display: none; }
+  .dword b { font-size: 1.15rem; }
+  .dinfo .qline { font-size: 1.05rem; }
+  .dinfo .sub { font-size: .78rem; margin: .3em 0 .1em !important; }
+  .dmsg { font-size: .85rem; line-height: 1.35; min-height: 2.7em; display: flex; align-items: center; justify-content: center; }
+  #v-drillrun .controls .btn { min-height: 52px; font-size: .95rem; }
+  .dnav .btn { min-height: 40px; font-size: .9rem; }
+  .dnav .wn { display: none; }   /* 何字目かは 上の 1 / 5 に出ている */
+  .dnav .btn { flex: 1 1 0; }
+}
+/* 低いスマホ（SE など）：お手本を小さく、言葉は1つだけ */
+@media (max-width: 600px) and (max-height: 740px) {
+  .dcard { padding: 8px 10px; gap: 6px 10px; }
+  .dmodel .order, .dmodel .hidden-ch { width: min(28vw, 96px); }
+  .dword .w ~ .w { display: none; }
+  .dinfo .sub { display: none; }
+  .dinfo dt:nth-of-type(2), .dinfo dd:nth-of-type(2) { display: none; }   /* 画数は 枠の左上（0 / 3かく）に出ている */
+  .dinfo dd { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+  .dinfo .qline { font-size: 1rem; }
+  .dmodel .replay { min-height: 32px; }
+  #v-drillrun .controls .btn { min-height: 48px; }
+  .dnav .btn { min-height: 38px; }
+}
+@media (max-width: 360px) {
+  .controls .btn { min-width: 0; white-space: normal; line-height: 1.15; font-size: .85rem !important; padding: 0 4px; }   /* ボタンの字が 画面の外に はみ出さないように */
+  .dsteps { gap: 3px; flex-wrap: nowrap; }
+  .dsteps li button { font-size: .68rem; padding: 3px 6px; white-space: nowrap; letter-spacing: -.02em; }
+}
+/* スマホ横向きの練習：右の細い列（知らせ・ボタン・前後の字）を つめる */
+@media (max-height: 560px) and (orientation: landscape) {
+  #v-drillrun .writer { grid-template-rows: auto auto 1fr; }
+  .dmsg { font-size: .74rem; min-height: 4.1em; }
+  #v-drillrun .controls .btn { min-height: 42px; font-size: .85rem; }
+  .dnav { flex-direction: row !important; flex-wrap: wrap; }
+  .dnav .wn { display: none; }
+  .dnav .btn { flex: 1 1 0; min-height: 38px; font-size: .72rem; padding: 0 4px; }
+}
 .fb .misjudge { background: none; border: none; color: var(--muted); text-decoration: underline; font-size: .85rem; cursor: pointer; padding: 0; align-self: flex-start; min-height: 36px; }
 .fb .misjudge:disabled { cursor: wait; text-decoration: none; opacity: .7; }
+.fb .misjudge.armed { color: var(--retry); font-weight: 700; text-decoration: none; border: 2px solid var(--retry); border-radius: 10px; padding: 0 10px; background: var(--surface); }
 .fb .rmsg { font-size: .85rem; color: var(--muted); }
+/* テストの画数ヒントのあとの「かきじゅんを みる」と、書き順を見せる小さな窓 */
+.fb .orderbtn { display: inline-flex; align-items: center; vertical-align: middle; min-height: 32px; margin: 2px 0; padding: 0 10px; border: 2px solid var(--sky); border-radius: 99px; background: var(--surface); color: var(--sky); font: inherit; font-size: .85rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.orderpop { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(20, 40, 60, .45); }
+.orderpop[hidden] { display: none; }
+.orderpop .box { background: var(--surface); color: var(--ink); border-radius: var(--r); padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; max-width: min(100%, 460px); max-height: 100%; overflow: auto; box-shadow: 0 10px 40px rgba(20, 40, 60, .3); }
+.orderpop .svgs { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.orderpop .order { width: min(64vw, 46vh, 240px); aspect-ratio: 1; background: var(--surface); border: 2px solid var(--line); border-radius: var(--r); }
+.orderpop .svgs.many .order { width: min(38vw, 34vh, 180px); }
+.orderpop .order path { fill: none; stroke: var(--stroke); stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
+.orderpop .order path.ghost { stroke: var(--guide); }
+.orderpop .order text { font-size: 15px; font-weight: 700; fill: var(--accent); }
+.orderpop .bigch { font-family: var(--font-kanji); font-size: min(30vw, 30vh, 9rem); line-height: 1; }
+.orderpop .note { margin: 0; color: var(--muted); font-size: .9rem; font-weight: 700; text-align: center; }
+.orderpop .row { gap: 10px; flex-wrap: nowrap; }
+.orderpop .row .btn { min-height: 48px; padding: 0 16px; flex: 1 1 auto; white-space: nowrap; }
 .fb .rmsg.ok { color: var(--ok); }
 .fb .rmsg.ng { color: var(--retry); }
 

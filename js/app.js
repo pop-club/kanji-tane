@@ -246,6 +246,7 @@
     // テスト中は モードを切りかえられない（ボタンを おせない見た目にする）
     Array.prototype.forEach.call(document.querySelectorAll('#modeSw button'), function (b) { b.disabled = name === 'test' || name === 'drillrun'; });
     if (name === 'test' && pad) setTimeout(function () { fitPad(); pad.redraw(); }, 0);
+    if (name === 'drillrun' && dpad) setTimeout(dFitPad, 0);
   }
   function route() {
     var h = (location.hash || '#home').slice(1);
@@ -736,16 +737,19 @@
     return '<dl><dt>' + K('[読:よ]み') + '</dt><dd>' + esc(yomi) + '</dd><dt>' + K('[意味:いみ]') + '</dt><dd>' + mean + '</dd>' +
       (k.words && k.words.length ? '<dt class="dw">' + K('[言葉:ことば]') + '</dt><dd class="kj dw">' + esc(k.words.slice(0, 4).join('　')) + '</dd>' : '') + '</dl>';
   }
-  function feedback(kind, verdict, detail, withInfo, misjudge) {
+  // order: 画数のヒントのとき、書き順を見られる字（「かきじゅんを みる」）
+  function feedback(kind, verdict, detail, withInfo, misjudge, order) {
     var it = cur();
     var showAns = kind !== 'retry';   // 書き直しのときは答えを見せない
     var html = '<div class="fb ' + kind + '" role="status"><div class="head">' + (showAns ? '<span class="ans' + (it.parts ? ' word' : '') + '">' + esc(it.parts ? it.word : it.ch) + '</span>' : '') + '<div><div class="verdict">' + verdict + '</div>' +
-      (detail ? '<div>' + detail + '</div>' : '') + '</div></div>' + (withInfo ? infoDl(it.ch) : '') +
+      (detail || order ? '<div>' + (detail || '') + (order ? ' <button type="button" class="orderbtn" id="tOrderBtn">▶ ' + K('[書:か]き[順:じゅん]を [見:み]る') + '</button>' : '') + '</div>' : '') + '</div></div>' + (withInfo ? infoDl(it.ch) : '') +
       (kind === 'wrong' || kind === 'recog' ? '<button class="btn practice" id="tPractice">✏️ ' + K('お[手本:てほん]を [見:み]て [練習:れんしゅう]する') + '</button><div class="pmsg" id="tPmsg" aria-live="polite"></div>' : '') +
       (misjudge ? '<button class="misjudge" id="tMis">' + K('[正:ただ]しく [書:か]いたのに [間違:まちが]いに なった') + '</button>' : '') +
       (kind === 'correct' ? '<button class="misjudge" id="tMisOk">' + K('[間違:まちが]えて [書:か]いたのに [正解:せいかい]に なった') + '</button>' : '') +
-      '<div class="rmsg" id="tRmsg" aria-live="polite" hidden></div></div>';
+      '<div class="rmsg" id="tRmsg" aria-live="polite" hidden></div></div>' +
+      (order ? '<div class="orderpop" id="tOrderPop" role="dialog" aria-modal="true" aria-label="' + esc(K('[書:か]き[順:じゅん]')) + '" hidden></div>' : '');
     $('tFb').innerHTML = html; $('tFb').hidden = false;
+    if (order) $('tOrderBtn').onclick = function () { showOrderPop(it, order); };
     setTimeout(fitPad, 0);
     // 間違えたときの練習は、練習モードと同じ画面（大きな書く枠）で1字だけ。終わったらテストに戻る
     if ($('tPractice')) $('tPractice').onclick = function () {
@@ -754,12 +758,24 @@
       if (c.parts) { var bad = c.parts.filter(function (p) { return p.res !== 'correct' && KANJI[p.ch]; }).map(function (p) { return p.ch; }); if (bad.length) list = bad.filter(function (x, i) { return bad.indexOf(x) === i; }); }
       startDrill(list, { back: 'test', word: c.word });
     };
-    // 判定ミスの報告：記録はすぐに直し（まちがい・正解のどちらにもしない）、REPORT_URL があれば分析用に送る
+    // 判定ミスの報告：まちがえて おさないように、1回めは「ほんとうに？」と聞く（4びょうで もとに もどる）。
+    // 2回めで 記録を直し（まちがい・正解のどちらにもしない）、REPORT_URL があれば分析用に送る
     function onMisjudge(type, label) {
       return function () {
         var btn = this;
         if (btn.disabled) return;
+        if (!btn.dataset.marked && !btn.dataset.armed) {
+          btn.dataset.armed = '1'; btn.dataset.label = btn.innerHTML;
+          btn.classList.add('armed');
+          btn.textContent = K('ほんとうに？ もう[一度:いちど] おすと [直:なお]します');
+          setTimeout(function () {
+            if (!btn.isConnected || !btn.dataset.armed || btn.dataset.marked) return;
+            delete btn.dataset.armed; btn.classList.remove('armed'); btn.innerHTML = btn.dataset.label;
+          }, 4000);
+          return;
+        }
         if (!btn.dataset.marked) {
+          delete btn.dataset.armed; btn.classList.remove('armed'); btn.innerHTML = btn.dataset.label;
           btn.dataset.marked = '1';
           pending = 'recog';
           $('tFb').firstChild.className = 'fb recog';
@@ -772,6 +788,25 @@
     }
     if (misjudge) $('tMis').onclick = onMisjudge('false_negative', K('[間違:まちが]いに しませんでした'));
     if ($('tMisOk')) $('tMisOk').onclick = onMisjudge('false_positive', K('[正解:せいかい]に しませんでした'));
+  }
+  // テスト中に書き順を見る（画数のヒントのあと）。見たら その問題は 正解でも 記録に入れない（'recog' あつかい）
+  function peekNote() { return K('[書:か]き[順:じゅん]を [見:み]たので、[記録:きろく]には [入:い]れないよ。'); }
+  function showOrderPop(it, chars) {
+    var pop = $('tOrderPop');
+    if (!pop) return;
+    it.peeked = true;
+    function paint() {
+      pop.innerHTML = '<div class="box"><div class="svgs' + (chars.length > 1 ? ' many' : '') + '">' + chars.map(function (ch) { return orderSvg(ch, true); }).join('') + '</div>' +
+        '<p class="note">' + K('[見:み]たときは [記録:きろく]に [入:い]れないよ') + '</p>' +
+        '<div class="row"><button type="button" class="btn" id="tOrderAgain">▶ ' + K('もう[一度:いちど]') + '</button><button type="button" class="btn primary" id="tOrderClose">' + K('とじる') + '</button></div></div>';
+      $('tOrderAgain').onclick = paint;
+      $('tOrderClose').onclick = function () { pop.hidden = true; pop.innerHTML = ''; try { $('tOrderBtn').focus({ preventScroll: true }); } catch (e) {} };
+      try { $('tOrderClose').focus({ preventScroll: true }); } catch (e) {}
+    }
+    pop.hidden = false;
+    paint();
+    pop.onclick = function (e) { if (e.target === pop) $('tOrderClose').onclick(); };
+    pop.onkeydown = function (e) { if (e.key === 'Escape') $('tOrderClose').onclick(); };
   }
   // 報告用の画像：書いた線だけを 白地に黒で 256×256 にかく（枠の点線・お手本・画面の色は入れない）
   function strokesImage(strokes) {
@@ -912,11 +947,12 @@
     // 1回めは画数のヒントを出して書き直し、2回めも画数がちがえば理由を伝えてまちがいにする。
     var std = STD_STROKES[it.ch], n = pad.strokes().length, mismatch = !!std && n !== std;
     if (j.result === 'correct') {
-      feedback('correct', K('[正解:せいかい]！'), it.again ? K('[今度:こんど]は [書:か]けたね。[別:べつ]の [日:ひ]にも [書:か]けたら「[覚:おぼ]えた」に なるよ。') : '', true, false);
+      feedback('correct', K('[正解:せいかい]！'), it.peeked ? peekNote() : it.again ? K('[今度:こんど]は [書:か]けたね。[別:べつ]の [日:ひ]にも [書:か]けたら「[覚:おぼ]えた」に なるよ。') : '', true, false);
       finishItem('correct');
+      if (it.peeked) pending = 'recog';   // 書き順を見たあとの正解は 記録に入れない
     } else if (mismatch && !it.strokeHinted) {
       it.strokeHinted = true;
-      feedback('retry', std + K('[画:かく]で [書:か]いてみよう'), K('[今:いま]は ') + n + K('[画:かく] だったよ。1[画:かく]ずつ [離:はな]して [書:か]こう。'), false, false);
+      feedback('retry', std + K('[画:かく]で [書:か]いてみよう'), K('[今:いま]は ') + n + K('[画:かく] だったよ。1[画:かく]ずつ [離:はな]して [書:か]こう。'), false, false, [it.ch]);
       pad.clear();
     } else if (j.result === 'retry' && it.tries < MAX_RETRY) {
       feedback('retry', K('もう[一度:いちど] ていねいに [書:か]いてね'), K('うまく [読:よ]み[取:と]れなかったよ（') + it.tries + ' / ' + MAX_RETRY + '）', false, false);
@@ -965,15 +1001,18 @@
     var bad = it.parts.filter(function (q) { return !q.ok; });
     var names = function (l) { return l.map(function (q) { return (it.parts.indexOf(q) + 1) + K('[字:じ][目:め]'); }).join('・'); };
     if (!bad.length) {
-      feedback('correct', K('[正解:せいかい]！'), '', true, false);
+      feedback('correct', K('[正解:せいかい]！'), it.peeked ? peekNote() : '', true, false);
       finishItem('correct');
+      if (it.peeked) pending = 'recog';   // applyRec で 出題の字も 'recog' になる
     } else if (it.tries < MAX_RETRY && bad.every(function (q) { return q.res === 'retry' || (q.mismatch && !q.hinted); })) {
       // 読み取りにくかった字・画数がちがった字だけ、もう一度書く（書けた字はそのまま）
       bad.forEach(function (q) { if (q.mismatch) q.hinted = true; q.thumb = ''; q.strokes = null; });
       it.pi = it.parts.indexOf(bad[0]); it.mq.state.cur = it.pi;
       paintWord();
-      var hint = bad.filter(function (q) { return q.mismatch; }).map(function (q) { return (it.parts.indexOf(q) + 1) + K('[字:じ][目:め]は ') + STD_STROKES[q.ch] + K('[画:かく]'); }).join('、');
-      feedback('retry', names(bad) + K('を もう[一度:いちど] ていねいに [書:か]いてね'), hint ? hint + K('で [書:か]いてみよう') : K('うまく [読:よ]み[取:と]れなかったよ（') + it.tries + ' / ' + MAX_RETRY + '）', false, false);
+      var hinted = bad.filter(function (q) { return q.mismatch; });
+      var hint = hinted.map(function (q) { return (it.parts.indexOf(q) + 1) + K('[字:じ][目:め]は ') + STD_STROKES[q.ch] + K('[画:かく]'); }).join('、');
+      var orderChars = hinted.map(function (q) { return q.ch; }).filter(function (c, i, a) { return a.indexOf(c) === i; });
+      feedback('retry', names(bad) + K('を もう[一度:いちど] ていねいに [書:か]いてね'), hint ? hint + K('で [書:か]いてみよう') : K('うまく [読:よ]み[取:と]れなかったよ（') + it.tries + ' / ' + MAX_RETRY + '）', false, false, orderChars.length ? orderChars : null);
       pad.clear(); showCount(0); updateAnswerBtn();
     } else if (bad.every(function (q) { return q.res === 'retry'; })) {
       feedback('recog', K('[読:よ]み[取:と]れませんでした'), K('[間違:まちが]いには しません。[答:こた]えは この [言葉:ことば]です。'), true, false);
@@ -1046,6 +1085,7 @@
         var o = { ch: x.ch, q: x.q.id, result: x.result, tries: x.tries, seenAs: x.seenAs, top: x.top || null };
         if (x.word) o.word = x.word;
         if (x.again) o.again = true;
+        if (x.peeked) o.peeked = true;   // テスト中に書き順を見た（正解でも記録に入れない）
         if (x.result !== 'correct') o.strokes = x.strokes;   // まちがい・読み取れなかった字の筆跡（読み取り改善用、この端末だけ）
         return o;
       }) });
@@ -1174,11 +1214,12 @@
     $('dNext').textContent = drill.idx + 1 < n ? K('[次:つぎ]の [字:じ] ▶') : K('おわる ▶');
     $('dPos').textContent = (drill.idx + 1) + ' / ' + n + K('[字:じ]');
     dShowStep();
+    dFitPad();
   }
   $('dPrev').onclick = function () { if (!drill || dBusy || drill.idx === 0) return; drill.idx--; dShowChar(); };
   $('dNext').onclick = function () { if (!drill || dBusy) return; dNextChar(); };
   function dShowStep() {
-    var it = dCur(), k = KANJI[it.ch], step = DSTEPS[it.step];
+    var it = dCur(), step = DSTEPS[it.step];
     $('dSteps').innerHTML = DSTEPS.map(function (s, i) {
       return '<li class="' + (i < it.step ? 'done' : i === it.step ? 'now' : '') + '"><button type="button" data-s="' + i + '" aria-pressed="' + (i === it.step) + '">' + (i + 1) + '. ' + K(s.label) + (s.times > 1 && i === it.step ? '（' + (it.count + 1) + '/' + s.times + '）' : '') + '</button></li>';
     }).join('');
@@ -1186,11 +1227,23 @@
     Array.prototype.forEach.call($('dSteps').querySelectorAll('button'), function (b) {
       b.onclick = function () { dGoStep(+b.dataset.s); };
     });
-    var hide = step.key === 'recall' && !it.peek;
-    $('dModel').innerHTML = hide ? '<div class="hidden-ch" aria-label="' + K('かくれて いるよ') + '">？</div>' :
-      orderSvg(it.ch, it.step === 0 && it.count === 0) + '<div class="bigch" aria-hidden="true">' + esc(it.ch) + '</div>';
-    if (!hide) $('dModel').insertAdjacentHTML('beforeend', '<button class="btn replay" id="dReplay">▶ ' + K('[書:か]き[順:じゅん]') + '</button>');
-    if ($('dReplay')) $('dReplay').onclick = function () { var svg = $('dModel').querySelector('.order'); if (svg) svg.outerHTML = orderSvg(it.ch, true); };
+    var c = dCard(it, it.step, it.peek, it.step === 0 && it.count === 0);
+    $('dModel').innerHTML = c.model;
+    $('dInfo').innerHTML = c.info;
+    dBindReplay();
+    $('dMsg').textContent = step.key === 'trace' ? K('うすい [字:じ]を なぞって [書:か]こう。[書:か]き[順:じゅん]に [気:き]を つけてね') :
+      step.key === 'copy' ? K('[左:ひだり]の お[手本:てほん]を [見:み]ながら [書:か]こう') : K('お[手本:てほん]を [見:み]ないで [書:か]けるかな？');
+    $('dMsg').className = 'dmsg';
+    dpad.setGuide(step.key === 'trace' ? it.ch : null); dpad.setInk(null); dpad.lock(false); dpad.clear();
+    $('dPad').classList.remove('ok', 'ng');
+    dShowCount(0); dUpdateBtns();
+  }
+  // お手本（書き順）と 読み・画数・言葉の HTML。s = 段階、peek = 見ないで書くときに お手本を見せるか
+  function dCard(it, s, peek, animate) {
+    var k = KANJI[it.ch];
+    var hide = DSTEPS[s].key === 'recall' && !peek;
+    var model = hide ? '<div class="hidden-ch" aria-label="' + K('かくれて いるよ') + '">？</div>' :
+      orderSvg(it.ch, animate) + '<div class="bigch" aria-hidden="true">' + esc(it.ch) + '</div><button class="btn replay" id="dReplay">▶ ' + K('[書:か]き[順:じゅん]') + '</button>';
     // 読み・画数・言葉。見ないで書くときは、問題の文（空欄つき）で思い出す
     var yomi = [].concat(k.on, k.kun).filter(Boolean).join('・') || '—';
     var info = '<dl><dt>' + K('[読:よ]み') + '</dt><dd>' + esc(yomi) + '</dd><dt>' + K('[画数:かくすう]') + '</dt><dd>' + (STD_STROKES[it.ch] || '—') + K('[画:かく]') + '</dd></dl>';
@@ -1201,14 +1254,47 @@
     });
     if (ws.length) info += '<div class="dword"><span class="lb">' + K('この [字:じ]を つかう [言葉:ことば]') + '</span>' + ws.join('') + '</div>';
     if (hide && QUESTIONS[it.ch]) { var q = QUESTIONS[it.ch][0]; info += '<p class="sub" style="margin:.6em 0 .2em">' + K('[四角:しかく]に [入:はい]る [漢字:かんじ]を [書:か]こう') + '</p><div class="qtext qline">' + renderQ(q, 'test') + '</div>'; }
-    $('dInfo').innerHTML = info;
-    $('dMsg').textContent = step.key === 'trace' ? K('うすい [字:じ]を なぞって [書:か]こう。[書:か]き[順:じゅん]に [気:き]を つけてね') :
-      step.key === 'copy' ? K('[左:ひだり]の お[手本:てほん]を [見:み]ながら [書:か]こう') : K('お[手本:てほん]を [見:み]ないで [書:か]けるかな？');
-    $('dMsg').className = 'dmsg';
-    dpad.setGuide(step.key === 'trace' ? it.ch : null); dpad.setInk(null); dpad.lock(false); dpad.clear();
-    $('dPad').classList.remove('ok', 'ng');
-    dShowCount(0); dUpdateBtns();
+    return { model: model, info: info };
   }
+  function dBindReplay() {
+    var it = dCur();
+    if ($('dReplay')) $('dReplay').onclick = function () { var svg = $('dModel').querySelector('.order'); if (svg) svg.outerHTML = orderSvg(it.ch, true); };
+  }
+  // 書く枠の大きさ：お手本・知らせ・ボタン・前後の字まで 1画面に収まるように決める（テストの fitPad と同じ考え方）。
+  // 1字のあいだは大きさを変えない：説明の長さは段階で変わるので、いちばん長い段階に合わせて 字ごとに決める
+  function dFitPad() {
+    if (!drill || $('v-drillrun').hidden) return;
+    var it = dCur(), padEl = $('dPad'), w = padEl.parentNode, card = $('dModel').parentNode;
+    padEl.style.width = ''; padEl.style.alignSelf = ''; w.style.gridTemplateColumns = '';
+    var cr = card.getBoundingClientRect(), pr = padEl.getBoundingClientRect();
+    if (!pr.width) return;
+    var top = pr.top + window.scrollY;
+    if (pr.top >= cr.bottom - 1) {
+      // 枠が説明の下にあるとき：どの段階でも 枠が下がりすぎないように、写しを作って いちばん高い説明の高さを はかる
+      var cl = card.cloneNode(true);
+      Array.prototype.forEach.call(cl.querySelectorAll('[id]'), function (e) { e.removeAttribute('id'); });
+      cl.removeAttribute('id');
+      cl.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;left:0;top:0;box-sizing:border-box;width:' + cr.width + 'px';
+      card.parentNode.appendChild(cl);
+      var maxH = cr.height;
+      [[0, false], [1, false], [2, false], [2, true]].forEach(function (v) {
+        var c = dCard(it, v[0], v[1], false);
+        cl.querySelector('.dmodel').innerHTML = c.model; cl.querySelector('.dinfo').innerHTML = c.info;
+        maxH = Math.max(maxH, cl.getBoundingClientRect().height);
+      });
+      cl.remove();
+      top += maxH - cr.height;
+    }
+    var below = 0, grid = getComputedStyle(w).display === 'grid';
+    if (!grid) Array.prototype.forEach.call(w.children, function (c) { if (c !== padEl && !c.hidden) below += c.getBoundingClientRect().height + 8; });
+    var vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    var size = Math.floor(Math.max(180, Math.min(pr.width, vh - top - below - 10)));
+    if (size >= pr.width) return;
+    // 小さくするのは枠だけ（ボタンの列は はばを そのままにして、字が はみ出さないように）
+    if (grid) { var cols = getComputedStyle(w).gridTemplateColumns.split(' '); cols[0] = size + 'px'; w.style.gridTemplateColumns = cols.join(' '); }
+    else { padEl.style.width = (size - (pr.width - padEl.clientWidth)) + 'px'; padEl.style.alignSelf = 'center'; }
+  }
+  window.addEventListener('resize', function () { if (drill) dFitPad(); });
   function dGoStep(i) {
     if (!drill || dBusy || i === dCur().step) return;
     var it = dCur();
@@ -1402,15 +1488,17 @@
     var items = all.filter(function (x) { return !x.again; }), again = all.filter(function (x) { return x.again; });
     var ok = items.filter(function (x) { return x.result === 'correct'; }).length;
     var wrong = items.filter(function (x) { return x.result === 'wrong'; });
-    var recog = items.filter(function (x) { return x.result === 'recog'; }).length;
+    var recog = items.filter(function (x) { return x.result === 'recog' && !x.peeked; }).length;
+    var peeked = items.filter(function (x) { return x.result === 'recog' && x.peeked; }).length;
     $('rScore').textContent = ok;
     $('rOf').textContent = '/ ' + items.length + K(' [問:もん] [正解:せいかい]') + (lastResult.partial ? K('（[途中:とちゅう]で やめた ところまで）') : '');
     $('rNote').textContent = (wrong.length ? K('[間違:まちが]えた ') + wrong.length + K('字は [苦手:にがて]リストに [入:はい]りました。') : K('[間違:まちが]いは ありませんでした。')) +
       (recog ? K(' [読:よ]み[取:と]れなかった ') + recog + K('字は [間違:まちが]いに していません。') : '') +
+      (peeked ? K(' [書:か]き[順:じゅん]を [見:み]た ') + peeked + K('字は [記録:きろく]に [入:い]れていません。') : '') +
       (again.length ? K(' もう[一度:いちど]：') + again.filter(function (x) { return x.result === 'correct'; }).length + ' / ' + again.length + K('字 [書:か]けました。') : '');
     function row(x) {
       return '<div class="ritem' + (x.again ? ' again' : '') + '"><span class="k">' + esc(x.word || x.ch) + '</span><span class="q qline">' + renderQ(x.parts ? x.mq : x.q, x.result === 'correct' ? 'answer' : 'wrong') +
-        '</span><span class="pill ' + x.result + '">' + (x.again ? K('もう[一度:いちど] ') : '') + K(PILL[x.result]) + '</span></div>';
+        '</span><span class="pill ' + x.result + '">' + (x.again ? K('もう[一度:いちど] ') : '') + K(x.peeked && x.result === 'recog' ? '[書:か]き[順:じゅん]を [見:み]た' : PILL[x.result]) + '</span></div>';
     }
     $('rList').innerHTML = items.map(row).join('') + (again.length ? '<h3 class="rsub">' + K('もう[一度:いちど] [書:か]いた [漢字:かんじ]') + '</h3>' + again.map(row).join('') : '');
     $('rPrint').disabled = !wrong.length;
